@@ -1928,7 +1928,7 @@ int32 zSaveLoad_DoAutoSave()
 }
 
 // func_800AFB84
-#ifndef NON_MATCHING
+#ifdef NON_MATCHING
 #pragma GLOBAL_ASM("asm/Game/zSaveLoad.s", "zSaveLoad_SaveGame__Fv")
 #else
 // Reordering at beginning
@@ -2035,7 +2035,7 @@ int32 zSaveLoad_SaveGame()
     {
         int32 idx = xSGTgtPhysSlotIdx(xsgdata, use_tgt);
         asg->SetCache(use_tgt, use_game, idx);
-        globals.autoSaveFeature = 1;
+        globals.autoSaveFeature = 0;
         return 1;
     }
     asg->Discard();
@@ -2055,7 +2055,7 @@ int32 zSaveLoad_SaveGame()
 #endif
 
 // func_800AFE6C
-#ifndef NON_MATCHING
+#ifdef NON_MATCHING
 #pragma GLOBAL_ASM("asm/Game/zSaveLoad.s", "zSaveLoad_LoadGame__Fv")
 #else
 // Reordering, causing different register use at the end
@@ -2140,7 +2140,7 @@ int32 zSaveLoad_LoadGame()
     {
         int32 idx = xSGTgtPhysSlotIdx(xsgdata, use_tgt);
         asg->SetCache(use_tgt, use_game, idx);
-        globals.autoSaveFeature = 1;
+        globals.autoSaveFeature = 0;
         return 1;
     }
     asg->Discard();
@@ -2223,7 +2223,7 @@ uint32 zSaveLoad_LoadLoop()
                 zGameModeSwitch(eGameMode_Game);
                 zGameStateSwitch(0);
                 state = 6;
-                globals.autoSaveFeature = 1;
+                globals.autoSaveFeature = 0;
                 break;
             case 7:
                 zSaveLoad_DamagedSaveGameErrorPrompt(1);
