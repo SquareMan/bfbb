@@ -23,9 +23,26 @@ static int32 g_flg_chEnabled;
 static float32 sCheatTimer;
 static int32 sCheatInputCount;
 
-static EGGItemFuncs EGGEmpty = {};
 
-static EGGItem g_eggBasket[] = { { EGG_check_ExtrasFlags, &EGGEmpty, NULL, NULL }, {} };
+static xVec3 TargetVec;
+
+int32 EGG_check_True(EGGItem* e)
+{
+    return true;
+}
+
+void EGGNetworkBall_Update(float dt, EGGItem* e)
+{
+    xEntShow((xEnt*)globals.player.bubblebowl);
+    *xEntGetPos((xEnt*)globals.player.bubblebowl) = TargetVec;
+}
+
+static EGGItemFuncs EGGEmpty = {};
+static EGGItemFuncs EGGNetworkBall = { EGGNetworkBall_Update, NULL, NULL, NULL };
+
+static EGGItem g_eggBasket[] = { { EGG_check_ExtrasFlags, &EGGEmpty, NULL, NULL },
+                                 { EGG_check_True, &EGGNetworkBall, NULL, NULL },
+                                 {} };
 
 int32 zGameExtras_ExtrasFlags()
 {
