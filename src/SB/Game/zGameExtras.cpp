@@ -272,6 +272,19 @@ U32 sCheatRichPeep[16] = { 0, 0, 0, 0, Y, Y, Y, Y, Y, X, Y, X, X, Y, X, Y };
 U32 sCheatPanHandle[16] = { 0, 0, 0, 0, Y, Y, Y, Y, Y, X, Y, X, Y, Y, X, X };
 U32 sCheatMedics[16] = { 0, 0, 0, 0, Y, Y, Y, Y, Y, X, Y, X, X, X, Y, Y };
 U32 sCheatDogTrix[16] = { 0, 0, 0, 0, Y, Y, Y, Y, Y, X, Y, X, Y, X, X, Y };
+U32 sCheatReset[16] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, X, X, Y };
+
+void zSceneReset();
+void GEC_cb_Reset()
+{
+    xMat4x3 orig = globals.player.ent.frame->mat;
+
+    zSceneReset();
+    zGameModeSwitch(eGameMode_Game);
+    zGameStateSwitch(eGameState_Play);
+
+    xEntReposition(globals.player.ent, orig);
+}
 
 // zGameCheats assumes this list will contain an empty entry at the end (null key_code pointer)
 static GECheat cheatList[] = { { sCheatAddShiny, GEC_cb_AddShiny, 0x2, 0 },
@@ -295,6 +308,7 @@ static GECheat cheatList[] = { { sCheatAddShiny, GEC_cb_AddShiny, 0x2, 0 },
                                { sCheatPanHandle, GEC_cb_PanHandle, 0x200000, 0 },
                                { sCheatMedics, GEC_cb_Medics, 0x20100, 0 },
                                { sCheatDogTrix, GEC_cb_DogTrix, 0x400000, 0 },
+                               { sCheatReset, GEC_cb_Reset, 0x2, 0 },
                                {} };
 
 U32 sCheatPressed[16] = {};
