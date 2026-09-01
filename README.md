@@ -1,3 +1,16 @@
+# YAPP
+
+*Yet Another PC Port*
+
+I am starting from [Joey's Duplotron Branch](https://github.com/joeyballentine/bfbb/tree/duplotron) which is an
+AI driven decomp of the remain ~30% of the game code. This is done so that I can start exploring this project now before
+too much effort is invested in the AI-led [Treedome](https://github.com/joeyballentine/bfbb/tree/treedome) port. Some parts
+of Treedome may be transferred here manually if they turn out to have been the best decision.
+If this project succeds, the plan will be to replace the base game code with the more highly audited and validated code
+that will eventually make it's way into the main upstream decomp repo.
+
+### Original Readme
+
 # SpongeBob SquarePants: Battle for Bikini Bottom
 
 [![Discord Badge]][discord]
