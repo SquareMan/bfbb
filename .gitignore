@@ -18,7 +18,7 @@ orig/*/*
 *.MAP
 
 # Build files
-build/
+build*/
 .ninja_*
 build.ninja
 
@@ -31,7 +31,6 @@ objdiff.json
 compile_commands.json
 
 # Miscellaneous
-/*.txt
 *.exe
 
 # ProDG scratch: ngccc writes <basename><pid>.i / .s into the cwd for every
