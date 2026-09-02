@@ -257,8 +257,8 @@ namespace
             'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X',
             'Y', 'Z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '?', '!',
             '.', ',', '-', ':', '_', '"', '\'', '&', '(', ')', '<', '>', '/', '%',
-            '\xFC', '\xFB', '\xF9', '\xE2', '\xE4', '\xE0', '\xEA', '\xE8', '\xE9',
-            '\xEE', '\xF6', '\xF4', '\xE7', '\xDF', '\x2B'
+            0xFC, 0xFB, 0xF9, 0xE2, 0xE4, 0xE0, 0xEA, 0xE8, 0xE9,
+            0xEE, 0xF6, 0xF4, 0xE7, 0xDF, 0x2B
         },
         {},
 
@@ -271,10 +271,10 @@ namespace
             'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '0', '1', '2', '3',
             '4', '5', '6', '7', '8', '9', '?', '!', '.', ',', ';', ':', '+', '-',
             '=', '/', '&', '(', ')', '%', '"', '\'', '_', '<', '>', '*', '[', ']',
-            '\xDC', '\xDB', '\xD9', '\xC2', '\xC4', '\xC0', '\xCA', '\xC8', '\xC9',
-            '\xCE', '\xD6', '\xD4', '\xC7', '\xDF', '\xFC', '\xFB', '\xF9', '\xE2',
-            '\xE4', '\xE0', '\xEA', '\xE8', '\xE9', '\xEE', '\xF6', '\xF4', '\xE7',
-            '~', '\xA9', '\xAE', '\x99', '@', '\x7C'
+            0xDC, 0xDB, 0xD9, 0xC2, 0xC4, 0xC0, 0xCA, 0xC8, 0xC9,
+            0xCE, 0xD6, 0xD4, 0xC7, 0xDF, 0xFC, 0xFB, 0xF9, 0xE2,
+            0xE4, 0xE0, 0xEA, 0xE8, 0xE9, 0xEE, 0xF6, 0xF4, 0xE7,
+            '~', 0xA9, 0xAE, 0x99, '@', 0x7C
         },
         {},
 
@@ -1993,7 +1993,7 @@ void xtextbox::layout::calc(const xtextbox& ctb, size_t start_text)
 
             if (a.context == &context_buffer[context_buffer_size])
             {
-                context_buffer_size += ALIGN(a.context_size, 4);
+                context_buffer_size += ALIGN_NEXT(a.context_size, 4);
             }
 
             _jots_size++;

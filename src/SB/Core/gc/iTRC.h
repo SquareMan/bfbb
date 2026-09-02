@@ -37,7 +37,7 @@ namespace ROMFont
     void DrawCell(S32 x, S32 y, S32 u, S32 v);
     void LoadSheet(void* image_ptr);
     S32 DrawString(S32 param_1, S32 param_2, char* string);
-    S32 GetWidth(char* string);
+    S32 GetWidth(const char* string);
     void DrawTextBox(S32 param_1, S32 param_2, S32 param_3, S32 param_4, char* str);
 } // namespace ROMFont
 

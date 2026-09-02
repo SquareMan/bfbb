@@ -2076,10 +2076,10 @@ void xAnimPoolInit(xMemPool* pool, U32 count, U32 singles, U32 blendFlags, U32 e
 
     U32 size =
         (effectMax * sizeof(xAnimActiveEffect) + sizeof(xAnimSingle)) *
-            (ADD_4_BITS((blendFlags & 0xffff) & ((int)(1 << singles) - 1 >> 0x0)) +
-             ADD_4_BITS((blendFlags & 0xffff) & ((int)(1 << singles) - 1 >> 0x4)) +
-             ADD_4_BITS((blendFlags & 0xffff) & ((int)(1 << singles) - 1 >> 0x8)) +
-             ADD_4_BITS((blendFlags & 0xffff) & ((int)(1 << singles) - 1 >> 0xC)) + singles) +
+            (ADD_4_BITS((blendFlags & 0xffff) & (((int)(1 << singles) - 1) >> 0x0)) +
+             ADD_4_BITS((blendFlags & 0xffff) & (((int)(1 << singles) - 1) >> 0x4)) +
+             ADD_4_BITS((blendFlags & 0xffff) & (((int)(1 << singles) - 1) >> 0x8)) +
+             ADD_4_BITS((blendFlags & 0xffff) & (((int)(1 << singles) - 1) >> 0xC)) + singles) +
         sizeof(xAnimPlay);
 
     U32 i;

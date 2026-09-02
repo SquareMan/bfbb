@@ -22,7 +22,7 @@
 #define LassoGuide_Hold01 2
 
 U32 g_hash_lassanim[3] = {};
-char* g_strz_lassanim[3] = { "Unknown", "LassoGuide_Grab01", "LassoGuide_Hold01" };
+const char* g_strz_lassanim[3] = { "Unknown", "LassoGuide_Grab01", "LassoGuide_Hold01" };
 static NPCConfig* g_ncfghead;
 static volatile S32 g_skipDescent;
 static zNPCSettings* g_dflt_npcsettings;
@@ -66,7 +66,7 @@ void __deadstripped_zNPCTypeCommon_lass_strings(char* str)
     printf("LASS_STAT_TOSSING");
 }
 
-static char* g_strz_params[NPC_PARM_NOMORE] = {
+static const char* g_strz_params[NPC_PARM_NOMORE] = {
     "Empty",
     "MoveSpeed",
     "TurnSpeed",
@@ -602,6 +602,8 @@ void zNPCCommon::Damage(en_NPC_DAMAGE_TYPE damtype, xBase* who, const xVec3* vec
     case DMGTYP_BUNGEED:
         if (!(this->flg_vuln & 0x400000))
             return;
+        break;
+    default:
         break;
     }
 
@@ -1659,6 +1661,8 @@ void zNPCCommon::ParseINI()
         case NPC_PARAM_TEST_COUNT:
             this->GetParm(pid, &cfg->test_count);
             break;
+        default:
+            break;
         }
     }
 }
@@ -2207,7 +2211,7 @@ void zNPCCommon::GetParm(en_npcparm pid, void* val)
     S32 iv;
     xVec3 vec_tmp;
     zMovePoint* mvpt;
-    char** names;
+    const char** names;
     U32 pmsize;
     xModelAssetParam* pmdata;
 
@@ -2324,6 +2328,8 @@ void zNPCCommon::GetParm(en_npcparm pid, void* val)
         case NPC_PARM_ENDTAG_INI:
         case NPC_PARM_ENDTAG_PROPS:
         case NPC_PARM_ENDTAG_SHARE:
+            break;
+        default:
             break;
         }
     }
@@ -3426,6 +3432,8 @@ void zNPCCommon::LassoSyncAnims(en_lassanim lassanim)
         lass_ast = this->lassdata->holdGuideAnim;
         lass_mdl = this->lassdata->holdGuideModel;
         break;
+    default:
+        break;
     }
 
     if (lass_ast != NULL && lass_mdl != NULL)
@@ -3477,6 +3485,8 @@ void zNPCCommon::LassoNotify(en_LASSO_EVENT event)
         lass->stage = LASS_STAT_DONE;
         break;
     }
+    default:
+        break;
     }
 }
 
@@ -3563,11 +3573,11 @@ xAnimTable* ZNPC_AnimTable_LassoGuide()
     return table;
 }
 
-void NPCC_BuildStandardAnimTran(xAnimTable* table, char** namelist, S32* ourAnims, S32 idx_dflt,
+void NPCC_BuildStandardAnimTran(xAnimTable* table, const char** namelist, S32* ourAnims, S32 idx_dflt,
                                 F32 blend)
 {
     xAnimTransition* def = NULL;
-    char** names = namelist;
+    const char** names = namelist;
 
     S32 i = 0;
 

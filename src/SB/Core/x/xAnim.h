@@ -6,13 +6,13 @@
 #include "xMath3.h"
 #include "xMemMgr.h"
 
-typedef struct xAnimState;
-typedef struct xAnimTransition;
-typedef struct xAnimTransitionList;
-typedef struct xAnimEffect;
-typedef struct xAnimActiveEffect;
-typedef struct xAnimSingle;
-typedef struct xAnimPlay;
+struct xAnimState;
+struct xAnimTransition;
+struct xAnimTransitionList;
+struct xAnimEffect;
+struct xAnimActiveEffect;
+struct xAnimSingle;
+struct xAnimPlay;
 
 extern U32 gxAnimUseGrowAlloc;
 
@@ -162,7 +162,7 @@ struct xAnimSingle
     U32 pad;
 };
 
-typedef struct xModelInstance;
+struct xModelInstance;
 
 struct xAnimPlay
 {
@@ -180,7 +180,7 @@ struct xAnimPlay
 class AnimTableList
 { // size: 0xC
 public:
-    char* name; // offset 0x0, size 0x4
+    const char* name; // offset 0x0, size 0x4
     class xAnimTable* (*constructor)(); // offset 0x4, size 0x4
     unsigned int id; // offset 0x8, size 0x4
 };

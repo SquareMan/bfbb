@@ -744,7 +744,7 @@ xModelInstance* xEntLoadModel(xEnt* ent, RpAtomic* imodel)
 
     model = xModelInstanceAlloc(imodel, ent, 0, 0, NULL);
 
-    while (imodel = iModelFile_RWMultiAtomic(imodel))
+    while ((imodel = iModelFile_RWMultiAtomic(imodel)))
     {
         xModelInstanceAttach(xModelInstanceAlloc(imodel, ent, 0x8, 0, NULL), model);
     }

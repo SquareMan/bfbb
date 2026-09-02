@@ -1788,38 +1788,38 @@ namespace cruise_bubble
         // Very dumb scheduling.
         void load_cheat_tweak()
         {
-            *(volatile F32*)(&cheat_tweak.missle.crash_angle) = 0.7536f;
-            *(volatile F32*)(&cheat_tweak.missle.collide_twist) = 0.05f;
-            *(volatile F32*)(&cheat_tweak.missle.appear.delay_fly) = 0.16666667f;
-            *(volatile F32*)(&cheat_tweak.missle.fly.accel) = 12.0f;
-            *(volatile F32*)(&cheat_tweak.missle.fly.turn.xdelta) = 7.0f;
-            *(volatile F32*)(&cheat_tweak.missle.fly.turn.ydelta) = 5.0f;
-            *(volatile F32*)(&cheat_tweak.missle.fly.turn.ydecay) =
-                *(volatile F32*)(&cheat_tweak.missle.fly.turn.xdecay) = 0.985f;
-            *(volatile F32*)(&cheat_tweak.missle.fly.turn.ybound) = 1.24248f;
+            cheat_tweak.missle.crash_angle = 0.7536f;
+            cheat_tweak.missle.collide_twist = 0.05f;
+            cheat_tweak.missle.appear.delay_fly = 0.16666667f;
+            cheat_tweak.missle.fly.accel = 12.0f;
+            cheat_tweak.missle.fly.turn.xdelta = 7.0f;
+            cheat_tweak.missle.fly.turn.ydelta = 5.0f;
+            cheat_tweak.missle.fly.turn.ydecay = 0.985f;
+            cheat_tweak.missle.fly.turn.xdecay = 0.985f;
+            cheat_tweak.missle.fly.turn.ybound = 1.24248f;
 
             F32 one_tenth = 0.1f;
-            *(volatile F32*)(&cheat_tweak.missle.fly.turn.roll_frac) = one_tenth;
-            *(volatile F32*)(&cheat_tweak.missle.explode.hit_radius) = 2.0f;
-            *(volatile F32*)(&cheat_tweak.camera.seize.blend_time) = 0.75f;
-            *(volatile F32*)(&cheat_tweak.camera.survey.duration) = 1.0f;
-            *(volatile F32*)(&cheat_tweak.camera.survey.min_duration) = one_tenth;
+            cheat_tweak.missle.fly.turn.roll_frac = one_tenth;
+            cheat_tweak.missle.explode.hit_radius = 2.0f;
+            cheat_tweak.camera.seize.blend_time = 0.75f;
+            cheat_tweak.camera.survey.duration = 1.0f;
+            cheat_tweak.camera.survey.min_duration = one_tenth;
 
-            *(volatile F32*)(&cheat_tweak.camera.survey.drift_dist) = 10.0f;
-            *(volatile F32*)(&cheat_tweak.material.env_alpha) = 0.2f;
-            *(volatile U32*)(&cheat_tweak.material.env_texture) = xStrHash("aura2");
-            *(volatile F32*)(&cheat_tweak.material.fresnel_alpha) = 0.1f;
-            *(volatile F32*)(&cheat_tweak.material.fresnel_coeff) = 1.0f;
-            *(volatile U32*)(&cheat_tweak.material.fresnel_texture) =
+            cheat_tweak.camera.survey.drift_dist = 10.0f;
+            cheat_tweak.material.env_alpha = 0.2f;
+            cheat_tweak.material.env_texture = xStrHash("aura2");
+            cheat_tweak.material.fresnel_alpha = 0.1f;
+            cheat_tweak.material.fresnel_coeff = 1.0f;
+            cheat_tweak.material.fresnel_texture =
                 xStrHash("par_cruise_explode");
-            *(volatile F32*)(&cheat_tweak.trail.bubble_rate) = 90.0f;
-            *(volatile F32*)(&cheat_tweak.trail.bubble_emit_radius) = 0.75f;
-            *(volatile F32*)(&cheat_tweak.trail.wake_emit_radius) = 0.3f;
-            *(volatile U32*)(&cheat_tweak.blast.emit) = 400;
-            *(volatile F32*)(&cheat_tweak.blast.vel) = 7.5f;
-            *(volatile U32*)(&cheat_tweak.droplet.emit_min) = 0xf;
-            *(volatile F32*)(&cheat_tweak.droplet.vel_min) = 4.0f;
-            *(volatile F32*)(&cheat_tweak.droplet.vel_max) = 8.0f;
+            cheat_tweak.trail.bubble_rate = 90.0f;
+            cheat_tweak.trail.bubble_emit_radius = 0.75f;
+            cheat_tweak.trail.wake_emit_radius = 0.3f;
+            cheat_tweak.blast.emit = 400;
+            cheat_tweak.blast.vel = 7.5f;
+            cheat_tweak.droplet.emit_min = 0xf;
+            cheat_tweak.droplet.vel_min = 4.0f;
+            cheat_tweak.droplet.vel_max = 8.0f;
         }
 
         void load_settings()
@@ -2510,7 +2510,7 @@ namespace cruise_bubble
         }
     } // namespace
 
-    void cruise_bubble::init()
+    void init()
     {
         if ((shared.flags & 0x1) != 0x1)
         {
@@ -2543,7 +2543,7 @@ namespace cruise_bubble
         }
     } // namespace
 
-    void cruise_bubble::reset()
+    void reset()
     {
         if ((shared.flags & 0x3) == 0x3)
         {
@@ -2551,7 +2551,7 @@ namespace cruise_bubble
         }
     }
 
-    void cruise_bubble::launch()
+    void launch()
     {
         if ((shared.flags & 0x13) != 0x3)
         {
@@ -2583,7 +2583,7 @@ namespace cruise_bubble
         cruise_bubble::set_state(THREAD_PLAYER, BEGIN_STATE_PLAYER);
     }
 
-    bool cruise_bubble::update(xScene* s, F32 dt)
+    bool update(xScene* s, F32 dt)
     {
         if ((shared.flags & 0x3) != 0x3)
         {
@@ -2622,7 +2622,7 @@ namespace cruise_bubble
         return true;
     }
 
-    bool cruise_bubble::render()
+    bool render()
     {
         if ((shared.flags & 0x7) != 0x7)
         {
@@ -2645,7 +2645,7 @@ namespace cruise_bubble
         }
     } // namespace
 
-    void cruise_bubble::render_screen()
+    void render_screen()
     {
         if ((shared.flags & 0x7) == 0x7)
         {
@@ -2653,7 +2653,7 @@ namespace cruise_bubble
         }
     }
 
-    void cruise_bubble::insert_player_animations(xAnimTable& table)
+    void insert_player_animations(xAnimTable& table)
     {
         if (shared.astate.player.aim != NULL)
         {
@@ -2705,7 +2705,7 @@ namespace cruise_bubble
         xMemPopTemp(start_from);
     }
 
-    xAnimTable* cruise_bubble::anim_table()
+    xAnimTable* anim_table()
     {
         xAnimTable* table = xAnimTableNew("Cruise Bubble", 0, 0);
         shared.astate.missle.fire =
@@ -2719,12 +2719,12 @@ namespace cruise_bubble
         return table;
     }
 
-    bool cruise_bubble::active()
+    bool active()
     {
         return shared.flags & 0x10;
     }
 
-    F32 cruise_bubble::exploding()
+    F32 exploding()
     {
         state_missle_explode* state = (state_missle_explode*)shared.state[THREAD_MISSLE];
         if (state == NULL || state->type != STATE_MISSLE_EXPLODE)
@@ -2735,7 +2735,7 @@ namespace cruise_bubble
         return current_tweak->missle.explode.hit_duration - state->hit_time;
     }
 
-    void cruise_bubble::get_explode_sphere(xVec3& center, F32& radius)
+    void get_explode_sphere(xVec3& center, F32& radius)
     {
         state_missle_explode* state = (state_missle_explode*)shared.state[THREAD_MISSLE];
         if (state == NULL || state->type != STATE_MISSLE_EXPLODE)
@@ -2760,7 +2760,7 @@ namespace cruise_bubble
         }
     } // namespace
 
-    xEnt** cruise_bubble::get_explode_hits(S32& size)
+    xEnt** get_explode_hits(S32& size)
     {
         state_missle_explode* state = (state_missle_explode*)shared.state[THREAD_MISSLE];
         if (state == NULL || state->type != STATE_MISSLE_EXPLODE)
@@ -2779,7 +2779,7 @@ namespace cruise_bubble
     }
 
     // param names guessed
-    void cruise_bubble::add_life(F32 life, F32 max)
+    void add_life(F32 life, F32 max)
     {
         state_missle_fly* state = (state_missle_fly*)shared.state[THREAD_MISSLE];
         if (state == NULL || state->type != STATE_MISSLE_FLY)
@@ -2806,7 +2806,7 @@ namespace cruise_bubble
         state->life = max;
     }
 
-    void cruise_bubble::set_life(F32 life)
+    void set_life(F32 life)
     {
         state_missle_fly* state = (state_missle_fly*)shared.state[THREAD_MISSLE];
         if (state == NULL || state->type != STATE_MISSLE_FLY)
@@ -2817,7 +2817,7 @@ namespace cruise_bubble
         state->life = life;
     }
 
-    void cruise_bubble::reset_life()
+    void reset_life()
     {
         state_missle_fly* state = (state_missle_fly*)shared.state[THREAD_MISSLE];
         if (state == NULL || state->type != STATE_MISSLE_FLY)
@@ -2828,7 +2828,7 @@ namespace cruise_bubble
         state->life = current_tweak->missle.life;
     }
 
-    bool cruise_bubble::event_handler(xBase* from, U32 event, const F32* fparam, xBase* to)
+    bool event_handler(xBase* from, U32 event, const F32* fparam, xBase* to)
     {
         switch (event)
         {

@@ -34,7 +34,7 @@ void iFileExit()
 {
 }
 
-U32* iFileLoad(char* name, U32* buffer, U32* size)
+U32* iFileLoad(const char* name, U32* buffer, U32* size)
 {
     char path[128];
     tag_xFile file;
@@ -225,7 +225,7 @@ static void async_cb(s32 result, DVDFileInfo* fileInfo)
         s32 length;
         if ((entry->size - entry->offset < 0x8000))
         {
-            length = ALIGN(entry->size - entry->offset, 4);
+            length = ALIGN_NEXT(entry->size - entry->offset, 4);
         }
         else
         {
@@ -273,7 +273,7 @@ S32 iFileReadAsync(tag_xFile* file, void* buf, U32 aSize, void (*callback)(tag_x
             file_queue[i].callback = callback;
             file_queue[i].asynckey = asynckey;
 
-            aSize = (aSize < 32) ? ALIGN(aSize, 4) : 32;
+            aSize = (aSize < 32) ? ALIGN_NEXT(aSize, 4) : 32;
 
             ps->fileInfo.cb.userData = (void*)i;
 
@@ -335,7 +335,7 @@ void iFileFullPath(const char* relname, char* fullname)
     strcpy(fullname, relname);
 }
 
-void iFileSetPath(char* path)
+void iFileSetPath(const char* path)
 {
 }
 

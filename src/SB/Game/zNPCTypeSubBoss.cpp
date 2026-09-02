@@ -5,10 +5,11 @@
 #include "zNPCTypeDutchman.h"
 #include "zNPCTypePrawn.h"
 
+#define ANIM_COUNT 23
 U32 g_hash_subbanim[ANIM_COUNT] = {};
 
 // clang-format off
-char* g_strz_subbanim[ANIM_COUNT] =
+const char* g_strz_subbanim[ANIM_COUNT] =
 {
     "Unknown",
     "Idle01",

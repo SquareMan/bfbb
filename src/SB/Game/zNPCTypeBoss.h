@@ -34,8 +34,7 @@ void zNPCBoss_SceneFinish();
 
 xAnimTable* ZNPC_AnimTable_BossSBobbyArm();
 
-#define ANIM_COUNT 78
-extern U32 g_hash_bossanim[ANIM_COUNT];
-extern char* g_strz_bossanim[ANIM_COUNT];
+extern U32 g_hash_bossanim[];
+extern const char* g_strz_bossanim[];
 
 #endif

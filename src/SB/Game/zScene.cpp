@@ -891,7 +891,10 @@ void zSceneInit(U32 theSceneID, S32 reloadInProgress)
 
     char b[5] = "";
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wformat-security"
     sprintf(b, xUtil_idtag2string(theSceneID, 0));
+#pragma clang diagnostic pop
     xStrupr(b);
 
     theSceneID = (b[0] << 24) | (b[1] << 16) | (b[2] << 8) | b[3];

@@ -9,6 +9,7 @@
 
 #include "xString.h"
 
+#define ANIM_COUNT 78
 U32 g_hash_bossanim[ANIM_COUNT] = {};
 
 void foo(zNPCBPatrick* pat)
@@ -16,7 +17,7 @@ void foo(zNPCBPatrick* pat)
 }
 
 // clang-format off
-char* g_strz_bossanim[ANIM_COUNT] =
+const char* g_strz_bossanim[ANIM_COUNT] =
 {
     "Unknown",
     "Idle01",

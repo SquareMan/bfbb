@@ -73,7 +73,10 @@ st_PACKER_READ_FUNCS* PKRGetReadFuncs(S32 apiver)
 
 S32 PKRStartup()
 {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-volatile"
     if (g_packinit++ == 0)
+#pragma clang diagnostic pop
     {
         g_pkr_read_funcmap = g_pkr_read_funcmap_original;
         g_hiprf = get_HIPLFuncs();
@@ -84,7 +87,10 @@ S32 PKRStartup()
 
 S32 PKRShutdown()
 {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-volatile"
     g_packinit--;
+#pragma clang diagnostic pop
     return g_packinit;
 }
 
@@ -456,6 +462,8 @@ char* PKR_LayerMemReserve(st_PACKER_READ_DATA* pr, st_PACKER_LTOC_NODE* layer)
         PKR_push_memmark();
         mem = (char*)PKR_getmem('LYR\0', layer->laysize, layer->laytyp + 0x8000, 0x40);
         break;
+    default:
+        break;
     }
 
     return mem;
@@ -479,6 +487,8 @@ void PKR_LayerMemRelease(st_PACKER_READ_DATA* pr, st_PACKER_LTOC_NODE* layer)
         PKR_relmem('LYR\0', layer->laysize, layer->laytru, layer->laytyp + 0x8000, 1);
         layer->laymem = NULL;
         layer->laytru = NULL;
+        break;
+    default:
         break;
     }
 }
@@ -859,9 +869,9 @@ U32 PKRAssetIDFromInst(void* asset_inst)
     return ((st_PACKER_ATOC_NODE*)asset_inst)->aid;
 }
 
-char* PKR_AssetName(st_PACKER_READ_DATA* pr, U32 aid)
+const char* PKR_AssetName(st_PACKER_READ_DATA* pr, U32 aid)
 {
-    char* name = NULL;
+    const char* name = NULL;
 
     if (aid == 0)
     {
@@ -1734,7 +1744,11 @@ void* PKR_getmem(U32 id, S32 amount, U32, S32 align, S32 isTemp, char** memtrue)
         memset(memptr, 0, amount);
     }
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-volatile"
     g_memalloc_pair++;
+#pragma clang diagnostic pop
+
     g_memalloc_runtot += amount;
     if (g_memalloc_runtot < 0)
     {
@@ -1755,7 +1769,11 @@ void* PKR_getmem(U32 id, S32 amount, U32, S32 align, S32 isTemp, char** memtrue)
 
 void PKR_relmem(U32 id, S32 blksize, void* memptr, U32, S32 isTemp)
 {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-volatile"
     g_memalloc_pair--;
+#pragma clang diagnostic pop
+    
     g_memalloc_runfree += blksize;
     if (g_memalloc_runfree < 0)
     {
@@ -1786,7 +1804,7 @@ void PKR_pop_memmark()
     xMemPopBase(xMemGetBase() - 1);
 }
 
-char* st_PACKER_ATOC_NODE::Name() const
+const char* st_PACKER_ATOC_NODE::Name() const
 {
     return "<unknown>";
 }

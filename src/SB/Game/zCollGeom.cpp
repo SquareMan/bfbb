@@ -29,27 +29,27 @@ U32 zCollGeom_EntSetup(xEnt* ent)
                 {
                     RpAtomic* imodel;
 
-                    if (imodel = sTableList[j][i].colModel[0])
+                    if ((imodel = sTableList[j][i].colModel[0]))
                     {
                         xModelInstance* model = xModelInstanceAlloc(imodel, ent, 0x2000, 0, NULL);
 
                         ent->collModel = model;
                         ent->collModel->Mat = ent->model->Mat;
 
-                        while (imodel = iModelFile_RWMultiAtomic(imodel))
+                        while ((imodel = iModelFile_RWMultiAtomic(imodel)))
                         {
                             xModelInstanceAttach(xModelInstanceAlloc(imodel, ent, 0x2000, 0, NULL),
                                                  model);
                         }
                     }
-                    else if (imodel = sTableList[j][i].camcolModel)
+                    else if ((imodel = sTableList[j][i].camcolModel))
                     {
                         xModelInstance* model = xModelInstanceAlloc(imodel, ent, 0x2000, 0, NULL);
 
                         ent->camcollModel = model;
                         ent->camcollModel->Mat = ent->model->Mat;
 
-                        while (imodel = iModelFile_RWMultiAtomic(imodel))
+                        while ((imodel = iModelFile_RWMultiAtomic(imodel)))
                         {
                             xModelInstanceAttach(xModelInstanceAlloc(imodel, ent, 0x2000, 0, NULL),
                                                  model);

@@ -84,7 +84,7 @@ xIniFile* xIniParse(char* buf, S32 len)
         buf[0] = '\0';
     }
 
-    char* ltoken;
+    const char* ltoken;
     char* line = xStrTok(buf, "\n\r", &ltoken);
     if (line == NULL)
     {
@@ -192,7 +192,7 @@ F32 xIniGetFloat(xIniFile* ini, const char* tok, F32 def)
     return atof(ini->Values[index].val);
 }
 
-char* xIniGetString(xIniFile* ini, const char* tok, char* def)
+const char* xIniGetString(xIniFile* ini, const char* tok, const char* def)
 {
     S32 index = xIniGetIndex(ini, tok);
     if (index == -1)

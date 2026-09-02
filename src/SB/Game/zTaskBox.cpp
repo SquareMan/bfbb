@@ -19,7 +19,8 @@ namespace
 
 void ztaskbox::load(const ztaskbox::asset_type& a)
 {
-    xBaseInit((xBase*)this, &(xBaseAsset)a);
+    // SUS: maybe we could make xBaseInit accept a cont xBaseAsset*? this is hairy
+    xBaseInit((xBase*)this, const_cast<ztaskbox::asset_type*>(&a));
     this->baseType = eBaseTypeTaskBox;
     this->asset = &a;
     this->eventFunc = cb_dispatch;

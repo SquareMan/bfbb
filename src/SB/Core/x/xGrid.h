@@ -96,7 +96,10 @@ inline xGridBound* xGridIterFirstCell(xGridBound** head, xGridIterator& it)
     it.listhead = head;
     it.curcell = cell;
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-volatile"
     gGridIterActive++;
+#pragma clang diagnostic pop
 
     return cell;
 }
@@ -142,7 +145,10 @@ inline void xGridIterClose(xGridIterator& it)
 {
     if (it.listhead)
     {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-volatile"
         gGridIterActive--;
+#pragma clang diagnostic pop
 
         if (it.delfound && !gGridIterActive)
         {

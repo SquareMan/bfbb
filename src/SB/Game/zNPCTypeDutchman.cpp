@@ -242,7 +242,7 @@ namespace
 
     struct sound_asset
     {
-        char* name;
+        const char* name;
         U32 priority;
         U32 flags;
     };
@@ -509,7 +509,7 @@ void zNPCDutchman::Init(xEntAsset* asset)
     flg_move = 1;
     flg_vuln = 1;
 
-    char* scorch_name[2] = { "Dutchman Left Burn", "Dutchman Right Burn" };
+    const char* scorch_name[2] = { "Dutchman Left Burn", "Dutchman Right Burn" };
 
     for (S32 i = 0; i < 2; i++)
     {
@@ -1595,6 +1595,8 @@ void zNPCDutchman::LassoNotify(en_LASSO_EVENT event)
         break;
     case LASS_EVNT_GRABEND:
         break;
+    default:
+        break;
     }
 
     zNPCCommon::LassoNotify(event);
@@ -1788,6 +1790,8 @@ void zNPCDutchman::update_move(F32 dt)
         break;
     case MOVE_STOP:
         update_move_stop(frame->mat.pos, move, dt);
+        break;
+    default:
         break;
     }
 }
@@ -2170,6 +2174,8 @@ void zNPCDutchman::update_fade(F32 dt)
             set_alpha(frac);
             set_volume(SOUND_VAPOR, fade.sound_handle, 1.0f - frac);
         }
+        break;
+    default:
         break;
     }
 }

@@ -28,7 +28,7 @@ static S32 g_firstFrameUpdateAllNPC;
 
 struct NPCBrainTableEntry
 {
-    char* name;
+    const char* name;
     en_NPCTYPES type;
     U32 id;
 } g_brainTable[63] =
@@ -101,7 +101,7 @@ struct NPCBrainTableEntry
 static struct NPCMTypeTable
 {
     en_NPCTYPES useNPCType;
-    char* modelName;
+    const char* modelName;
     U32 hashOfName;
 } g_tbltype[250] =
 {

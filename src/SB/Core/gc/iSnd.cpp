@@ -359,7 +359,10 @@ static void fcb()
         return;
     }
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-volatile"
     fc++;
+#pragma clang diagnostic pop
     S32 i;
     S32 need_update = FALSE;
     for (i = 0; i < 6; i++)

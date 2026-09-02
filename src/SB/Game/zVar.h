@@ -9,7 +9,7 @@ struct zVarEntry
 {
     U32 entry;
     U32 varNameID;
-    char* varName;
+    const char* varName;
     U32 (*varCB)(void*);
 };
 
@@ -43,7 +43,7 @@ Num  | Name     | Callback
 struct var_type
 {
     substr name;
-    char* (*get_text)();
+    const char* (*get_text)();
 };
 
 extern S32 bad_card_needed;

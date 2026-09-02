@@ -10,7 +10,7 @@
 extern const basic_rect<F32> screen_bounds;
 
 struct special_data {
-    char* hud_model;
+    const char* hud_model;
     S32 max_value;
 };
 

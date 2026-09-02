@@ -947,6 +947,8 @@ S32 xPsyche::TranGoal(F32 dt, void* updCtxt)
                 this->pendtype = PEND_TRAN_INPROG;
             }
             break;
+        default:
+            break;
         }
 
         if (this->pendtype != PEND_TRAN_INPROG)

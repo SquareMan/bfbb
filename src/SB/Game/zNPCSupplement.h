@@ -288,7 +288,7 @@ struct NPARInfo
 {
     void (*fun_update)(NPARMgmt*, F32);
     S32 num_maxParticles;
-    char* nam_texture;
+    const char* nam_texture;
     S32 flg_npar;
 };
 

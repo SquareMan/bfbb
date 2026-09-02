@@ -1261,7 +1261,7 @@ xGroup* sTaxiConfirmGrp;
 void zUI_ParseINI(xIniFile* ini)
 {
     char itemName[16];
-    char *value, *tok, *ltok;
+    const char *value, *tok, *ltok;
 
     strcpy(itemName, "Menu00");
 
@@ -1286,7 +1286,7 @@ void zUI_ParseINI(xIniFile* ini)
         }
         else
         {
-            tok = xStrTok(value, " ", &ltok);
+            tok = xStrTok(const_cast<char*>(value), " ", &ltok);
 
             sWorld[i].worldPrefix[0] = tok[0];
             sWorld[i].worldPrefix[1] = tok[1];
@@ -1474,7 +1474,7 @@ void zUI_ScenePortalInit(zScene* zsc)
             {
                 sWorld[i].task[j].portalAsset.sceneID = (sWorld[i].task[j].levelSuffix[1] << 24) |
                                                         (sWorld[i].task[j].levelSuffix[0] << 16) |
-                                                        'BH';
+                                                        '\0\0BH';
             }
             else
             {

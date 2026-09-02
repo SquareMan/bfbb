@@ -3175,6 +3175,8 @@ void zEntPlayer_LassoNotify(en_LASSO_EVENT event)
         globals.player.lassoInfo.lasso.flags = 0;
         globals.player.lassoInfo.target = NULL;
         break;
+    default:
+        break;
     }
 }
 
@@ -7015,6 +7017,8 @@ void zEntPlayer_Update(xEnt* ent, xScene* sc, F32 dt)
                 gReticleTarget = NULL;
                 globals.player.IsBubbleBowling = 0;
             }
+            break;
+        default:
             break;
         }
     }
@@ -12002,7 +12006,10 @@ static void zEntPlayerDriveUpdate(xEnt* ent, xScene* sc, F32 dt)
 
         if (globals.player.Health)
         {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wmicrosoft-goto"
             goto do_bounce;
+#pragma clang diagnostic pop
         }
     }
 
@@ -13622,6 +13629,8 @@ void zEntPlayerCollTrigger(xEnt* ent, xScene* sc)
                     case eCurrentPlayerSandy:
                         zEntEvent(trig, eEventEnterSandy);
                         break;
+                default:
+                    break;
                     }
                 }
             }
@@ -13639,6 +13648,8 @@ void zEntPlayerCollTrigger(xEnt* ent, xScene* sc)
                     break;
                 case eCurrentPlayerSandy:
                     zEntEvent(trig, eEventEnterSandy);
+                    break;
+                default:
                     break;
                 }
             }
@@ -13663,6 +13674,8 @@ void zEntPlayerCollTrigger(xEnt* ent, xScene* sc)
                     case eCurrentPlayerSandy:
                         zEntEvent(trig, eEventExitSandy);
                         break;
+                    default:
+                        break;
                     }
                 }
             }
@@ -13680,6 +13693,8 @@ void zEntPlayerCollTrigger(xEnt* ent, xScene* sc)
                     break;
                 case eCurrentPlayerSandy:
                     zEntEvent(trig, eEventExitSandy);
+                    break;
+                default:
                     break;
                 }
             }
@@ -15409,7 +15424,7 @@ void _iAnimSKBAdjustTranslate(iAnimSKBHeader* skb, U32 bone, F32* tranStart, F32
 
 static void PlayerHackFixBbashMiss(xModelInstance* model)
 {
-    static char* bbstate[4] = { "BbashStart01", "BbashAttack01", "BbashStrike01",
+    static const char* bbstate[4] = { "BbashStart01", "BbashAttack01", "BbashStrike01",
                                 "BbashMiss01" };
     static F32 bbadjust[4][2] = { { 0.0f, -0.55f },
                                   { -0.55f, -0.55f },

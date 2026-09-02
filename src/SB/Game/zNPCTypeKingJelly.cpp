@@ -260,7 +260,7 @@ namespace
     static xParEmitterCustomSettings thump_ring_emitter_settings;
     static xVec3 ring_segments[64];
     
-    static char* sound_name[11][3] = {
+    static const char* sound_name[11][3] = {
         {
             "KJ_pulseupdown",
             NULL,
@@ -2109,6 +2109,8 @@ void zNPCKingJelly::Damage(en_NPC_DAMAGE_TYPE damtype, xBase*, const xVec3*)
             set_life(this->life - 1);
         }
         break;
+    default:
+        break;
     }
 }
 
@@ -3686,6 +3688,8 @@ S32 zNPCGoalKJShockGround::Process(en_trantype* trantype, float dt, void* updCtx
         break;
     case zNPCKingJelly::SS_STOP:
         kj.shockstate = (zNPCKingJelly::shockstate_enum)update_stop(dt);
+        break;
+    default:
         break;
     }
 

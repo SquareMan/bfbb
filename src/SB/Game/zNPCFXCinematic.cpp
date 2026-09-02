@@ -2094,6 +2094,8 @@ static void NCIN_Zapper(const zCutsceneMgr*, NCINEntry* fxrec, S32 killit)
 
             fxrec->fxdata.lytdata.lyt_zap = NULL;
             break;
+        default:
+            break;
         }
         return;
     }
@@ -2109,6 +2111,8 @@ static void NCIN_Zapper(const zCutsceneMgr*, NCINEntry* fxrec, S32 killit)
             break;
         case NCIN_FXTYP_MONCLOUD:
             NPCC_MakeLightningInfo(NPC_LYT_CLOUDZAP, &addInfo);
+            break;
+        default:
             break;
         }
 
@@ -2231,6 +2235,8 @@ static void NCIN_HazProjShoot(const zCutsceneMgr*, NCINEntry* fxrec, S32 killit)
             break;
         case NCIN_FXTYP_OILSHOOT:
             use_haztyp = NPC_HAZ_OILBUBBLE;
+            break;
+        default:
             break;
         }
 

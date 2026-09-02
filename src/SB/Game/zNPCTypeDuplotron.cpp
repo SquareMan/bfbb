@@ -12,8 +12,8 @@
 #define ANIM_Shiver01 3
 #define ANIM_Hurt01 4
 
-extern U32 g_hash_dupoanim[5] = {};
-extern char* g_strz_dupoanim[5] = { "Unknown", "Idle01", "Spawn01", "Shiver01", "Hurt01" };
+static U32 g_hash_dupoanim[5] = {};
+static const char* g_strz_dupoanim[5] = { "Unknown", "Idle01", "Spawn01", "Shiver01", "Hurt01" };
 static zParEmitter* g_pemit_smoky;
 static zParEmitter* g_pemit_steam;
 static zParEmitter* g_pemit_overheat;

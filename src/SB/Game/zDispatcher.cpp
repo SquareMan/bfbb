@@ -329,6 +329,8 @@ static S32 ZDSP_doCommand(st_ZDISPATCH_DATA* dspdata, st_ZDISPATCH_CONTEXT* cmdC
     case ZDSP_CMD_SNDVOL_DECR:
     case ZDSP_CHECKPNT_SET:
         break;
+    default:
+        break;
     }
     return 1;
 }

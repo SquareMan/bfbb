@@ -64,7 +64,7 @@ namespace xhud
 
     block_allocator::block_allocator(U32 a0, U32 a1)
     {
-        _block_size = ALIGN(a0, 4) + 4;
+        _block_size = ALIGN_NEXT(a0, 4) + 4;
         _top = NULL;
         _next_alloc = _head_alloc;
         _head_alloc = this;
@@ -648,7 +648,7 @@ namespace xhud
         return true;
     }
 
-    void xhud::render_model(xModelInstance& m, const xhud::render_context& rc)
+    void render_model(xModelInstance& m, const xhud::render_context& rc)
     {
         basic_rect<F32> r = { 0 };
         r.x = rc.loc.x;

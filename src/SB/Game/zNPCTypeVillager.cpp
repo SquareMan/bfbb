@@ -10,7 +10,7 @@
 #include "zNPCGoals.h"
 #include "zRenderState.h"
 #include "xDebug.h"
-#include "xUtil.h"
+#include "xutil.h"
 
 // These structs were used in deadstripped functions.
 // This function is here to force the symbols to be linked.
@@ -68,14 +68,14 @@ U32 g_hash_folkanim[26] = {};
 zParEmitter* g_pemit_aqualeak;
 static xParEmitterCustomSettings g_parf_aqualeak;
 
-char* g_strz_folkanim[26] = {
+const char* g_strz_folkanim[26] = {
     "Unknown", "Idle01",    "Move01", "Hurt01", "Yawn01", "Talk01", "Flee01", "Fear01", "Pray01",
     "Clap01",  "Special01", "Ride01", "Bump01", "Fall01", "Land01", "Weep01", "Swim01", "Idle02",
     "Idle03",  "Idle04",    "Yawn02", "Yawn03", "Yawn04", "Talk02", "Talk03", "Talk04",
 };
 
 static U32 g_hash_platanim[2] = {};
-static char* g_strz_platanim[2] = { "fish_d_balloon_move", "fish_d_balloon_hit" };
+static const char* g_strz_platanim[2] = { "fish_d_balloon_move", "fish_d_balloon_hit" };
 
 F32 g_vilg_ds2_playernear = 25.0f;
 static F32 g_rad_cowercheck = 15.0f;
@@ -215,7 +215,7 @@ xAnimTable* ZNPC_AnimTable_Villager(xAnimTable* callerTable)
     S32 ourAnims[11] = { Idle01, Move01, Hurt01, Yawn01,    Talk01, Flee01,
                          Fear01, Pray01, Clap01, Special01, Unknown };
     xAnimTable* table = callerTable;
-    char** names = g_strz_folkanim;
+    const char** names = g_strz_folkanim;
 
     if (callerTable != NULL)
     {
@@ -264,7 +264,7 @@ xAnimTable* ZNPC_AnimTable_BalloonBoy(xAnimTable* callerTable)
 {
     S32 ourAnims[7] = { Ride01, Bump01, Fall01, Land01, Weep01, Swim01, Unknown };
     xAnimTable* table = callerTable;
-    char** names = g_strz_folkanim;
+    const char** names = g_strz_folkanim;
 
     if (callerTable != NULL)
     {
@@ -310,7 +310,7 @@ xAnimTable* ZNPC_AnimTable_SuperFriend(xAnimTable* callerTable)
     S32 ourAnims[10] = { Idle02, Idle03, Idle04, Yawn02, Yawn03,
                          Yawn04, Talk02, Talk03, Talk04, Unknown };
     xAnimTable* table;
-    char** names = g_strz_folkanim;
+    const char** names = g_strz_folkanim;
 
     if (callerTable != NULL)
     {
@@ -1429,7 +1429,7 @@ void zNPCMerManChair::Process(xScene* scn, F32 dt)
     }
 }
 
-static char* news_fish_audio[71] = {
+static const char* news_fish_audio[71] = {
     "FAB1001",   "FAB1002",   "FAB1003",   "FAB1004",   "FAB1011",   "FAB1017", "FAB1018",
     "FAB1019",   "FAB1020",   "FAB1021",   "FAB1022",   "FAB1023",   "FAB1025", "FAB1029",
     "FAB1030",   "FAB1032",   "FAB1033",   "FAB1034",   "FAB1035",   "FAB1038", "FAB1046",
@@ -2185,7 +2185,7 @@ void zNPCBubbleBuddy::Setup()
     zNPCCommon::Setup();
     if (!this->rast_fresnel && !this->rast_enviro)
     {
-        char* nam_fresTxtr = "gloss_edge";
+        const char* nam_fresTxtr = "gloss_edge";
         this->aid_fresnelTxtr = xStrHash(nam_fresTxtr);
         this->txtr_fresnel = NPCC_FindRWTexture(this->aid_fresnelTxtr);
         this->rast_fresnel = NPCC_FindRWRaster(this->txtr_fresnel);

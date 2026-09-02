@@ -221,12 +221,12 @@ static void BSP_Unload(void*, U32)
     xEnvFree(globals.sceneCur->env);
 }
 
-static char* jsp_shadow_hack_textures[] = {
+static const char* jsp_shadow_hack_textures[] = {
     "beach_towel",  "wood_board_Nails_singleV2", "wood_board_Nails_singleV3",
     "glass_broken", "ground_path_alpha",
 };
 
-static char** jsp_shadow_hack_end_textures = &jsp_shadow_hack_textures[5];
+static const char** jsp_shadow_hack_end_textures = &jsp_shadow_hack_textures[5];
 
 struct AnimTableList animTable[33] = {
     { "ZNPC_AnimTable_Test", ZNPC_AnimTable_Test, 0 },
@@ -280,11 +280,11 @@ inline bool jsp_shadow_hack_match(RpAtomic* atomic)
     RpGeometry* geom = RpAtomicGetGeometry(atomic);
     S32 numMaterials = geom->matList.numMaterials;
 
-    char** hack = &jsp_shadow_hack_textures[0];
-    char** hack_end = jsp_shadow_hack_end_textures;
+    const char** hack = &jsp_shadow_hack_textures[0];
+    const char** hack_end = jsp_shadow_hack_end_textures;
     for (; hack != hack_end; ++hack)
     {
-        char* name = *hack;
+        const char* name = *hack;
         for (S32 i = 0; i < numMaterials; ++i)
         {
             RwTexture* texture = geom->matList.materials[i]->texture;

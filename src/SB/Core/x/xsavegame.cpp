@@ -234,6 +234,71 @@ S32 xSGGameSize(st_XSAVEGAME_DATA* xsgdata, S32 gidx)
     return size;
 }
 
+static void deadstripped(const char** out) {
+
+    out[0] = "The Mystery Machine";
+    out[1] = "Mystery Machine";
+    out[2] = "On Edge in the Hedge!";
+    out[3] = "Hedges";
+    out[4] = "It's a Mean Greenhouse, Scooby!";
+    out[5] = "Greenhouse";
+    out[6] = "Chills & Spills on Haunted Hill!";
+    out[7] = "Haunted Hill";
+    out[8] = "Scared Stiff at Skull Cliff!";
+    out[9] = "Skull Cliff";
+    out[11] = "Misbehavin'? Cause a Cave In";
+    out[12] = "Caves";
+    out[13] = "A Tight Spot for a Grave Plot!";
+    out[14] = "Graves";
+    out[15] = "A One Way Trip to the Crypt!";
+    out[16] = "Crypts";
+    out[17] = "Gloom & Doom Down in the Tomb!";
+    out[18] = "Tombs";
+    out[19] = "Shock on the Dock!";
+    out[20] = "Docks";
+    out[21] = "Fishy Clues for Scooby-Doo?";
+    out[22] = "Cannery Row";
+    out[23] = "Fear on the Pier!";
+    out[24] = "Piers";
+    out[25] = "Coast for Some Ghosts!";
+    out[26] = "Shoreline";
+    out[27] = "Going Down Witch Way?";
+    out[28] = "Coastal Point";
+    out[29] = "Lighthouse Fright House!";
+    out[30] = "Lighthouse";
+    out[31] = "Wreck on the Deck!";
+    out[32] = "Danger Rocks";
+    out[33] = "Aghast by the Mast!";
+    out[34] = "Masts";
+    out[35] = "Shiver Your Timbers, Scooby!";
+    out[36] = "Shipwrecks";
+    out[37] = "Clamor in the Manor!";
+    out[38] = "Manor";
+    out[39] = "Mind Your Manors!";
+    out[40] = "Stairway";
+    out[41] = "All Scares Upstairs!";
+    out[42] = "Upstairs";
+    out[43] = "Don't Look Down, Scooby-Doo!";
+    out[44] = "Hallways";
+    out[45] = "Panic in the Attic!";
+    out[46] = "Attic";
+    out[47] = "A Dark and Stormy Knight!";
+    out[48] = "Rooftops";
+    out[49] = "Who's Yella' in the Cellar?";
+    out[50] = "Cellar";
+    out[51] = "Creepy Crawlies in the Hallways";
+    out[52] = "Catacombs";
+    out[53] = "Gusts Abound Underground";
+    out[54] = "Tunnels";
+    out[55] = "Little Lab of Horrors";
+    out[56] = "Secret Lab";
+    out[57] = "Mastermind Unmasked!";
+    out[58] = "Mastermind";
+    out[59] = "Cower in the Tower!";
+    out[60] = "Tower";
+    out[61] = "Monster Gallery";
+}
+
 char* xSGGameModDate(st_XSAVEGAME_DATA* xsgdata, S32 gidx)
 {
     static char da_date[32] = {};
@@ -248,71 +313,7 @@ char* xSGGameModDate(st_XSAVEGAME_DATA* xsgdata, S32 gidx)
         }
         else
         {
-            strcpy(da_date,
-#if 1 // Need these strings and can't seem get them any other way
-                   0x409 + "The Mystery Machine\0"
-                           "Mystery Machine\0"
-                           "On Edge in the Hedge!\0"
-                           "Hedges\0"
-                           "It's a Mean Greenhouse, Scooby!\0"
-                           "Greenhouse\0"
-                           "Chills & Spills on Haunted Hill!\0"
-                           "Haunted Hill\0"
-                           "Scared Stiff at Skull Cliff!\0"
-                           "Skull Cliff\0"
-                           "Misbehavin'? Cause a Cave In\0"
-                           "Caves\0"
-                           "A Tight Spot for a Grave Plot!\0"
-                           "Graves\0"
-                           "A One Way Trip to the Crypt!\0"
-                           "Crypts\0"
-                           "Gloom & Doom Down in the Tomb!\0"
-                           "Tombs\0"
-                           "Shock on the Dock!\0"
-                           "Docks\0"
-                           "Fishy Clues for Scooby-Doo?\0"
-                           "Cannery Row\0"
-                           "Fear on the Pier!\0"
-                           "Piers\0"
-                           "Coast for Some Ghosts!\0"
-                           "Shoreline\0"
-                           "Going Down Witch Way?\0"
-                           "Coastal Point\0"
-                           "Lighthouse Fright House!\0"
-                           "Lighthouse\0"
-                           "Wreck on the Deck!\0"
-                           "Danger Rocks\0"
-                           "Aghast by the Mast!\0"
-                           "Masts\0"
-                           "Shiver Your Timbers, Scooby!\0"
-                           "Shipwrecks\0"
-                           "Clamor in the Manor!\0"
-                           "Manor\0"
-                           "Mind Your Manors!\0"
-                           "Stairway\0"
-                           "All Scares Upstairs!\0"
-                           "Upstairs\0"
-                           "Don't Look Down, Scooby-Doo!\0"
-                           "Hallways\0"
-                           "Panic in the Attic!\0"
-                           "Attic\0"
-                           "A Dark and Stormy Knight!\0"
-                           "Rooftops\0"
-                           "Who's Yella' in the Cellar?\0"
-                           "Cellar\0"
-                           "Creepy Crawlies in the Hallways\0"
-                           "Catacombs\0"
-                           "Gusts Abound Underground\0"
-                           "Tunnels\0"
-                           "Little Lab of Horrors\0"
-                           "Secret Lab\0"
-                           "Mastermind Unmasked!\0"
-                           "Mastermind\0"
-                           "Cower in the Tower!\0"
-                           "Tower\0"
-                           "Monster Gallery\0"
-#endif
-                           "");
+            strcpy(da_date, "");
         }
     }
     return da_date;
@@ -321,7 +322,10 @@ char* xSGGameModDate(st_XSAVEGAME_DATA* xsgdata, S32 gidx)
 char* xSGGameLabel(st_XSAVEGAME_DATA* xsgdata, S32 gidx)
 {
     char* da_name = NULL;
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wtautological-pointer-compare"
     if (xSG_chdir_gamedir(xsgdata) && g_leaders[gidx].gameLabel != NULL)
+#pragma clang diagnostic pop
     {
         da_name = g_leaders[gidx].gameLabel;
     }
@@ -448,7 +452,7 @@ S32 xSGSetup(st_XSAVEGAME_DATA* xsgdata)
     return xSGSetup(xsgdata, 0, "nothing", -1, 0, 0);
 }
 
-S32 xSGSetup(st_XSAVEGAME_DATA* xsgdata, S32 gidx, char* label, S32 progress, iTime playtime,
+S32 xSGSetup(st_XSAVEGAME_DATA* xsgdata, S32 gidx, const char* label, S32 progress, iTime playtime,
                S32 thumbIconIdx)
 {
     S32 result = 1;

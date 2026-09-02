@@ -182,7 +182,7 @@ namespace
     struct sound_asset
     {
         S32 group;
-        char* name;
+        const char* name;
         U32 priority;
         U32 flags;
     };
@@ -195,12 +195,12 @@ namespace
 
     struct platform_hook
     {
-        char* name;
+        const char* name;
     };
 
     struct node_hook
     {
-        char* name;
+        const char* name;
         S32 model;
         bool midpoint;
         S32 points;
@@ -219,7 +219,7 @@ namespace
         U32 size;
     };
 
-    static char* sound_asset_names[10][4];
+    static const char* sound_asset_names[10][4];
     static U32 sound_asset_ids[10][4];
     static S32 sound_asset_names_size[10];
     static sound_data_type sound_data[10];
@@ -2045,7 +2045,7 @@ void zNPCB_SB2::emit_slug(zNPCB_SB2::slug_enum which)
         xMat3x3RMulVec(&offset, &slug.mat, &tweak.karate.emit_offset);
         slug.mat.pos += offset;
 
-        F32 launch_ang = which - 1.0f;
+        F32 launch_ang = (F32)which - 1.0f;
 
         launch_ang *= tweak.karate.emit_arc;
 
@@ -2375,6 +2375,8 @@ void zNPCB_SB2::update_move(F32 dt)
         break;
     case MOVE_Y:
         update_ymove(dt);
+        break;
+    default:
         break;
     }
 }

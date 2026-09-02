@@ -11,7 +11,10 @@ static RwV3d** sAtomicStartVert;
 
 static RpAtomic* CountAtomicCB(RpAtomic* atomic, void* data)
 {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-volatile"
     sAtomicStartCount++;
+#pragma clang diagnostic pop
     *(U32*)data += atomic->geometry->mesh->totalIndicesInMesh;
     return atomic;
 }
@@ -30,7 +33,10 @@ static RpAtomic* AddAtomicCB(RpAtomic* atomic, void* data)
 {
     // The dwarf defines this variable but it looks like it isnt used
     // TempAtomicList** tmpList;
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-volatile"
     sAtomicStartVert[--sAtomicStartCount] = *(RwV3d**)data;
+#pragma clang diagnostic pop
     sCurrVert = atomic->geometry->morphTarget->verts;
     _rpMeshHeaderForAllMeshes(atomic->geometry->mesh, (RpMeshCallBack)&AddMeshCB, data);
     return atomic;
@@ -38,7 +44,10 @@ static RpAtomic* AddAtomicCB(RpAtomic* atomic, void* data)
 
 static RpAtomic* AddAtomicPrecalcedVertCB(RpAtomic* atomic, void* data)
 {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-volatile"
     sAtomicStartVert[--sAtomicStartCount] = *(RwV3d**)data;
+#pragma clang diagnostic pop
     *(RwV3d**)data += atomic->geometry->mesh->totalIndicesInMesh;
     return atomic;
 }

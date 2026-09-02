@@ -145,6 +145,7 @@ void zRenderState(_SDRenderState newState)
     case SDRS_Default:
     case SDRS_AlphaModels:
     case SDRS_Projectile:
+    case SDRS_Total:
         break;
     }
 }

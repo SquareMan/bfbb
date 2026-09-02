@@ -159,7 +159,7 @@ S32 xSGAddLoadClient(st_XSAVEGAME_DATA* xsgdata, U32 clttag, void* cltdata,
                        S32 (*loadfunc)(void*, st_XSAVEGAME_DATA*, st_XSAVEGAME_READCONTEXT*,
                                          U32, S32));
 S32 xSGSetup(st_XSAVEGAME_DATA* xsgdata);
-S32 xSGSetup(st_XSAVEGAME_DATA* xsgdata, S32 gidx, char* label, S32 progress, iTime playtime,
+S32 xSGSetup(st_XSAVEGAME_DATA* xsgdata, S32 gidx, const char* label, S32 progress, iTime playtime,
                S32 thumbIconIdx);
 S32 xSGProcess(st_XSAVEGAME_DATA* xsgdata);
 S32 xSGWrapup(st_XSAVEGAME_DATA* xsgdata);

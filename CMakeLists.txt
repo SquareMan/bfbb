@@ -10,7 +10,7 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/$<CONFIGURATION>")
 set(CMAKE_CXX_FLAGS -m32)
 set(CMAKE_C_FLAGS -m32)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-everything")
+# set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-everything")
 
 # ------------------ librw --------------------------------
 set(LIBRW_TOOLS OFF CACHE BOOL "" FORCE)
@@ -18,12 +18,15 @@ set(LIBRW_INSTALL OFF CACHE BOOL "" FORCE)
 add_subdirectory(third_party/librw)
 
 # suppress librw warnings
-target_compile_options(librw PRIVATE -fpermissive -Wno-everything)
+target_compile_options(librw PRIVATE -Wno-everything)
 
 # ------------------ sdl ----------------------------------
 add_subdirectory(third_party/sdl)
 
 add_executable(bfbb)
+# FIXME: This should be removable after getting the build fully linking and removing the dependency on gc headers
+# silence warning from RenderWare macros doing cursed enum stuff
+target_compile_options(bfbb PRIVATE -Wno-deprecated-enum-enum-conversion)
 
 target_include_directories(bfbb SYSTEM PRIVATE
     include/

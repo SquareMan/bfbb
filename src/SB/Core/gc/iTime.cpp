@@ -51,7 +51,7 @@ void iFuncProfileDump()
     // Redacted. :}
 }
 
-void iFuncProfileParse(char* elfPath, S32 profile)
+void iFuncProfileParse(const char* elfPath, S32 profile)
 {
     // Redacted. :}
 }

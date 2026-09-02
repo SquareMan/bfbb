@@ -30,7 +30,7 @@ static void xEntMechMove(xEntMotion* motion, xScene* sc, F32 dt, xEntFrame* fram
 static void xEntPenMove(xEntMotion* motion, xScene* sc, F32 dt, xEntFrame* frame);
 static U32 xEntSldMove(xEntMotion* motion, xScene* sc, F32 dt, xEntFrame* frame);
 static U32 xEntRotMove(xEntMotion* motion, xScene* sc, F32 dt, xEntFrame* frame);
-char* xbtoa(U32 param);
+const char* xbtoa(U32 param);
 
 void xEntMotionInit(xEntMotion* motion, xEnt* owner, xEntMotionAsset* asset)
 {
@@ -1332,7 +1332,7 @@ void xDrawSetColor(iColor_tag color)
 {
 }
 
-char* xbtoa(U32 param)
+const char* xbtoa(U32 param)
 {
     if (param != 0)
     {

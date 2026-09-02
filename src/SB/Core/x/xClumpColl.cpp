@@ -884,6 +884,8 @@ xClumpCollBSPTree* xClumpColl_ForAllIntersections(xClumpCollBSPTree* tree,
 
             return tree;
         }
+        default:
+            break;
     }
 
     return NULL;

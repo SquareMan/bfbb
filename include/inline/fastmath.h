@@ -17,9 +17,8 @@
 #define W2_XY fp12
 #define W2_Z fp13
 
-// All this essentially does is do "*dst = *src;"
+
 #define PSVECCopy(dst, src)
 
-// I can't figure out how to get this as a C-style inline function, so use this in an ASM function or block.
-#define PSVECDotProduct(vec1, vec2)
+#define PSVECDotProduct(vec1, vec2) 1.0f
 #endif

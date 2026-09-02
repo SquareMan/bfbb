@@ -5,7 +5,7 @@
 
 struct PickupTranslEntry
 {
-    char* tname;
+    const char* tname;
     U32 hval;
     U8 type;
     U8 subtype;

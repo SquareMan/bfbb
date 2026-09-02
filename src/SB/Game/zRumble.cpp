@@ -72,6 +72,8 @@ void zRumbleStart(S32 pad_id, _tagSDRumbleType rumble_type, xEnt* ent)
     case SDR_TeleportEject:
         xPadAddRumble(pad_id, eRumble_VeryHeavyHi, 0.09f, 1, 0);
         break;
+    default:
+        break;
     }
 }
 

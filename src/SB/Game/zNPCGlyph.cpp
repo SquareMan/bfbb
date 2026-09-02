@@ -9,7 +9,7 @@
 
 #include <types.h>
 
-char* g_strz_glyphmodel[10] = {
+const char* g_strz_glyphmodel[10] = {
     "unknown",
     "shiny_obj_purple.dff",
     "shiny_obj_blue.dff",
@@ -34,7 +34,7 @@ static NPCGlyph g_glyphs_shinyFifty[16] = { NPC_GLYPH_UNKNOWN };
 static NPCGlyph g_glyphs_shinyHundred[16] = { NPC_GLYPH_UNKNOWN };
 
 // This function is put here to force the string to be linked in, since it isn't used anywhere.
-char* __deadstripped_zNPCGlyph()
+const char* __deadstripped_zNPCGlyph()
 {
     return "%s.MINF";
 }
@@ -204,6 +204,8 @@ S32 zNPCGlyph_TypeToList(en_npcglyph gtyp, NPCGlyph** glist)
     case NPC_GLYPH_DAZED:
         cnt = 8;
         *glist = g_glyphs_dazed;
+        break;
+    default:
         break;
     }
 
@@ -610,6 +612,8 @@ void NPCGlyph::Timestep(F32 dt)
             xVec3AddScaled(&vec, &vel_glyph, dt);
             PosSet(&vec);
         }
+        break;
+    default:
         break;
     }
 }

@@ -610,7 +610,7 @@ F32 NPCC_DstSq(const xVec3*, const xVec3*, xVec3*);
 void zNPCCommon_WonderReset();
 xAnimTable* ZNPC_AnimTable_Common();
 xAnimTable* ZNPC_AnimTable_LassoGuide();
-void NPCC_BuildStandardAnimTran(xAnimTable* table, char** namelist, S32* ourAnims, S32 idx_dflt,
+void NPCC_BuildStandardAnimTran(xAnimTable* table, const char** namelist, S32* ourAnims, S32 idx_dflt,
                                 F32 blend);
 void zNPCCommon_EjectPhlemOnPawz();
 U32 xSndIsPlaying(U32 assetID, U32 parid);

@@ -907,7 +907,10 @@ namespace
                            0);
         }
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wswitch-bool"
         switch (talk.asset->audio_effect)
+#pragma clang diagnostic pop
         {
         case 0:
 
@@ -926,13 +929,17 @@ namespace
     {
         if (shared.active)
         {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wswitch-bool"
             switch (shared.active->asset->audio_effect)
+#pragma clang diagnostic pop
             {
             case 0:
-
                 break;
             case 1:
                 zMusicSetVolume(1.0f, music_fade_delay);
+                break;
+            default:
                 break;
             }
         }

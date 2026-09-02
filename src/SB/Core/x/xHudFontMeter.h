@@ -31,7 +31,7 @@ namespace xhud
         U8 pad2; // offset 0x72, size 0x1
         U8 pad3; // offset 0x73, size 0x1
 
-        char* type_name();
+        const char* type_name();
     };
 
     struct font_meter_widget : meter_widget

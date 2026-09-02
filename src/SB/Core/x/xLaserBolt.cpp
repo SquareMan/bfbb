@@ -466,6 +466,8 @@ void xLaserBoltEmitter::emit_particle(effect_data& effect, bolt& b, F32 from_dis
         break;
     case FX_ORIENT_HIT_REFLECT:
         break;
+    default:
+        break;
     }
 
     if (pea.emit_type == eParEmitterLine)
@@ -502,6 +504,8 @@ void xLaserBoltEmitter::emit_decal(effect_data& effect, bolt& b, F32 from_dist, 
         break;
     case FX_ORIENT_HIT_REFLECT:
         break;
+    default:
+        break;
     }
 
     mat.pos = b.origin + b.dir * to_dist;
@@ -534,6 +538,8 @@ void xLaserBoltEmitter::emit_decal_dist(effect_data& effect, bolt& b, F32 from_d
         xMat3x3LookVec3(mat, b.hit_norm);
         break;
     case FX_ORIENT_HIT_REFLECT:
+        break;
+    default:
         break;
     }
 

@@ -31,7 +31,10 @@ void xParMgrUpdate(F32 elapsedTime)
 {
     iParMgrUpdate(elapsedTime);
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-volatile"
     sFrameCount++;
+#pragma clang diagnostic pop
 
     if (sFrameCount > 10)
     {

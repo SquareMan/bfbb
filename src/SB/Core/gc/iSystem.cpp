@@ -914,10 +914,10 @@ S32 iGetMonth()
     return td.mon + 1;
 }
 
-char* months[] = { "January ", "February ", "March ",     "April ",   "May ",      "June ",
+const char* months[] = { "January ", "February ", "March ",     "April ",   "May ",      "June ",
                    "July ",    "August ",   "September ", "October ", "November ", "December " };
 
-char* dotw[] = {
+const char* dotw[] = {
     "Sunday ", "Monday ", "Tuesday ", "Wednesday ", "Thursday ", "Friday ", "Saturday "
 };
 

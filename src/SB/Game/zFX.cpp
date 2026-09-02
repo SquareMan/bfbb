@@ -407,7 +407,8 @@ void zFXGooUpdateInstance(zFXGooInstance* goo, F32 dt)
         }
     }
 
-    if (xabs(goo->state_time[goo->state] < 1e-5f))
+    // silence this warning, they really did convert the float to a bool...
+    if ((bool)xabs(goo->state_time[goo->state] < 1e-5f))
     {
         goo->state_time[goo->state] = 1e-5f;
     }
@@ -454,6 +455,8 @@ void zFXGooUpdateInstance(zFXGooInstance* goo, F32 dt)
         goo->max *= rate;
         break;
     }
+    default:
+        break;
     }
 
     goo->warbc[0] = goo->w0 * (1.0f - goo->alpha);
@@ -892,6 +895,8 @@ F32 zFXGooFreezeTimeLeft()
             time += (goo->timer - goo->time);
             break;
         }
+        default:
+            break;
         }
 
         if (maxTime < time)
@@ -1278,7 +1283,7 @@ namespace
 
     struct entrail_type
     {
-        char* model_name;
+        const char* model_name;
         S32 bone;
         F32 rate;
         F32 cull_dist;
@@ -1762,6 +1767,8 @@ namespace
             set_popper_alpha(popper, xSCurve(1.0f - t));
             break;
         }
+        case STATE_NONE:        
+            break;
         }
 
         F32 size;
@@ -1834,6 +1841,8 @@ namespace
             m->PipeFlags = (m->PipeFlags & ~0xc) | data.pipe_flags;
             break;
         }
+        case STATE_NONE:
+            break;
         }
 
         data.state = STATE_NONE;

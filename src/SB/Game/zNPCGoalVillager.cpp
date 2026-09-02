@@ -329,6 +329,8 @@ S32 zNPCGoalPlayerNear::NPCMessage(NPCMsg* mail)
             flg_plyrnear |= (1 << 0);
         }
         break;
+    default:
+        break;
     }
 
     return handled;
@@ -1074,6 +1076,8 @@ S32 zNPCGoalBoyWeep::NPCMessage(NPCMsg* mail)
             zNPCBalloonBoy* npc = (zNPCBalloonBoy*)psyche->clt_owner;
             npc->SndPlayRandom(NPC_STYP_EXCLAIM);
         }
+        break;
+    default:
         break;
     }
 

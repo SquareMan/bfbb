@@ -270,7 +270,7 @@ S32 ROMFont::DrawString(S32 param_1, S32 param_2, char* string)
     return iVar1;
 }
 
-S32 ROMFont::GetWidth(char* string)
+S32 ROMFont::GetWidth(const char* string)
 {
     S32 iVar1;
     void* image[1];
@@ -281,7 +281,7 @@ S32 ROMFont::GetWidth(char* string)
     iVar1 = 0;
     while (*string != '\0')
     {
-        string = OSGetFontTexture(string, image, (s32*)&x, (s32*)&y, (s32*)&width);
+        OSGetFontTexture(string, image, (s32*)&x, (s32*)&y, (s32*)&width);
         iVar1 = iVar1 + width;
     }
     return iVar1;

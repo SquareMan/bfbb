@@ -487,6 +487,8 @@ void NPCC_MakeLightningInfo(en_npclyt style, _tagLightningAdd* info)
             info->move_degrees *= -1.0f;
         }
         break;
+    default:
+        break;
     }
 }
 
@@ -587,6 +589,8 @@ void NPCC_MakeStreakInfo(en_npcstreak styp, StreakInfo* info)
         info->rgba_left.b = 0xf0;
         info->rgba_left.a = 0xf0;
         info->freq = 0.025f;
+        break;
+    default:
         break;
     }
 }

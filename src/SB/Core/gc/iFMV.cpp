@@ -391,7 +391,7 @@ void iFMV::Resume()
 
 static void xDrawLine2D_LocaliFMVVersion(F32 arg0, F32 arg1, F32 arg2, F32 arg3)
 {
-    RwRGBA color = { -1, -1, -1, -1 };
+    RwRGBA color = { 0xFF, 0xFF, 0xFF, 0xFF };
 
     F32 nearz = RwIm2DGetNearScreenZ();
     void* texraster_state;

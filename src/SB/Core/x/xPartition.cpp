@@ -186,6 +186,6 @@ void xPartitionSpaceMove(_tagPartSpace* src, _tagPartSpace* dest, U32 data)
     dest->total++;
 }
 
-void xPartitionDump(_tagPartition*, char*)
+void xPartitionDump(_tagPartition*, const char*)
 {
 }

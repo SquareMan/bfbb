@@ -279,7 +279,10 @@ void zLightAddLocalEnv()
             gLightWorld->directionalLightList.link.prev = &light->hw->inWorld;
 
             gTemporaryLights[gNumTemporaryLights] = zlight;
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-volatile"
             gNumTemporaryLights++;
+#pragma clang diagnostic pop
         }
     }
 }

@@ -76,7 +76,10 @@ static S32 iSG_mc_unmount(S32 slot);
 
 S32 iSGStartup()
 {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-volatile"
     if (g_isginit++ != 0)
+#pragma clang diagnostic pop
     {
         return g_isginit;
     }
@@ -846,7 +849,7 @@ en_ASYNC_OPSTAT iSGPollStatus(st_ISGSESSION* isgdata, en_ASYNC_OPCODE* curop, S3
 
 en_ASYNC_OPERR iSGOpError(st_ISGSESSION* isgdata, char* errmsg)
 {
-    static char* errmsgs[0x16] = {
+    static const char* errmsgs[0x16] = {
         "No current error",
         "No operation in async queue",
         "Too many async ops queued simultaneously",
@@ -1196,7 +1199,7 @@ static S32 iSG_isSpaceForFile(st_ISG_MEMCARD_DATA* mcdata, S32 param2, const cha
     {
         if (param6)
         {
-            *param6 = *param6 - 1 & ~(*param6 - 1 >> 0x1f); // FIXME: Fakematch
+            *param6 = *param6 - 1 & ~((*param6 - 1) >> 0x1f); // FIXME: Fakematch
         }
         if (len <= mcdata->unk_b0.length + byteNotUsed)
         {

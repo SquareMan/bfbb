@@ -52,7 +52,7 @@ U32 xStrHashCat(U32 prefix, const char* str)
     return hash;
 }
 
-char* xStrTok(char* string, const char* control, char** nextoken)
+char* xStrTok(char* string, const char* control, const char** nextoken)
 {
     U8* str;
     U8* ctrl;

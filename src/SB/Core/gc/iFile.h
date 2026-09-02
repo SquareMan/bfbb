@@ -39,7 +39,7 @@ struct tag_xFile;
 
 void iFileInit();
 void iFileExit();
-U32* iFileLoad(char* name, U32* buffer, U32* size);
+U32* iFileLoad(const char* name, U32* buffer, U32* size);
 U32 iFileOpen(const char* name, S32 flags, tag_xFile* file);
 S32 iFileSeek(tag_xFile* file, S32 offset, S32 whence);
 U32 iFileRead(tag_xFile* file, void* buf, U32 size);
@@ -50,7 +50,7 @@ U32 iFileClose(tag_xFile* file);
 U32 iFileGetSize(tag_xFile* file);
 void iFileReadStop();
 void iFileFullPath(const char* relname, char* fullname);
-void iFileSetPath(char* path);
+void iFileSetPath(const char* path);
 U32 iFileFind(const char* name, tag_xFile* file);
 void iFileGetInfo(tag_xFile* file, U32* addr, U32* length);
 void iFileAsyncService();

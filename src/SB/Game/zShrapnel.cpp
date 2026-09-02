@@ -254,6 +254,8 @@ void zShrapnel_SceneInit(zScene* sc)
             case eFragLightning:
                 fasset = (zFragAsset*)((zFragLightningAsset*)fasset + 1);
                 break;
+            default:
+                break;
             }
         }
     }
@@ -417,6 +419,8 @@ void zShrapnel_DefaultInit(zShrapnelAsset* shrap, xModelInstance* parent, xVec3*
             break;
         case eFragLightning:
             fasset = (zFragAsset*)((zFragLightningAsset*)fasset + 1);
+            break;
+        default:
             break;
         }
 
@@ -708,6 +712,8 @@ void zFrag_DefaultInit(zFrag* frag, zFragAsset* fasset)
         break;
     }
     case eFragShockwave:
+        break;
+    default:
         break;
     }
 }
@@ -1660,6 +1666,8 @@ static void zShrapnel_GlobalRobotInit(zShrapnelAsset* shrap, xModelInstance* par
         case eFragLightning:
             fasset = (zFragAsset*)((zFragLightningAsset*)fasset + 1);
             break;
+        default:
+            break;
         }
 
         curr++;
@@ -1755,6 +1763,8 @@ static void zShrapnel_SpongebobInit(zShrapnelAsset* shrap, xModelInstance* paren
             break;
         case eFragLightning:
             fasset = (zFragAsset*)((zFragLightningAsset*)fasset + 1);
+            break;
+        default:
             break;
         }
 

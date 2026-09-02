@@ -146,7 +146,7 @@ namespace
     struct sound_asset
     {
         S32 group;
-        char* name;
+        const char* name;
         U32 priority;
         U32 flags;
     };
@@ -165,7 +165,7 @@ namespace
 
     static effect_data beam_kill_effect[1] = { { FX_TYPE_CALLBACK } };
 
-    static char* sound_asset_names[6][10];
+    static const char* sound_asset_names[6][10];
     static U32 sound_asset_ids[6][10];
     static S32 sound_asset_names_size[6];
     static sound_data_type sound_data[6];
@@ -1593,6 +1593,8 @@ void zNPCBPlankton::Damage(en_NPC_DAMAGE_TYPE damtype, xBase* from, const xVec3*
         stun();
         break;
     }
+    default:
+        break;
     }
 }
 
@@ -1869,6 +1871,8 @@ void zNPCBPlankton::update_move(F32 dt)
         update_move_orbit(frame->mat.pos, move, orbit.center, dt, false);
         break;
     }
+    default:
+        break;    
     }
 }
 
@@ -1991,6 +1995,8 @@ void zNPCBPlankton::update_follow(F32 dt)
         update_follow_camera(dt);
         break;
     }
+    default:
+        break;
     }
 }
 

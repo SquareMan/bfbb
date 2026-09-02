@@ -554,13 +554,13 @@ void zEntAnimEvent(zEnt* ent, U32 animEvent, const F32* animParam)
 }
 
 U32 g_hash_xentanim[5] = { 0 };
-char* g_strz_xentanim[5] = {
+const char* g_strz_xentanim[5] = {
     "Idle01", "Anim02", "Anim03", "Anim04", "Anim05",
 };
 // Thank you floating point memes. Very cool.
 xAnimTable* xEnt_AnimTable_AutoEventSmall()
 {
-    char** names = g_strz_xentanim;
+    const char** names = g_strz_xentanim;
     U32* hash = g_hash_xentanim;
     xAnimTransition* deftran = NULL;
     if (*hash == 0)

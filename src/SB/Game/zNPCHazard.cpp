@@ -10,7 +10,7 @@
 #include "zNPCSupport.h"
 #include "xMath.h"
 #include "xMathInlines.h"
-#include "xUtil.h"
+#include "xutil.h"
 #include "xordarray.h"
 #include "zRenderState.h"
 
@@ -39,7 +39,7 @@ void __deadstripped_zNPCHazard()
 // TU, not an import.
 static RpAtomic* g_hazard_rawModel[30] = { NULL };
 
-static char* g_strz_hazModel[30] = {
+static const char* g_strz_hazModel[30] = {
     "fx_boomball_bubble",       "fx_boomball_smoke",
     "fx_fodbomb.dff",           "fx_tubelet_blast.dff",
     "fx_duplotron_blast.dff",   "fx_cattleprod.dff",
@@ -58,7 +58,7 @@ static char* g_strz_hazModel[30] = {
 };
 
 static U32 g_hash_hazanim[3] = { 0, 0, 0 };
-static char* g_strz_hazanim[3] = { "Unknown", "Idle01", "Active01" };
+static const char* g_strz_hazanim[3] = { "Unknown", "Idle01", "Active01" };
 
 static NPCHazard* g_haz_uvAnimQue[27] = { NULL };
 
@@ -78,13 +78,13 @@ static en_hazmodel g_funfrag_choices[8] = {
 
 static zShrapnelAsset* g_data_hazshrap[5] = { NULL, NULL, NULL, NULL, NULL };
 
-char* g_strz_hazshrap[5] = {
+const char* g_strz_hazshrap[5] = {
     "", "tartar_gunshot", "tartar_splatter", "slick_oilspill", "shrapnel_splash_water",
 };
 
 static RwRaster* g_rast_hazshad[30] = { NULL };
 
-char* g_strz_hazshad[30] = {
+const char* g_strz_hazshad[30] = {
     "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "",
     "shadow_monsoon_cloud", "", "", "", "", "", "", "", "", "", "", "", "",
 };
@@ -220,7 +220,7 @@ void zNPCHazard_InitEffects()
 
     for (i = 0; i < 30; i++)
     {
-        char* namez = g_strz_hazModel[i];
+        const char* namez = g_strz_hazModel[i];
 
         if (namez != NULL && namez[0] != '\0')
         {
@@ -251,7 +251,7 @@ void zNPCHazard_InitEffects()
     {
         g_data_hazshrap[i] = NULL;
 
-        char* namez = g_strz_hazshrap[i];
+        const char* namez = g_strz_hazshrap[i];
         if (namez != NULL && namez[0] != '\0')
         {
             U32 hashy = xStrHash(namez);

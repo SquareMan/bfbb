@@ -15,7 +15,7 @@
 
 #include "xMathInlines.h"
 #include "xMath3.h"
-#include "xUtil.h"
+#include "xutil.h"
 #include "xQuickCull.h"
 #include "xCollide.h"
 
@@ -45,7 +45,7 @@ void __deadstripped_zNPCSupport_head()
 
 static NPCWidget g_npc_widgets[1];
 static U32 g_hash_uiwidgets[1] = { 0 };
-static char* g_strz_uiwidgets[1] = { "MNU4 NPCTALK" };
+static const char* g_strz_uiwidgets[1] = { "MNU4 NPCTALK" };
 
 static U32 sNPCSndFx[eNPCSnd_Total] = {};
 static U32 sNPCSndID[eNPCSnd_Total] = {};
@@ -409,6 +409,8 @@ S32 NPCTarget::IsDead()
         }
         break;
     case NPC_TGT_BASE:
+        break;
+    default:
         break;
     }
 
@@ -798,6 +800,8 @@ void Firework::Update(F32 dt)
         this->fwstate = FW_STAT_DONE;
         break;
     case FW_STAT_DONE:
+        break;
+    default:
         break;
     }
 
@@ -1227,6 +1231,8 @@ void NPCTarget::PosGet(xVec3* pos)
         break;
     case NPC_TGT_MVPT:
         xVec3Copy(pos, zMovePointGetPos(nav_target));
+        break;
+    default:
         break;
     }
 }

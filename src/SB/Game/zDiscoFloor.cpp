@@ -182,7 +182,10 @@ namespace
                 bit_index = 0x20;
                 init = 1;
             }
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-volatile"
             bit_index++;
+#pragma clang diagnostic pop
             if (bit_index >= 0x20)
             {
                 bit_index = 0;

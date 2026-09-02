@@ -8,7 +8,7 @@
 
 char zEventLogBuf[20][256];
 
-void zEntEvent(char* to, U32 toEvent)
+void zEntEvent(const char* to, U32 toEvent)
 {
     U32 id = xStrHash(to);
     xBase* sendTo = zSceneFindObject(id);

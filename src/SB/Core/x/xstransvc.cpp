@@ -17,8 +17,8 @@ static st_STRAN_SCENE* XST_lock_next();
 static void XST_unlock_all();
 static S32 XST_cnt_locked();
 static S32 XST_PreLoadScene(st_STRAN_SCENE* sdata, const char* path);
-static char* XST_translate_sid(U32 sid, char* extension);
-static char* XST_translate_sid_path(U32 sid, char* extension);
+static char* XST_translate_sid(U32 sid, const char* extension);
+static char* XST_translate_sid_path(U32 sid, const char* extension);
 static st_STRAN_SCENE* XST_find_bySID(U32 sid, S32 findTheHOP);
 static void XST_reset_raw();
 static void XST_unlock(st_STRAN_SCENE* sdata);
@@ -225,9 +225,9 @@ S32 xSTSwitchScene(U32 sid, void* userdata, S32 (*progmon)(void*, F32))
     return rc;
 }
 
-char* xSTAssetName(U32 aid)
+const char* xSTAssetName(U32 aid)
 {
-    char* aname = NULL;
+    const char* aname = NULL;
 
     S32 cnt = XST_cnt_locked();
     for (int i = 0; i < cnt; i++)
@@ -246,9 +246,9 @@ char* xSTAssetName(U32 aid)
     return aname;
 }
 
-char* xSTAssetName(void* raw_HIP_asset)
+const char* xSTAssetName(void* raw_HIP_asset)
 {
-    char* aname = NULL;
+    const char* aname = NULL;
 
     S32 cnt = XST_cnt_locked();
     for (int i = 0; i < cnt; i++)
@@ -447,14 +447,14 @@ static S32 XST_PreLoadScene(st_STRAN_SCENE* sdata, const char* name)
     return NULL;
 }
 
-static char* XST_translate_sid(U32 sid, char* extension)
+static char* XST_translate_sid(U32 sid, const char* extension)
 {
     static char fname[0x40] = {};
     sprintf(fname, "%s%s", xUtil_idtag2string(sid, 0), extension);
     return fname;
 }
 
-static char* XST_translate_sid_path(U32 sid, char* extension)
+static char* XST_translate_sid_path(U32 sid, const char* extension)
 {
     // NOTE: This buffer extends for 0x44 bytes in the rom
     // However, I think that's most likely padding for the jumptable that occurs afterwards

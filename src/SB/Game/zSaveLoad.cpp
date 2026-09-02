@@ -104,7 +104,7 @@ zSaveLoadUI zSaveLoadUITable[62] = { { 0, 0, "ld gameslot group" },
                                      { 60, 0, "ld damaged save game" },
                                      { 0, 0, NULL } };
 
-char* thumbIconMap[15] = { "ThumbIconHB", "ThumbIconJF", "ThumbIconBB", "ThumbIconGL",
+const char* thumbIconMap[15] = { "ThumbIconHB", "ThumbIconJF", "ThumbIconBB", "ThumbIconGL",
                            "ThumbIconB1", "ThumbIconRB", "ThumbIconBC", "ThumbIconSM",
                            "ThumbIconB2", "ThumbIconKF", "ThumbIconGY", "ThumbIconDB",
                            "ThumbIconB3", "ThumbIconHB", "ThumbIconHB" };
@@ -1788,6 +1788,8 @@ S32 zSaveLoad_DoAutoSave()
             case XSG_ASTAT_FAILED:
                 success = false;
                 break;
+            default:
+                break;
             }
         }
     }
@@ -2379,9 +2381,8 @@ S32 xSGT_LoadPrefsCB(void* vp, st_XSAVEGAME_DATA* xsgdata, st_XSAVEGAME_READCONT
 
 U32 zSaveLoad_slotIsEmpty(U32 i)
 {
-    // TODO: Fix this hardcoded offset once string generation is correct
     char* label = zSaveLoadGameTable[i].label;
-    return strcmp(label, "ld gameslot group" + 0x49c) == 0 ? 1 : 0;
+    return strcmp(label, "Empty") == 0 ? 1 : 0;
 }
 
 S32 XSGAutoData::LastPhysicalSlot()

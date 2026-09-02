@@ -22,12 +22,12 @@ struct LaunchStats
 
 struct ThrowableStats
 {
-    char* name;
+    const char* name;
     void (*collCB)(zThrownStruct*, xEntCollis*, F32*, F32*);
     CarryableStats* carry;
     LaunchStats* launch;
     iColor_tag glowColor;
-    char* shrapName;
+    const char* shrapName;
     F32 stackHeight;
     U32 nameHash;
     U32 nameHashMINF;

@@ -32,7 +32,7 @@ void iCSSoundSetup(xCutscene* csn)
             csn->SndNumChannel++;
         }
 
-        data = (xCutsceneData*)((U8*)data + ALIGN(data->ChunkSize, 16) + sizeof(xCutsceneData));
+        data = (xCutsceneData*)((U8*)data + ALIGN_NEXT(data->ChunkSize, 16) + sizeof(xCutsceneData));
     }
 }
 
@@ -110,7 +110,7 @@ void* iCSSoundGetData(xSndVoiceInfo* vp, U32* size)
             }
         }
 
-        data = (xCutsceneData*)((U8*)data + ALIGN(data->ChunkSize, 16) + sizeof(xCutsceneData));
+        data = (xCutsceneData*)((U8*)data + ALIGN_NEXT(data->ChunkSize, 16) + sizeof(xCutsceneData));
     }
 
     if (!retdata)
@@ -150,7 +150,7 @@ U32 iCSFileOpen(xCutscene* csn)
     U32 headerskip;
     st_PKR_ASSET_TOCINFO ainfo;
 
-    headerskip = ALIGN(csn->Info->HeaderSize, 2048);
+    headerskip = ALIGN_NEXT(csn->Info->HeaderSize, 2048);
 
     if (!xSTGetAssetInfo(csn->Info->AssetID, &ainfo))
     {
@@ -161,7 +161,7 @@ U32 iCSFileOpen(xCutscene* csn)
 
     if (iFileOpen(filename, 0x1, &csn->File) == 0)
     {
-        iFileSeek(&csn->File, headerskip + (ainfo.sector - csn->File.ps.fileInfo.startAddr << 5),
+        iFileSeek(&csn->File, headerskip + ((ainfo.sector - csn->File.ps.fileInfo.startAddr) << 5),
                   IFILE_SEEK_SET);
 
         csn->File.ps.asynckey = -1;
@@ -242,7 +242,7 @@ S32 iCSLoadStep(xCutscene* csn)
             {
                 csn->Data[csn->DataLoading].DataPtr = foundModel;
 
-                skipAccum += ALIGN(csn->Data[csn->DataLoading].ChunkSize, 2048);
+                skipAccum += ALIGN_NEXT(csn->Data[csn->DataLoading].ChunkSize, 2048);
 
                 csn->DataLoading++;
             }
@@ -278,7 +278,7 @@ S32 iCSLoadStep(xCutscene* csn)
                 else
                 {
                     iCSFileAsyncRead(csn, csn->AlignBuf,
-                                     ALIGN(csn->Data[csn->DataLoading].ChunkSize, 2048));
+                                     ALIGN_NEXT(csn->Data[csn->DataLoading].ChunkSize, 2048));
 
                     csn->GotData = 1;
                     return 0;

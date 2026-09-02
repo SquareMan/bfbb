@@ -83,7 +83,7 @@ struct st_PACKER_ATOC_NODE
     // Evidence: memory allocation; Name function returns a constant
     // char basename[32];
 
-    char* Name() const;
+    const char* Name() const;
 };
 
 struct st_PACKER_LTOC_NODE
@@ -134,7 +134,7 @@ struct st_PACKER_READ_FUNCS
     S32 (*AssetCount)(st_PACKER_READ_DATA*, U32);
     S32 (*IsAssetReady)(st_PACKER_READ_DATA*, U32);
     S32 (*SetActive)(st_PACKER_READ_DATA*, en_LAYER_TYPE);
-    char* (*AssetName)(st_PACKER_READ_DATA*, U32);
+    const char* (*AssetName)(st_PACKER_READ_DATA*, U32);
     U32 (*GetBaseSector)(st_PACKER_READ_DATA*);
     S32 (*GetAssetInfo)(st_PACKER_READ_DATA*, U32, st_PKR_ASSET_TOCINFO*);
     S32 (*GetAssetInfoByType)(st_PACKER_READ_DATA*, U32, S32, st_PKR_ASSET_TOCINFO*);
@@ -173,7 +173,7 @@ S32 PKR_IsAssetReady(st_PACKER_READ_DATA* pr, U32 aid);
 U32 PKR_getPackTimestamp(st_PACKER_READ_DATA* pr);
 void PKR_Disconnect(st_PACKER_READ_DATA* pr);
 U32 PKRAssetIDFromInst(void* asset_inst);
-char* PKR_AssetName(st_PACKER_READ_DATA* pr, U32 aid);
+const char* PKR_AssetName(st_PACKER_READ_DATA* pr, U32 aid);
 U32 PKR_GetBaseSector(st_PACKER_READ_DATA* pr);
 S32 PKR_GetAssetInfo(st_PACKER_READ_DATA* pr, U32 aid, st_PKR_ASSET_TOCINFO* tocinfo);
 S32 PKR_GetAssetInfoByType(st_PACKER_READ_DATA* pr, U32 type, S32 idx,

@@ -550,7 +550,7 @@ enum en_xEventTags
 };
 
 // Oddly, all the zEntEvent functions are in xEvent, not zEvent
-void zEntEvent(char* to, U32 toEvent);
+void zEntEvent(const char* to, U32 toEvent);
 void zEntEvent(U32 toID, U32 toEvent);
 void zEntEvent(U32 toID, U32 toEvent, F32 toParam0, F32 toParam1, F32 toParam2,
                F32 toParam3);

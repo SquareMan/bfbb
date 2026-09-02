@@ -243,7 +243,7 @@ void xModelBucket_InsertBucket(RpAtomic* data, U32 pipeFlags, U32 subObjects)
             sBucketClipCullCurr += 2;
         }
         subObjects >>= 1;
-    } while (data = iModelFile_RWMultiAtomic(data));
+    } while ((data = iModelFile_RWMultiAtomic(data)));
 }
 
 void xModelBucket_Init()

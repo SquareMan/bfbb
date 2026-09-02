@@ -18,7 +18,7 @@ extern "C" int sprintf(char*, const char*, ...);
 // those templates at *parse* time, so merely including them emits a 12-byte .rodata
 // and an 8-byte .sbss2 anonymous object into this TU. Retail's zMain.o has neither,
 // and their presence displaces screen_bounds/@1170 and the three RwRGBA .sbss2 zeros.
-#include "xUtil.h"
+#include "xutil.h"
 #include "zEntPickup.h"
 #include "xDebug.h"
 #include "xsavegame.h"
@@ -43,7 +43,7 @@ void zAssetShutdown();
 #include "iTime.h"
 #include "zDispatcher.h"
 #include "xserializer.h"
-#include "xScrFX.h"
+#include "xScrFx.h"
 #include "xFX.h"
 #include "xParMgr.h"
 #include "zParCmd.h"
@@ -101,7 +101,7 @@ int main(S32 argc, char** argv)
 {
     U32 options;
     S32 i;
-    char* tmpStr;
+    const char* tmpStr;
 
     memset(&globals, 0, 0x1fc8);
     globals.firstStartPressed = TRUE;
@@ -155,7 +155,7 @@ int main(S32 argc, char** argv)
 void zMainOutputMgrSetup()
 {
     iTime tim = iTimeGet();
-    __FUNCTION__; // stands in for the (NDEBUG'd) load-timing report; retail's object
+    (void)__FUNCTION__; // stands in for the (NDEBUG'd) load-timing report; retail's object
                   // carries the __FUNCTION__ string object this evaluation emits
     iTimeDiffSec(tim);
     iTimeGet();
@@ -166,13 +166,13 @@ void zMainInitGlobals()
     memset(&globals, 0, sizeof(zGlobals));
     globals.sceneFirst = 1;
     iTime tim = iTimeGet();
-    __FUNCTION__; // stands in for the (NDEBUG'd) load-timing report; retail's object
+    (void)__FUNCTION__; // stands in for the (NDEBUG'd) load-timing report; retail's object
                   // carries the __FUNCTION__ string object this evaluation emits
     iTimeDiffSec(tim);
     iTimeGet();
 }
 
-static void ParseFloatList(F32* dest, char* strbuf, S32 max)
+static void ParseFloatList(F32* dest, const char* strbuf, S32 max)
 {
     xStrParseFloatList(dest, strbuf, max);
 }
@@ -851,7 +851,7 @@ void zMainLoop()
 
 void zMainReadINI()
 {
-    char* str;
+    const char* str;
     void* buf;
     U32 size;
     xIniFile* ini;
@@ -908,7 +908,7 @@ void zMainReadINI()
     }
 
     iTime tim = iTimeGet();
-    __FUNCTION__; // stands in for the (NDEBUG'd) load-timing report; retail's object
+    (void)__FUNCTION__; // stands in for the (NDEBUG'd) load-timing report; retail's object
                   // carries the __FUNCTION__ string object this evaluation emits
     iTimeDiffSec(tim);
     iTimeGet();
@@ -1118,6 +1118,8 @@ void zMainMemCardSpaceQuery()
                 zMainMemCardRenderText("{i:text_mem_card_corrupt_file}", 1);
                 break;
             case eNoController:
+                break;
+            case eNoError:
                 break;
             }
         }

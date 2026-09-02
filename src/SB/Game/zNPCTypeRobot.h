@@ -9,8 +9,8 @@
 #include "zNPCGlyph.h"
 #include "zNPCHazard.h"
 
-typedef struct zNPCRobot;
-extern char* g_strz_roboanim[41];
+struct zNPCRobot;
+extern const char* g_strz_roboanim[41];
 extern U32 g_hash_roboanim[41];
 
 struct NPCArena
@@ -596,7 +596,7 @@ struct zNPCTubeSlave : zNPCRobot
     void Setup();
 };
 
-typedef struct zNPCSlick;
+struct zNPCSlick;
 
 struct zNPCSlick : zNPCRobot
 {

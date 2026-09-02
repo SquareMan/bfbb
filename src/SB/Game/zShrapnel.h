@@ -12,8 +12,8 @@
 #include <rwcore.h>
 #include <rpworld.h>
 
-typedef struct zFrag;
-typedef struct zShrapnelAsset;
+struct zFrag;
+struct zShrapnelAsset;
 
 enum zFragLocType
 {
@@ -216,7 +216,7 @@ struct zShrapnelAsset
 
 struct zShrapnelInitTable
 {
-    char* name;
+    const char* name;
     void (*initCB)(zShrapnelAsset*, xModelInstance*, xVec3*, void(*)(zFrag*, zFragAsset*));
     U32 ID;
 };

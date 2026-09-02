@@ -5,19 +5,14 @@
 
 #include "iMath.h"
 
-#define MAX(a, b) (((a) > (b)) ? (a) : (b))
-#define MIN(a, b) (((a) < (b)) ? (a) : (b))
 #define xabs(x) iabs(x)
 
 #define xeq(a, b, e) (xabs((a) - (b)) <= (e))
 #define xfeq0(x) (((x) >= -1e-5f) && ((x) <= 1e-5f))
 
-#define CLAMP(x, a, b) (MAX((a), MIN((x), (b))))
 #define xlerp(a, b, t) ((a) + (t) * ((b) - (a)))
 
 #define SQR(x) ((x) * (x))
-
-#define ALIGN(x, a) ((x) + ((a)-1) & ~((a)-1))
 
 // Override these to point to their corresponding symbols in .sdata2
 // For example:

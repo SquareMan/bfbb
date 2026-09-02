@@ -29,7 +29,7 @@
 #include "xScrFx.h"
 #include "xSkyDome.h"
 #include "xTRC.h"
-#include "xUtil.h"
+#include "xutil.h"
 
 #include <types.h>
 
@@ -90,7 +90,7 @@ U32 startPressed = -1;
 iColor_tag black = { 0x00, 0x00, 0x00, 0xFF };
 iColor_tag clear = { 0x00, 0x00, 0x00, 0x00 };
 
-char* soaklevels_gameorder[] =
+const char* soaklevels_gameorder[] =
 {
 	"HB02",
     "HB01",
@@ -151,112 +151,9 @@ char* soaklevels_gameorder[] =
 	NULL
 };
 
-char** soaklevels = soaklevels_gameorder;
+const char** soaklevels = soaklevels_gameorder;
 
 F32 soaktime = 4.0f;
-
-// Taken from zGame.s
-// Defining these here makes the stringBase0 offsets match in the later functions.
-static char* str52 = "techbutton6_click";
-static char* str53 = "SAVING GAME ICON UI";
-static char* str54 = "MNU4 AUTO SAVE FAILED";
-static char* str55 = "MNU4 SAVE COMPLETED";
-static char* str56 = "{font=0}{i:MNU4 AUTO SAVE TXT}";
-static char* str57 = "fx_boomball_smoke.RW3";
-static char* str58 = "ui_savinggame";
-static char* str59 = "ui_savinggame.RW3";
-static char* str60 = "GAME OVER (%f secs)\n";
-static char* str61 = "Loading... %3.2f\n";
-static char* str62 = "   ";
-static char* str63 = ".  ";
-static char* str64 = ".. ";
-static char* str65 = "...";
-static char* str66 = "loading screen bg";
-static char* str67 = "eGameWhere_NA";
-static char* str68 = "eGameWhere_InitStart";
-static char* str69 = "eGameWhere_InitScene";
-static char* str70 = "eGameWhere_InitCamera";
-static char* str71 = "eGameWhere_InitMusic";
-static char* str72 = "eGameWhere_InitOther";
-static char* str73 = "eGameWhere_InitEnd";
-static char* str74 = "eGameWhere_ExitStart";
-static char* str75 = "eGameWhere_ExitRumble";
-static char* str76 = "eGameWhere_ExitHUD";
-static char* str77 = "eGameWhere_ExitSound";
-static char* str78 = "eGameWhere_ExitCamera";
-static char* str79 = "eGameWhere_ExitScene";
-static char* str80 = "eGameWhere_ExitEnd";
-static char* str81 = "eGameWhere_SetupScene";
-static char* str82 = "eGameWhere_SetupZFX";
-static char* str83 = "eGameWhere_SetupPlayer";
-static char* str84 = "eGameWhere_SetupCamera";
-static char* str85 = "eGameWhere_SetupScrFX";
-static char* str86 = "eGameWhere_SetupSceneLoad";
-static char* str87 = "eGameWhere_SetupMusicNotify";
-static char* str88 = "eGameWhere_SetupHudSetup";
-static char* str89 = "eGameWhere_SetupSkydome";
-static char* str90 = "eGameWhere_SetupSceneEvents";
-static char* str91 = "eGameWhere_SetupUpdateCull";
-static char* str92 = "eGameWhere_SetupLOD";
-static char* str93 = "eGameWhere_SetupExtras";
-static char* str94 = "eGameWhere_SetupEnd";
-static char* str95 = "eGameWhere_LoopStart";
-static char* str96 = "eGameWhere_CutsceneFinish";
-static char* str97 = "eGameWhere_LoopDo";
-static char* str98 = "eGameWhere_LoopCalcTime";
-static char* str99 = "eGameWhere_LoopPadUpdate";
-static char* str100 = "eGameWhere_LoopTRCCheck";
-static char* str101 = "eGameWhere_LoopCheats";
-static char* str102 = "eGameWhere_LoopSceneUpdate";
-static char* str103 = "eGameWhere_LoopPlayerUpdate";
-static char* str104 = "eGameWhere_LoopSoundUpdate";
-static char* str105 = "eGameWhere_LoopSFXWidgets";
-static char* str106 = "eGameWhere_LoopHUDUpdate";
-static char* str107 = "eGameWhere_LoopCameraUpdate";
-static char* str108 = "eGameWhere_LoopCameraFXUpdate";
-static char* str109 = "eGameWhere_LoopFlyToInterface";
-static char* str110 = "eGameWhere_LoopCameraBegin";
-static char* str111 = "eGameWhere_LoopSceneRender";
-static char* str112 = "eGameWhere_LoopCameraEnd";
-static char* str113 = "eGameWhere_LoopCameraShowRaster";
-static char* str114 = "eGameWhere_LoopCameraFXEnd";
-static char* str115 = "eGameWhere_LoopMusicUpdate";
-static char* str116 = "eGameWhere_LoopUpdateMode";
-static char* str117 = "eGameWhere_LoopContinue";
-static char* str118 = "eGameWhere_LoopEndGameLoop";
-static char* str119 = "eGameWhere_SaveLoop";
-static char* str120 = "eGameWhere_ModeSceneSwitch";
-static char* str121 = "eGameWhere_ModeCutsceneFinish";
-static char* str122 = "eGameWhere_ModeGameExit";
-static char* str123 = "eGameWhere_ModeGameInit";
-static char* str124 = "eGameWhere_ModeGameSetup";
-static char* str125 = "eGameWhere_ModeSwitchAutoSave";
-static char* str126 = "eGameWhere_ModeSwitchCutsceneFinish";
-static char* str127 = "eGameWhere_ModeStoreCheckpoint";
-static char* str128 = "eGameWhere_LoseChanceReset";
-static char* str129 = "eGameWhere_LoseChanceResetDone";
-static char* str130 = "eGameWhere_TransitionBubbles";
-static char* str131 = "eGameWhere_TransitionBegin";
-static char* str132 = "eGameWhere_TransitionSnapShot";
-static char* str133 = "eGameWhere_TransitionUpdate";
-static char* str134 = "eGameWhere_TransitionPadUpdate";
-static char* str135 = "eGameWhere_TransitionTRCCheck";
-static char* str136 = "eGameWhere_TransitionCameraClear";
-static char* str137 = "eGameWhere_TransitionCameraBegin";
-static char* str138 = "eGameWhere_TransitionRenderBackground";
-static char* str139 = "eGameWhere_TransitionSpawnBubbles";
-static char* str140 = "eGameWhere_TransitionDrawEnd";
-static char* str141 = "eGameWhere_TransitionUpdateBubbles";
-static char* str142 = "eGameWhere_TransitionCameraEnd";
-static char* str143 = "eGameWhere_TransitionCameraShowRaster";
-static char* str144 = "eGameWhere_TransitionUpdateEnd";
-static char* str145 = "eGameWhere_TransitionUIRender";
-static char* str146 = "eGameWhere_TransitionUIRenderEnd";
-static char* str147 = "eGameWhere_TransitionEnd";
-static char* str148 = "eGameWhere_TransitionEnded";
-static char* str149 = "eGameWhere_SetupPlayerInit";
-static char* str150 = "eGameWhere_SetupPlayerCamera";
-static char* str151 = "eGameWhere_SetupPlayerEnd";
 
 static U32 PickNextSoak()
 {
@@ -276,7 +173,7 @@ static U32 PickNextSoak()
     } soakdir = SOAK_FOR;
 
     static S32 justwrap = 0;
-    char* name = NULL;
+    const char* name = NULL;
 
     if (soakcnt <= 0)
     {
@@ -1279,7 +1176,7 @@ void zGameScreenTransitionBegin()
     }
 }
 
-void zGameScreenTransitionUpdate(F32 percentComplete, char* msg)
+void zGameScreenTransitionUpdate(F32 percentComplete, const char* msg)
 {
     if (!zMenuIsFirstBoot())
     {
@@ -1303,7 +1200,7 @@ eGameWhereAmI gGameWhereAmI;
 // load-use gap, while our compiler interleaves the next vertex's stores between
 // each `lbz`/`stb` and `lfs`/`stfs` pair.  Same instruction multiset - SCHED,
 // same family as zGame_HackDrawCard.
-void zGameScreenTransitionUpdate(F32 percentComplete, char* msg, U8* rgba)
+void zGameScreenTransitionUpdate(F32 percentComplete, const char* msg, U8* rgba)
 {
     RwTexture* tex;
     RwRaster* ras;

@@ -443,6 +443,8 @@ S32 zNPCGoalIdle::NPCMessage(NPCMsg* mail)
         handled = 0;
         break;
     }
+    default:
+        break;
     }
 
     return handled;

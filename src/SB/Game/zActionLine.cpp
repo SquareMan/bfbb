@@ -61,7 +61,10 @@ static void RenderActionLine(_tagActionLine* l)
         RwIm3DVertexSetRGBA(&sStripVert[i], 0xFF, 0xFF, 0xFF, 0x80);
     }
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-volatile"
     sStripVert[3].v = sStripVert[3].u = sStripVert[2].u = 1.0f;
+#pragma clang diagnostic pop
 
     if (RwIm3DTransform((RwIm3DVertex*)sStripVert, 4, NULL, 0x19) != NULL)
     {

@@ -109,7 +109,7 @@ void render_mem_card_no_space(S32 needed, S32 available, S32 neededFiles, bool e
     bad_card_needed = needed;
     bad_card_available = available;
 
-    char* error_text = "{i:text_mem_card_no_space}";
+    const char* error_text = "{i:text_mem_card_no_space}";
     if (neededFiles == 0 && needed > available)
     {
         error_text = "{i:text_mem_card_no_space_overwrite}";

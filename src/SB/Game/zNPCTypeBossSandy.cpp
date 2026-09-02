@@ -111,7 +111,7 @@ static xVec3 sBoneOffset[13] = { {},
                                  { 0.0f, -0.6f, 0.3f },
                                  {},
                                  { 0.0f, -0.6f, 0.3f } };
-static char* sNFSoundLabel[30] = {
+static const char* sNFSoundLabel[30] = {
     "FAB1006", "FAB1007",   "FAB1008",   "FAB1009", "FAB1010", "FAB1011", "FAB1012", "FAB1013",
     "FAB1014", "FAB1015",   "FAB1016",   "FAB1017", "FAB1018", "FAB1019", "FAB1020", "FAB1021",
     "FAB1022", "FAB1023",   "FAB1024",   "FAB1025", "FAB1026", "FAB1027", "FAB1028", "FAB1029",
@@ -677,13 +677,13 @@ void zNPCBSandy::Reset()
     this->feetRaster = 0;
 
     RwRaster** x;
-
-    if (x = (RwRaster**)xSTFindAsset(xStrHash("target"), 0))
+    x = (RwRaster**)xSTFindAsset(xStrHash("target"), 0);
+    if (x != NULL)
     {
         this->helmetRaster = *x;
     }
-
-    if (x = (RwRaster**)xSTFindAsset(xStrHash("target_foot"), 0))
+    x = (RwRaster**)xSTFindAsset(xStrHash("target_foot"), 0);
+    if (x != NULL)
     {
         this->feetRaster = *x;
     }
