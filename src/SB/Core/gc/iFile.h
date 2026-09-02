@@ -14,7 +14,6 @@ enum IFILE_READSECTOR_STATUS
     IFILE_RDSTAT_EXPIRED
 };
 
-#ifdef GAMECUBE
 struct tag_iFile
 {
     U32 flags;
@@ -27,18 +26,6 @@ struct tag_iFile
     S32 unkE8;
     S32 offset;
 };
-#else
-#ifdef PS2
-struct tag_iFile
-{
-    U32 flags;
-    char path[128];
-    S32 fd;
-    S32 offset;
-    S32 length;
-};
-#endif
-#endif
 
 #define IFILE_OPEN_READ 0x1
 #define IFILE_OPEN_WRITE 0x2

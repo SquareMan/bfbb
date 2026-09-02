@@ -6,6 +6,6 @@
 #include <types.h>
 #include "xEvent.h"
 
-char* zEventName(U32 eventEnum);
+const char* zEventName(U32 eventEnum);
 
 #endif

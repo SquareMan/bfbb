@@ -29,6 +29,29 @@ static zNPCSettings* g_dflt_npcsettings;
 
 static F32 g_tmr_talkless = 10.0f;
 
+// SLOP: move to header
+template<>
+NPCConfig* xListItem<NPCConfig>::Next()
+{
+    return this->next;
+}
+
+template<>
+void xListItem<NPCConfig>::Insert(NPCConfig* list)
+{
+    NPCConfig* node = (NPCConfig*)this;
+
+    node->prev = list;
+    node->next = list->next;
+
+    if (list->next)
+    {
+        list->next->prev = node;
+    }
+
+    list->next = node;
+}
+
 void __deadstripped_zNPCTypeCommon_lass_strings(char* str)
 {
     printf("LASS_EVNT_BEGIN");
@@ -3603,24 +3626,4 @@ void zNPCCommon_EjectPhlemOnPawz()
 F32 __deadstripped_zNPCTypeCommon_int2flt(S32 i)
 {
     return i;
-}
-
-NPCConfig* xListItem<NPCConfig>::Next()
-{
-    return this->next;
-}
-
-void xListItem<NPCConfig>::Insert(NPCConfig* list)
-{
-    NPCConfig* node = (NPCConfig*)this;
-
-    node->prev = list;
-    node->next = list->next;
-
-    if (list->next)
-    {
-        list->next->prev = node;
-    }
-
-    list->next = node;
 }

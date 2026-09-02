@@ -35,6 +35,43 @@
 #define ANIM_Attack02End01 18
 #define ANIM_LassoGrab01 19
 
+// SLOP: put in header
+namespace auto_tweak
+{
+    template <>
+    inline void load_param<F32, F32>(F32& value, F32 scale, F32 lo, F32 hi, xModelAssetParam* ap,
+                              U32 apsize, const char* name)
+    {
+        value = zParamGetFloat(ap, apsize, name, value);
+        if (value < lo)
+        {
+            value = lo;
+        }
+        else if (value > hi)
+        {
+            value = hi;
+        }
+        value = value * scale;
+    }
+
+    template <>
+    inline void load_param<S32, S32>(S32& value, S32 scale, S32 lo, S32 hi, xModelAssetParam* ap,
+                              U32 apsize, const char* name)
+    {
+        S32 result = zParamGetInt(ap, apsize, name, value);
+        if (result < lo)
+        {
+            result = lo;
+        }
+        else if (result > hi)
+        {
+            result = hi;
+        }
+        result *= scale;
+        value = result;
+    }
+} // namespace auto_tweak
+
 U32 xSndPlay3DFade(U32 id, F32 vol, F32 pitch, U32 priority, U32 flags, const xVec3* pos,
                    F32 innerRadius, F32 outerRadius, sound_category category, F32 fade, F32 delay);
 void xDebugAddTweak(const char*, xVec3*, const tweak_callback*, void*, U32);
@@ -2303,39 +2340,3 @@ S32 zNPCPrawn::IsAlive()
 {
     return this->life > 0;
 }
-
-namespace auto_tweak
-{
-    template <>
-    inline void load_param<F32, F32>(F32& value, F32 scale, F32 lo, F32 hi, xModelAssetParam* ap,
-                              U32 apsize, const char* name)
-    {
-        value = zParamGetFloat(ap, apsize, name, value);
-        if (value < lo)
-        {
-            value = lo;
-        }
-        else if (value > hi)
-        {
-            value = hi;
-        }
-        value = value * scale;
-    }
-
-    template <>
-    inline void load_param<S32, S32>(S32& value, S32 scale, S32 lo, S32 hi, xModelAssetParam* ap,
-                              U32 apsize, const char* name)
-    {
-        S32 result = zParamGetInt(ap, apsize, name, value);
-        if (result < lo)
-        {
-            result = lo;
-        }
-        else if (result > hi)
-        {
-            result = hi;
-        }
-        result *= scale;
-        value = result;
-    }
-} // namespace auto_tweak

@@ -657,8 +657,8 @@ xSpline3* AllocSpline3(xVec3* points, F32* time, U32 numpoints, U32 numalloc, U3
         numalloc = numpoints;
     }
 
-    spl->type = (ushort)type;
-    spl->flags = (ushort)flags;
+    spl->type = (U16)type;
+    spl->flags = (U16)flags;
     spl->N = numpoints - 1;
     spl->allocN = numalloc - 1;
     spl->p12 = (xVec3*)0x0;

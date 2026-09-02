@@ -97,7 +97,7 @@ void zGameSetup();
 void zGameLoop();
 void zGameExit();
 
-void main(S32 argc, char** argv)
+int main(S32 argc, char** argv)
 {
     U32 options;
     S32 i;

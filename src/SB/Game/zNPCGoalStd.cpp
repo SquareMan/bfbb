@@ -1470,6 +1470,7 @@ S32 zNPCGoalLimbo::NPCMessage(NPCMsg* mail)
     switch (mail->msgid)
     {
     case NPC_MID_SYSEVENT:
+    {
         xPsyche* psyche_ = psyche; // why?
         if (mail->sysevent.toEvent != eEventNPCSetActiveOff)
         {
@@ -1484,6 +1485,7 @@ S32 zNPCGoalLimbo::NPCMessage(NPCMsg* mail)
             }
         }
         break;
+    }
     case NPC_MID_RESPAWN:
     case NPC_MID_DAMAGE:
         break;

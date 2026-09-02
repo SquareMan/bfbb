@@ -7,6 +7,7 @@
 #ifdef __MWERKS__
 #define iabs(x) (float)(__fabs((float)x))
 #else
+F32 fabsf(F32);
 #define iabs(x) fabsf(x)
 #endif
 

@@ -452,9 +452,9 @@ static void* _rwDolphinHeapRealloc(void* p1, u32 p2)
 
 S32 DolphinInitMemorySystem(RwMemoryFunctions* memoryFuncs)
 {
-    memoryFuncs->rwmalloc = _rwDolphinHeapAlloc;
-    memoryFuncs->rwcalloc = _rwDolphinHeapCalloc;
-    memoryFuncs->rwrealloc = _rwDolphinHeapRealloc;
+    memoryFuncs->rwmalloc = reinterpret_cast<typeof(memoryFuncs->rwmalloc)>(_rwDolphinHeapAlloc);
+    memoryFuncs->rwcalloc = reinterpret_cast<typeof(memoryFuncs->rwcalloc)>(_rwDolphinHeapCalloc);
+    memoryFuncs->rwrealloc = reinterpret_cast<typeof(memoryFuncs->rwrealloc)>(_rwDolphinHeapRealloc);
     memoryFuncs->rwfree = _rwDolphinHeapFree;
 
     return 1;

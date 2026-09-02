@@ -2601,7 +2601,7 @@ void zNPCBPlankton::aim_gun(xAnimPlay* play, xQuat* q, xVec3* v, S32 count)
 
 xFactoryInst* zNPCGoalBPlanktonIdle::create(S32 who, RyzMemGrow* grow, void* info)
 {
-    return new (who, grow) zNPCGoalBPlanktonIdle(who, (zNPCBPlankton&)*info);
+    return new (who, grow) zNPCGoalBPlanktonIdle(who, *(zNPCBPlankton*)info);
 }
 
 S32 zNPCGoalBPlanktonIdle::Enter(F32 dt, void* updCtxt)
@@ -2682,7 +2682,7 @@ void zNPCGoalBPlanktonIdle::apply_yaw(F32 yaw)
 
 xFactoryInst* zNPCGoalBPlanktonAttack::create(S32 who, RyzMemGrow* grow, void* info)
 {
-    return new (who, grow) zNPCGoalBPlanktonAttack(who, (zNPCBPlankton&)*info);
+    return new (who, grow) zNPCGoalBPlanktonAttack(who, *(zNPCBPlankton*)info);
 }
 
 S32 zNPCGoalBPlanktonAttack::Enter(F32 dt, void* updCtxt)
@@ -2722,7 +2722,7 @@ S32 zNPCGoalBPlanktonAttack::Process(en_trantype* trantype, F32 dt, void* updCtx
 
 xFactoryInst* zNPCGoalBPlanktonAmbush::create(S32 who, RyzMemGrow* grow, void* info)
 {
-    return new (who, grow) zNPCGoalBPlanktonAmbush(who, (zNPCBPlankton&)*info);
+    return new (who, grow) zNPCGoalBPlanktonAmbush(who, *(zNPCBPlankton*)info);
 }
 
 S32 zNPCGoalBPlanktonAmbush::Enter(F32 dt, void* ctxt)
@@ -2771,7 +2771,7 @@ S32 zNPCGoalBPlanktonAmbush::Process(en_trantype* trantype, F32 dt, void* updCtx
 
 xFactoryInst* zNPCGoalBPlanktonFlank::create(S32 who, RyzMemGrow* grow, void* info)
 {
-    return new (who, grow) zNPCGoalBPlanktonFlank(who, (zNPCBPlankton&)*info);
+    return new (who, grow) zNPCGoalBPlanktonFlank(who, *(zNPCBPlankton*)info);
 }
 
 S32 zNPCGoalBPlanktonFlank::Enter(F32 dt, void* updCtxt)
@@ -2811,7 +2811,7 @@ S32 zNPCGoalBPlanktonFlank::Process(en_trantype* trantype, F32 dt, void* updCtxt
 
 xFactoryInst* zNPCGoalBPlanktonEvade::create(S32 who, RyzMemGrow* grow, void* info)
 {
-    return new (who, grow) zNPCGoalBPlanktonEvade(who, (zNPCBPlankton&)*info);
+    return new (who, grow) zNPCGoalBPlanktonEvade(who, *(zNPCBPlankton*)info);
 }
 
 namespace
@@ -2912,7 +2912,7 @@ void __deadstripped_zNPCTypeBossPlankton_tail()
 
 xFactoryInst* zNPCGoalBPlanktonHunt::create(S32 who, RyzMemGrow* grow, void* info)
 {
-    return new (who, grow) zNPCGoalBPlanktonHunt(who, (zNPCBPlankton&)*info);
+    return new (who, grow) zNPCGoalBPlanktonHunt(who, *(zNPCBPlankton*)info);
 }
 
 S32 zNPCGoalBPlanktonHunt::Enter(F32 dt, void* updCtxt)
@@ -2964,7 +2964,7 @@ S32 zNPCGoalBPlanktonHunt::Process(en_trantype* trantype, F32 dt, void* updCtxt,
 
 xFactoryInst* zNPCGoalBPlanktonTaunt::create(S32 who, RyzMemGrow* grow, void* info)
 {
-    return new (who, grow) zNPCGoalBPlanktonTaunt(who, (zNPCBPlankton&)*info);
+    return new (who, grow) zNPCGoalBPlanktonTaunt(who, *(zNPCBPlankton*)info);
 }
 
 S32 zNPCGoalBPlanktonTaunt::Enter(F32 dt, void* updCtxt)
@@ -2984,7 +2984,7 @@ S32 zNPCGoalBPlanktonTaunt::Process(en_trantype*, F32, void*, xScene*)
 
 xFactoryInst* zNPCGoalBPlanktonMove::create(S32 who, RyzMemGrow* grow, void* info)
 {
-    return new (who, grow) zNPCGoalBPlanktonMove(who, (zNPCBPlankton&)*info);
+    return new (who, grow) zNPCGoalBPlanktonMove(who, *(zNPCBPlankton*)info);
 }
 
 S32 zNPCGoalBPlanktonMove::Enter(F32 dt, void* updCtxt)
@@ -3004,7 +3004,7 @@ S32 zNPCGoalBPlanktonMove::Process(en_trantype*, F32, void*, xScene*)
 
 xFactoryInst* zNPCGoalBPlanktonStun::create(S32 who, RyzMemGrow* grow, void* info)
 {
-    return new (who, grow) zNPCGoalBPlanktonStun(who, (zNPCBPlankton&)*info);
+    return new (who, grow) zNPCGoalBPlanktonStun(who, *(zNPCBPlankton*)info);
 }
 
 S32 zNPCGoalBPlanktonStun::Enter(F32 dt, void* updCtxt)
@@ -3050,7 +3050,7 @@ S32 zNPCGoalBPlanktonStun::Process(en_trantype* trantype, F32 dt, void* updCtxt,
 
 xFactoryInst* zNPCGoalBPlanktonFall::create(S32 who, RyzMemGrow* grow, void* info)
 {
-    return new (who, grow) zNPCGoalBPlanktonFall(who, (zNPCBPlankton&)*info);
+    return new (who, grow) zNPCGoalBPlanktonFall(who, *(zNPCBPlankton*)info);
 }
 
 S32 zNPCGoalBPlanktonFall::Enter(F32 dt, void* updCtxt)
@@ -3083,7 +3083,7 @@ S32 zNPCGoalBPlanktonFall::Process(en_trantype* trantype, F32 dt, void* updCtxt,
 
 xFactoryInst* zNPCGoalBPlanktonDizzy::create(S32 who, RyzMemGrow* grow, void* info)
 {
-    return new (who, grow) zNPCGoalBPlanktonDizzy(who, (zNPCBPlankton&)*info);
+    return new (who, grow) zNPCGoalBPlanktonDizzy(who, *(zNPCBPlankton*)info);
 }
 
 S32 zNPCGoalBPlanktonDizzy::Enter(F32 dt, void* updCtxt)
@@ -3128,7 +3128,7 @@ S32 zNPCGoalBPlanktonDizzy::Process(en_trantype* trantype, F32 dt, void* updCtxt
 
 xFactoryInst* zNPCGoalBPlanktonBeam::create(S32 who, RyzMemGrow* grow, void* info)
 {
-    return new (who, grow) zNPCGoalBPlanktonBeam(who, (zNPCBPlankton&)*info);
+    return new (who, grow) zNPCGoalBPlanktonBeam(who, *(zNPCBPlankton*)info);
 }
 
 S32 zNPCGoalBPlanktonBeam::Enter(F32 dt, void* updCtxt)
@@ -3244,7 +3244,7 @@ void zNPCGoalBPlanktonBeam::update_cool_down(F32 dt)
 
 xFactoryInst* zNPCGoalBPlanktonWall::create(S32 who, RyzMemGrow* grow, void* info)
 {
-    return new (who, grow) zNPCGoalBPlanktonWall(who, (zNPCBPlankton&)*info);
+    return new (who, grow) zNPCGoalBPlanktonWall(who, *(zNPCBPlankton*)info);
 }
 
 S32 zNPCGoalBPlanktonWall::Enter(F32 dt, void* updCtxt)
@@ -3264,7 +3264,7 @@ S32 zNPCGoalBPlanktonWall::Process(en_trantype*, F32, void*, xScene*)
 
 xFactoryInst* zNPCGoalBPlanktonMissle::create(S32 who, RyzMemGrow* grow, void* info)
 {
-    return new (who, grow) zNPCGoalBPlanktonMissle(who, (zNPCBPlankton&)*info);
+    return new (who, grow) zNPCGoalBPlanktonMissle(who, *(zNPCBPlankton*)info);
 }
 
 S32 zNPCGoalBPlanktonMissle::Enter(F32 dt, void* updCtxt)
@@ -3284,7 +3284,7 @@ S32 zNPCGoalBPlanktonMissle::Process(en_trantype*, F32, void*, xScene*)
 
 xFactoryInst* zNPCGoalBPlanktonBomb::create(S32 who, RyzMemGrow* grow, void* info)
 {
-    return new (who, grow) zNPCGoalBPlanktonBomb(who, (zNPCBPlankton&)*info);
+    return new (who, grow) zNPCGoalBPlanktonBomb(who, *(zNPCBPlankton*)info);
 }
 
 S32 zNPCGoalBPlanktonBomb::Enter(F32 dt, void* updCtxt)

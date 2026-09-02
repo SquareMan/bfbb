@@ -164,6 +164,7 @@ static U8 _xCheckAnimNameInner(const char* name, const char* pattern, S32 patter
             patternCurrent++;
             break;
         case '}':
+        {
             S32 length = &name[nameCurrent] - startExtra;
             if (extra != NULL)
             {
@@ -175,7 +176,9 @@ static U8 _xCheckAnimNameInner(const char* name, const char* pattern, S32 patter
             startExtra = NULL;
             patternCurrent++;
             break;
+        }
         case '(':
+        {
             patternCurrent++;
             U8 done = 0;
             const char* groupStart = &pattern[patternCurrent];
@@ -254,6 +257,7 @@ static U8 _xCheckAnimNameInner(const char* name, const char* pattern, S32 patter
                 return 0;
             }
             break;
+        }
         case '<':
         {
             patternCurrent++;

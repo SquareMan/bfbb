@@ -2,7 +2,7 @@
 #define _NEW_H
 
 #include <PowerPC_EABI_Support\MSL_C\MSL_Common\size_t.h>
-#include <exception.h>
+#include "exception.h"
 
 namespace std
 {

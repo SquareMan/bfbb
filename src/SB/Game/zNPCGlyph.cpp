@@ -575,6 +575,7 @@ void NPCGlyph::Timestep(F32 dt)
     }
     case NPC_GLYPH_TALK:
     case NPC_GLYPH_TALKOTHER:
+    {
         if (mdl_glyph == NULL)
         {
             break;
@@ -600,6 +601,7 @@ void NPCGlyph::Timestep(F32 dt)
         xVec3Cross(&frame->at, &frame->right, &g_Y3);
         xModelSetFrame(mdl_glyph, frame);
         break;
+    }
     case NPC_GLYPH_FRIEND:
     case NPC_GLYPH_DAZED:
         if (flg_glyph & (1 << 2))

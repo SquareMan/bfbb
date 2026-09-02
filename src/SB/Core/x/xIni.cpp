@@ -158,7 +158,7 @@ void xIniDestroy(xIniFile* ini)
     RwFree(ini);
 }
 
-S32 xIniGetIndex(xIniFile* ini, char* tok)
+S32 xIniGetIndex(xIniFile* ini, const char* tok)
 {
     for (S32 i = 0; i < ini->NumValues; i++)
     {
@@ -171,7 +171,7 @@ S32 xIniGetIndex(xIniFile* ini, char* tok)
     return -1;
 }
 
-S32 xIniGetInt(xIniFile* ini, char* tok, S32 def)
+S32 xIniGetInt(xIniFile* ini, const char* tok, S32 def)
 {
     S32 index = xIniGetIndex(ini, tok);
     if (index == -1)
@@ -181,7 +181,8 @@ S32 xIniGetInt(xIniFile* ini, char* tok, S32 def)
     return atoi(ini->Values[index].val);
 }
 
-F32 xIniGetFloat(xIniFile* ini, char* tok, F32 def)
+F32 atof(const char*);
+F32 xIniGetFloat(xIniFile* ini, const char* tok, F32 def)
 {
     S32 index = xIniGetIndex(ini, tok);
     if (index == -1)
@@ -191,7 +192,7 @@ F32 xIniGetFloat(xIniFile* ini, char* tok, F32 def)
     return atof(ini->Values[index].val);
 }
 
-char* xIniGetString(xIniFile* ini, char* tok, char* def)
+char* xIniGetString(xIniFile* ini, const char* tok, char* def)
 {
     S32 index = xIniGetIndex(ini, tok);
     if (index == -1)

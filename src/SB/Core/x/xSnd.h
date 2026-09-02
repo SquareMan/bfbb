@@ -80,6 +80,77 @@ struct _xSndDelayed
     U32 pad0;
 };
 
+enum sound_effect
+{
+    SND_EFFECT_NONE,
+    SND_EFFECT_CAVE
+};
+
+enum sound_listener_type
+{
+    SND_LISTENER_CAMERA,
+    SND_LISTENER_PLAYER,
+    SND_MAX_LISTENER_TYPES
+};
+
+extern xSndGlobals gSnd;
+
+void xSndInit();
+void xSndSceneInit();
+void xSndResume();
+void xSndUpdate();
+void xSndSetEnvironmentalEffect(sound_effect effectType);
+void xSndSuspend();
+void xSndSetVol(U32 snd, F32 vol);
+void xSndSetPitch(U32 snd, F32 pitch);
+void xSndStop(U32 snd);
+void xSndStopAll(U32 mask);
+void xSndStopFade(U32, F32);
+void xSndPauseAll(U32 pause_effects, U32 pause_streams);
+void xSndPauseCategory(U32 mask, U32 pause);
+void xSndDelayedInit();
+void reset_faders();
+void xSndParentDied(U32 pid);
+void xSndCalculateListenerPosition();
+void xSndDelayedUpdate();
+void update_faders(F32 timeElapsed);
+void xSndProcessSoundPos(const xVec3* pActual, xVec3* pProcessed);
+void xSndInternalUpdateVoicePos(xSndVoiceInfo* voiceInfo);
+void xSndSetListenerData(sound_listener_type listenerType, const xMat4x3* pMat);
+void xSndSelectListenerMode(sound_listener_game_mode listenerMode);
+void xSndExit();
+U32 xSndPlay(U32 id, F32 vol, F32 pitch, U32 priority, U32 flags, U32 parentID,
+             sound_category category, F32 delay);
+U32 xSndPlay3D(U32 id, F32 vol, F32 pitch, U32 priority, U32 flags, xEnt* parent, F32 innerRadius,
+               F32 outerRadius, sound_category category, F32 delay);
+U32 xSndPlay3D(U32 id, F32 vol, F32 pitch, U32 priority, U32 flags, const xVec3* pos,
+               F32 innerRadius, F32 outerRadius, sound_category category, F32 delay);
+U32 xSndPlayInternal(U32 id, F32 vol, F32 pitch, U32 priority, U32 flags, U32 parentID,
+                     xEnt* parentEnt, const xVec3* pos, F32 innerRadius, F32 outerRadius,
+                     sound_category category, F32 delay);
+void xSndStartStereo(U32 id1, U32 id2, F32 pitch);
+U8 xSndIsPlayingByHandle(U32 sndID);
+U32 xSndIsPlaying(U32 assetID);
+U32 xSndIDIsPlaying(U32 sndID);
+void xSndStop(U32 snd);
+void xSndParentDied(U32 pid);
+void xSndStopChildren(U32 pid);
+void xSndSetVol(U32 snd, F32 vol);
+void xSndSetPitch(U32 snd, F32 pitch);
+void xSndSetCategoryVol(sound_category category, F32 vol);
+void xSndSetExternalCallback(void (*callback)(U32));
+
+inline U32 xSndPlay3D(U32 id, F32 vol, F32 pitch, U32 priority, U32 flags, xEnt* ent, F32 radius,
+                      sound_category category, F32 delay)
+{
+    return xSndPlay3D(id, vol, pitch, priority, flags, ent, radius / 4.0f, radius, category, delay);
+}
+
+inline U32 xSndIsPlaying(U32 assetID, U32 parid)
+{
+    return iSndIsPlaying(assetID, parid);
+}
+
 template <S32 N> struct sound_queue
 {
     U32 _playing[N + 1];
@@ -159,76 +230,5 @@ template <S32 N> struct sound_queue
         }
     }
 };
-
-enum sound_effect
-{
-    SND_EFFECT_NONE,
-    SND_EFFECT_CAVE
-};
-
-enum sound_listener_type
-{
-    SND_LISTENER_CAMERA,
-    SND_LISTENER_PLAYER,
-    SND_MAX_LISTENER_TYPES
-};
-
-extern xSndGlobals gSnd;
-
-void xSndInit();
-void xSndSceneInit();
-void xSndResume();
-void xSndUpdate();
-void xSndSetEnvironmentalEffect(sound_effect effectType);
-void xSndSuspend();
-void xSndSetVol(U32 snd, F32 vol);
-void xSndSetPitch(U32 snd, F32 pitch);
-void xSndStop(U32 snd);
-void xSndStopAll(U32 mask);
-void xSndStopFade(U32, F32);
-void xSndPauseAll(U32 pause_effects, U32 pause_streams);
-void xSndPauseCategory(U32 mask, U32 pause);
-void xSndDelayedInit();
-void reset_faders();
-void xSndParentDied(U32 pid);
-void xSndCalculateListenerPosition();
-void xSndDelayedUpdate();
-void update_faders(F32 timeElapsed);
-void xSndProcessSoundPos(const xVec3* pActual, xVec3* pProcessed);
-void xSndInternalUpdateVoicePos(xSndVoiceInfo* voiceInfo);
-void xSndSetListenerData(sound_listener_type listenerType, const xMat4x3* pMat);
-void xSndSelectListenerMode(sound_listener_game_mode listenerMode);
-void xSndExit();
-U32 xSndPlay(U32 id, F32 vol, F32 pitch, U32 priority, U32 flags, U32 parentID,
-             sound_category category, F32 delay);
-U32 xSndPlay3D(U32 id, F32 vol, F32 pitch, U32 priority, U32 flags, xEnt* parent, F32 innerRadius,
-               F32 outerRadius, sound_category category, F32 delay);
-U32 xSndPlay3D(U32 id, F32 vol, F32 pitch, U32 priority, U32 flags, const xVec3* pos,
-               F32 innerRadius, F32 outerRadius, sound_category category, F32 delay);
-U32 xSndPlayInternal(U32 id, F32 vol, F32 pitch, U32 priority, U32 flags, U32 parentID,
-                     xEnt* parentEnt, const xVec3* pos, F32 innerRadius, F32 outerRadius,
-                     sound_category category, F32 delay);
-void xSndStartStereo(U32 id1, U32 id2, F32 pitch);
-U8 xSndIsPlayingByHandle(U32 sndID);
-U32 xSndIsPlaying(U32 assetID);
-U32 xSndIDIsPlaying(U32 sndID);
-void xSndStop(U32 snd);
-void xSndParentDied(U32 pid);
-void xSndStopChildren(U32 pid);
-void xSndSetVol(U32 snd, F32 vol);
-void xSndSetPitch(U32 snd, F32 pitch);
-void xSndSetCategoryVol(sound_category category, F32 vol);
-void xSndSetExternalCallback(void (*callback)(U32));
-
-inline U32 xSndPlay3D(U32 id, F32 vol, F32 pitch, U32 priority, U32 flags, xEnt* ent, F32 radius,
-                      sound_category category, F32 delay)
-{
-    return xSndPlay3D(id, vol, pitch, priority, flags, ent, radius / 4.0f, radius, category, delay);
-}
-
-inline U32 xSndIsPlaying(U32 assetID, U32 parid)
-{
-    return iSndIsPlaying(assetID, parid);
-}
 
 #endif

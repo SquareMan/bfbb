@@ -34,6 +34,68 @@
 #include "xString.h"
 #include "xVec3.h"
 
+// SLOP: put in header
+namespace auto_tweak
+{
+    template <>
+    inline void load_param<U32, S32>(U32& value, S32 scale, S32 lo, S32 hi, xModelAssetParam* ap,
+                                     U32 apsize, const char* name)
+    {
+        S32 v = zParamGetInt(ap, apsize, name, value);
+        if (v < lo)
+        {
+            v = lo;
+        }
+        else if (v > hi)
+        {
+            v = hi;
+        }
+        v = v * scale;
+        value = v;
+    }
+
+    template <>
+    inline void load_param<xVec3, S32>(xVec3& value, S32, S32, S32, xModelAssetParam* ap,
+                                       U32 apsize, const char* name)
+    {
+        xVec3 def = value;
+        zParamGetVector(ap, apsize, name, def, &value);
+    }
+
+    template <>
+    inline void load_param<S32, S32>(S32& value, S32 scale, S32 lo, S32 hi, xModelAssetParam* ap,
+                                     U32 apsize, const char* name)
+    {
+        S32 v = zParamGetInt(ap, apsize, name, value);
+        if (v < lo)
+        {
+            v = lo;
+        }
+        else if (v > hi)
+        {
+            v = hi;
+        }
+        v = v * scale;
+        value = v;
+    }
+
+    template <>
+    inline void load_param<F32, F32>(F32& value, F32 scale, F32 lo, F32 hi, xModelAssetParam* ap,
+                                     U32 apsize, const char* name)
+    {
+        value = zParamGetFloat(ap, apsize, name, value);
+        if (value < lo)
+        {
+            value = lo;
+        }
+        else if (value > hi)
+        {
+            value = hi;
+        }
+        value = value * scale;
+    }
+} // namespace auto_tweak
+
 // These are all defined in this translation unit only because the headers that
 // should declare them do not; see the report accompanying this change.
 bool xSphereHitsBound(const xSphere& o, const xBound& b);
@@ -2446,340 +2508,352 @@ namespace cruise_bubble
                 this->material.env_texture = xStrHash("rainbowfilm_smooth32");
             }
         }
+    } // namespace
 
-        void cruise_bubble::init()
+    void cruise_bubble::init()
+    {
+        if ((shared.flags & 0x1) != 0x1)
         {
-            if ((shared.flags & 0x1) != 0x1)
-            {
-                return;
-            }
-
-            cruise_bubble::init_sound();
-
-            shared.flags |= 0x2;
-
-            cruise_bubble::load_settings();
-            cruise_bubble::init_states();
-            cruise_bubble::init_missle_model();
-            cruise_bubble::init_wake_ribbons();
-            cruise_bubble::init_explode_decal();
-            cruise_bubble::init_shrapnel();
-            cruise_bubble::init_hud();
-            cruise_bubble::init_debug();
-
-            // scheduling off
-            shared.fov_default = xCameraGetFOV(&globals.camera);
-            shared.dialog_freq = current_tweak->dialog.freq;
+            return;
         }
 
+        cruise_bubble::init_sound();
+
+        shared.flags |= 0x2;
+
+        cruise_bubble::load_settings();
+        cruise_bubble::init_states();
+        cruise_bubble::init_missle_model();
+        cruise_bubble::init_wake_ribbons();
+        cruise_bubble::init_explode_decal();
+        cruise_bubble::init_shrapnel();
+        cruise_bubble::init_hud();
+        cruise_bubble::init_debug();
+
+        // scheduling off
+        shared.fov_default = xCameraGetFOV(&globals.camera);
+        shared.dialog_freq = current_tweak->dialog.freq;
+    }
+
+    namespace
+    {
         void init_debug()
         {
             // empty
         }
+    } // namespace
 
-        void cruise_bubble::reset()
+    void cruise_bubble::reset()
+    {
+        if ((shared.flags & 0x3) == 0x3)
         {
-            if ((shared.flags & 0x3) == 0x3)
-            {
-                cruise_bubble::kill(true, false);
-            }
+            cruise_bubble::kill(true, false);
+        }
+    }
+
+    void cruise_bubble::launch()
+    {
+        if ((shared.flags & 0x13) != 0x3)
+        {
+            return;
         }
 
-        void cruise_bubble::launch()
+        if (zGameExtras_CheatFlags() & 0x20000000)
         {
-            if ((shared.flags & 0x13) != 0x3)
-            {
-                return;
-            }
+            // scheduling off
+            shared.flags |= 0x200;
+            current_tweak = &cheat_tweak;
+        }
+        else
+        {
+            current_tweak = &normal_tweak;
+        }
 
-            if (zGameExtras_CheatFlags() & 0x20000000)
+        cruise_bubble::reset_wake_ribbons();
+        cruise_bubble::reset_explode_decal();
+
+        shared.flags = shared.flags | 0x14;
+        shared.last_sp = shared.sp = globals.pad0->analog[0].offset;
+        shared.player_health = globals.player.Health;
+        // scheduling off
+        shared.player_motion = 0.0f;
+        shared.fov_default = xCameraGetFOV(&globals.camera);
+
+        ztalkbox::permit(0x0, 0xffffffff);
+        cruise_bubble::set_state(THREAD_PLAYER, BEGIN_STATE_PLAYER);
+    }
+
+    bool cruise_bubble::update(xScene* s, F32 dt)
+    {
+        if ((shared.flags & 0x3) != 0x3)
+        {
+            return false;
+        }
+
+        if (!(shared.flags & 0x10))
+        {
+            if (cruise_bubble::check_launch())
             {
-                // scheduling off
-                shared.flags |= 0x200;
-                current_tweak = &cheat_tweak;
+                launch();
             }
             else
             {
-                current_tweak = &normal_tweak;
+                return false;
             }
-
-            cruise_bubble::reset_wake_ribbons();
-            cruise_bubble::reset_explode_decal();
-
-            shared.flags = shared.flags | 0x14;
-            shared.last_sp = shared.sp = globals.pad0->analog[0].offset;
-            shared.player_health = globals.player.Health;
-            // scheduling off
-            shared.player_motion = 0.0f;
-            shared.fov_default = xCameraGetFOV(&globals.camera);
-
-            ztalkbox::permit(0x0, 0xffffffff);
-            cruise_bubble::set_state(THREAD_PLAYER, BEGIN_STATE_PLAYER);
         }
 
-        bool cruise_bubble::update(xScene* s, F32 dt)
+        if (globals.player.ControlOff)
         {
-            if ((shared.flags & 0x3) != 0x3)
-            {
-                return false;
-            }
-
-            if (!(shared.flags & 0x10))
-            {
-                if (cruise_bubble::check_launch())
-                {
-                    launch();
-                }
-                else
-                {
-                    return false;
-                }
-            }
-
-            if (globals.player.ControlOff)
-            {
-                cruise_bubble::kill(true, false);
-                return false;
-            }
-
-            cruise_bubble::refresh_controls();
-            cruise_bubble::update_state(s, dt);
-
-            if (!(shared.flags & 0x10))
-            {
-                return false;
-            }
-
-            cruise_bubble::update_player(*s, dt);
-            cruise_bubble::update_missle(*s, dt);
-            cruise_bubble::update_hud(dt);
-            return true;
+            cruise_bubble::kill(true, false);
+            return false;
         }
 
-        bool cruise_bubble::render()
+        cruise_bubble::refresh_controls();
+        cruise_bubble::update_state(s, dt);
+
+        if (!(shared.flags & 0x10))
         {
-            if ((shared.flags & 0x7) != 0x7)
-            {
-                return false;
-            }
-
-            cruise_bubble::render_state();
-            cruise_bubble::render_player();
-            cruise_bubble::render_missle();
-            cruise_bubble::render_debug();
-
-            return true;
+            return false;
         }
 
+        cruise_bubble::update_player(*s, dt);
+        cruise_bubble::update_missle(*s, dt);
+        cruise_bubble::update_hud(dt);
+        return true;
+    }
+
+    bool cruise_bubble::render()
+    {
+        if ((shared.flags & 0x7) != 0x7)
+        {
+            return false;
+        }
+
+        cruise_bubble::render_state();
+        cruise_bubble::render_player();
+        cruise_bubble::render_missle();
+        cruise_bubble::render_debug();
+
+        return true;
+    }
+
+    namespace
+    {
         void render_debug()
         {
             // empty
         }
+    } // namespace
 
-        void cruise_bubble::render_screen()
+    void cruise_bubble::render_screen()
+    {
+        if ((shared.flags & 0x7) == 0x7)
         {
-            if ((shared.flags & 0x7) == 0x7)
-            {
-                cruise_bubble::render_hud();
-            }
+            cruise_bubble::render_hud();
+        }
+    }
+
+    void cruise_bubble::insert_player_animations(xAnimTable& table)
+    {
+        if (shared.astate.player.aim != NULL)
+        {
+            return;
         }
 
-        void cruise_bubble::insert_player_animations(xAnimTable& table)
+        shared.astate.player.aim =
+            xAnimTableNewState(&table, "cruise_bubble_aim", 0x10, 0, 1.0f, NULL, NULL, 0.0f, NULL,
+                               NULL, xAnimDefaultBeforeEnter, NULL, NULL);
+
+        shared.astate.player.fire =
+            xAnimTableNewState(&table, "cruise_bubble_fire", 0x20, 0, 1.0f, NULL, NULL, 0.0f, NULL,
+                               NULL, xAnimDefaultBeforeEnter, NULL, NULL);
+
+        shared.astate.player.idle =
+            xAnimTableNewState(&table, "cruise_bubble_idle", 0x10, 0, 1.0f, NULL, NULL, 0.0f, NULL,
+                               NULL, xAnimDefaultBeforeEnter, NULL, NULL);
+
+        char* start_from = (char*)xMemPushTemp(0x250);
+        memset(start_from, 0, 0x250);
+        char* s = start_from;
+        *s = '\0';
+        for (U32 i = 0; i < 37; ++i)
         {
-            if (shared.astate.player.aim != NULL)
-            {
-                return;
-            }
-
-            shared.astate.player.aim =
-                xAnimTableNewState(&table, "cruise_bubble_aim", 0x10, 0, 1.0f, NULL, NULL, 0.0f,
-                                   NULL, NULL, xAnimDefaultBeforeEnter, NULL, NULL);
-
-            shared.astate.player.fire =
-                xAnimTableNewState(&table, "cruise_bubble_fire", 0x20, 0, 1.0f, NULL, NULL, 0.0f,
-                                   NULL, NULL, xAnimDefaultBeforeEnter, NULL, NULL);
-
-            shared.astate.player.idle =
-                xAnimTableNewState(&table, "cruise_bubble_idle", 0x10, 0, 1.0f, NULL, NULL, 0.0f,
-                                   NULL, NULL, xAnimDefaultBeforeEnter, NULL, NULL);
-
-            char* start_from = (char*)xMemPushTemp(0x250);
-            memset(start_from, 0, 0x250);
-            char* s = start_from;
-            *s = '\0';
-            for (U32 i = 0; i < 37; ++i)
-            {
-                strcat(s, start_anim_states[i]);
-                s += strlen(s);
-                *s = ' ';
-                *++s = '\0';
-            }
-
-            shared.atran.player.aim =
-                xAnimTableNewTransition(&table, start_from, "cruise_bubble_aim",
-                                        (xAnimTransitionConditionalCallback)&check_anim_aim, NULL,
-                                        0, 0, 0.0f, 0.0f, 0, 0, 0.15f, NULL);
-
-            shared.atran.player.fire =
-                xAnimTableNewTransition(&table, "cruise_bubble_aim", "cruise_bubble_fire", NULL,
-                                        NULL, 0, 0, 0.0f, 0.0f, 0, 0, 0.15f, NULL);
-
-            shared.atran.player.idle =
-                xAnimTableNewTransition(&table, "cruise_bubble_fire", "cruise_bubble_idle", NULL,
-                                        NULL, 0x10, 0, 0.0f, 0.0f, 0, 0, 0.15f, NULL);
-
-            shared.atran.player.end =
-                xAnimTableNewTransition(&table,
-                                        "cruise_bubble_aim cruise_bubble_fire cruise_bubble_idle",
-                                        "Idle01", NULL, NULL, 0, 0, 0.0f, 0.0f, 0, 0, 0.15f, NULL);
-
-            xMemPopTemp(start_from);
+            strcat(s, start_anim_states[i]);
+            s += strlen(s);
+            *s = ' ';
+            *++s = '\0';
         }
 
-        xAnimTable* cruise_bubble::anim_table()
+        shared.atran.player.aim =
+            xAnimTableNewTransition(&table, start_from, "cruise_bubble_aim",
+                                    (xAnimTransitionConditionalCallback)&check_anim_aim, NULL, 0, 0,
+                                    0.0f, 0.0f, 0, 0, 0.15f, NULL);
+
+        shared.atran.player.fire =
+            xAnimTableNewTransition(&table, "cruise_bubble_aim", "cruise_bubble_fire", NULL, NULL,
+                                    0, 0, 0.0f, 0.0f, 0, 0, 0.15f, NULL);
+
+        shared.atran.player.idle =
+            xAnimTableNewTransition(&table, "cruise_bubble_fire", "cruise_bubble_idle", NULL, NULL,
+                                    0x10, 0, 0.0f, 0.0f, 0, 0, 0.15f, NULL);
+
+        shared.atran.player.end =
+            xAnimTableNewTransition(&table,
+                                    "cruise_bubble_aim cruise_bubble_fire cruise_bubble_idle",
+                                    "Idle01", NULL, NULL, 0, 0, 0.0f, 0.0f, 0, 0, 0.15f, NULL);
+
+        xMemPopTemp(start_from);
+    }
+
+    xAnimTable* cruise_bubble::anim_table()
+    {
+        xAnimTable* table = xAnimTableNew("Cruise Bubble", 0, 0);
+        shared.astate.missle.fire =
+            xAnimTableNewState(table, "fire", 0x20, 0, 1.0f, NULL, NULL, 0.0f, NULL, NULL,
+                               xAnimDefaultBeforeEnter, NULL, NULL);
+        shared.astate.missle.fly =
+            xAnimTableNewState(table, "fly", 0x10, 0, 1.0f, NULL, NULL, 0.0f, NULL, NULL,
+                               xAnimDefaultBeforeEnter, NULL, NULL);
+        shared.atran.missle.fly = xAnimTableNewTransition(table, "fire", "fly", NULL, NULL, 0x10, 0,
+                                                          0.0f, 0.0f, 0, 0, 0.15f, NULL);
+        return table;
+    }
+
+    bool cruise_bubble::active()
+    {
+        return shared.flags & 0x10;
+    }
+
+    F32 cruise_bubble::exploding()
+    {
+        state_missle_explode* state = (state_missle_explode*)shared.state[THREAD_MISSLE];
+        if (state == NULL || state->type != STATE_MISSLE_EXPLODE)
         {
-            xAnimTable* table = xAnimTableNew("Cruise Bubble", 0, 0);
-            shared.astate.missle.fire =
-                xAnimTableNewState(table, "fire", 0x20, 0, 1.0f, NULL, NULL, 0.0f, NULL, NULL,
-                                   xAnimDefaultBeforeEnter, NULL, NULL);
-            shared.astate.missle.fly =
-                xAnimTableNewState(table, "fly", 0x10, 0, 1.0f, NULL, NULL, 0.0f, NULL, NULL,
-                                   xAnimDefaultBeforeEnter, NULL, NULL);
-            shared.atran.missle.fly = xAnimTableNewTransition(
-                table, "fire", "fly", NULL, NULL, 0x10, 0, 0.0f, 0.0f, 0, 0, 0.15f, NULL);
-            return table;
+            return 0.0f;
         }
 
-        bool cruise_bubble::active()
+        return current_tweak->missle.explode.hit_duration - state->hit_time;
+    }
+
+    void cruise_bubble::get_explode_sphere(xVec3& center, F32& radius)
+    {
+        state_missle_explode* state = (state_missle_explode*)shared.state[THREAD_MISSLE];
+        if (state == NULL || state->type != STATE_MISSLE_EXPLODE)
         {
-            return shared.flags & 0x10;
+            return;
+        }
+        if (state->hit_time >= current_tweak->missle.explode.hit_duration)
+        {
+            return;
         }
 
-        F32 cruise_bubble::exploding()
-        {
-            state_missle_explode* state = (state_missle_explode*)shared.state[THREAD_MISSLE];
-            if (state == NULL || state->type != STATE_MISSLE_EXPLODE)
-            {
-                return 0.0f;
-            }
+        center = shared.hit_loc;
+        radius = state->get_radius();
+    }
 
-            return current_tweak->missle.explode.hit_duration - state->hit_time;
-        }
-
-        void cruise_bubble::get_explode_sphere(xVec3& center, F32& radius)
-        {
-            state_missle_explode* state = (state_missle_explode*)shared.state[THREAD_MISSLE];
-            if (state == NULL || state->type != STATE_MISSLE_EXPLODE)
-            {
-                return;
-            }
-            if (state->hit_time >= current_tweak->missle.explode.hit_duration)
-            {
-                return;
-            }
-
-            center = shared.hit_loc;
-            radius = state->get_radius();
-        }
-
+    namespace
+    {
         F32 cruise_bubble::state_missle_explode::get_radius() const
         {
             F32 t_frac = this->hit_time / current_tweak->missle.explode.hit_duration;
             return t_frac * current_tweak->missle.explode.hit_radius;
         }
+    } // namespace
 
-        xEnt** cruise_bubble::get_explode_hits(S32& size)
+    xEnt** cruise_bubble::get_explode_hits(S32& size)
+    {
+        state_missle_explode* state = (state_missle_explode*)shared.state[THREAD_MISSLE];
+        if (state == NULL || state->type != STATE_MISSLE_EXPLODE)
         {
-            state_missle_explode* state = (state_missle_explode*)shared.state[THREAD_MISSLE];
-            if (state == NULL || state->type != STATE_MISSLE_EXPLODE)
-            {
-                size = 0;
-                return NULL;
-            }
-            if (state->hit_time >= current_tweak->missle.explode.hit_duration)
-            {
-                size = 0;
-                return NULL;
-            }
-
-            size = shared.hits_size;
-            return shared.hits;
+            size = 0;
+            return NULL;
+        }
+        if (state->hit_time >= current_tweak->missle.explode.hit_duration)
+        {
+            size = 0;
+            return NULL;
         }
 
-        // param names guessed
-        void cruise_bubble::add_life(F32 life, F32 max)
+        size = shared.hits_size;
+        return shared.hits;
+    }
+
+    // param names guessed
+    void cruise_bubble::add_life(F32 life, F32 max)
+    {
+        state_missle_fly* state = (state_missle_fly*)shared.state[THREAD_MISSLE];
+        if (state == NULL || state->type != STATE_MISSLE_FLY)
         {
-            state_missle_fly* state = (state_missle_fly*)shared.state[THREAD_MISSLE];
-            if (state == NULL || state->type != STATE_MISSLE_FLY)
-            {
-                return;
-            }
-
-            state->life += life;
-
-            if (max < 0.0f)
-            {
-                max = current_tweak->missle.life;
-            }
-
-            if (!(max > 0.0f))
-            {
-                return;
-            }
-            if (!(state->life > max))
-            {
-                return;
-            }
-
-            state->life = max;
+            return;
         }
 
-        void cruise_bubble::set_life(F32 life)
-        {
-            state_missle_fly* state = (state_missle_fly*)shared.state[THREAD_MISSLE];
-            if (state == NULL || state->type != STATE_MISSLE_FLY)
-            {
-                return;
-            }
+        state->life += life;
 
-            state->life = life;
+        if (max < 0.0f)
+        {
+            max = current_tweak->missle.life;
         }
 
-        void cruise_bubble::reset_life()
+        if (!(max > 0.0f))
         {
-            state_missle_fly* state = (state_missle_fly*)shared.state[THREAD_MISSLE];
-            if (state == NULL || state->type != STATE_MISSLE_FLY)
-            {
-                return;
-            }
-
-            state->life = current_tweak->missle.life;
+            return;
+        }
+        if (!(state->life > max))
+        {
+            return;
         }
 
-        bool cruise_bubble::event_handler(xBase* from, U32 event, const F32* fparam, xBase* to)
+        state->life = max;
+    }
+
+    void cruise_bubble::set_life(F32 life)
+    {
+        state_missle_fly* state = (state_missle_fly*)shared.state[THREAD_MISSLE];
+        if (state == NULL || state->type != STATE_MISSLE_FLY)
         {
-            switch (event)
-            {
-            case eEventCruiseAddLife:
-                add_life(fparam[0], fparam[1]);
-                return true;
-
-            case eEventCruiseSetLife:
-                set_life(fparam[0]);
-                return true;
-
-            case eEventCruiseResetLife:
-                reset_life();
-                return true;
-
-            case eEventCruiseFired:
-            case eEventCruiseDied:
-                return true;
-            }
-
-            return false;
+            return;
         }
 
+        state->life = life;
+    }
+
+    void cruise_bubble::reset_life()
+    {
+        state_missle_fly* state = (state_missle_fly*)shared.state[THREAD_MISSLE];
+        if (state == NULL || state->type != STATE_MISSLE_FLY)
+        {
+            return;
+        }
+
+        state->life = current_tweak->missle.life;
+    }
+
+    bool cruise_bubble::event_handler(xBase* from, U32 event, const F32* fparam, xBase* to)
+    {
+        switch (event)
+        {
+        case eEventCruiseAddLife:
+            add_life(fparam[0], fparam[1]);
+            return true;
+
+        case eEventCruiseSetLife:
+            set_life(fparam[0]);
+            return true;
+
+        case eEventCruiseResetLife:
+            reset_life();
+            return true;
+
+        case eEventCruiseFired:
+        case eEventCruiseDied:
+            return true;
+        }
+
+        return false;
+    }
+
+    namespace
+    {
         void cruise_bubble::state_player_halt::start()
         {
             this->first_update = true;
@@ -3259,8 +3333,7 @@ namespace cruise_bubble
             xScene& s = *globals.sceneCur;
             xVec3& loc = get_missle_mat()->pos;
             xSweptSphere ss;
-            xSweptSpherePrepare(&ss, (xVec3*)&this->last_loc, &loc,
-                                current_tweak->missle.hit_dist);
+            xSweptSpherePrepare(&ss, (xVec3*)&this->last_loc, &loc, current_tweak->missle.hit_dist);
             ss.optr = NULL;
             if (!xSweptSphereToScene(&ss, &s, NULL, 0x10))
             {
@@ -3401,8 +3474,8 @@ namespace cruise_bubble
                 else
                 {
                     U32 rand = xrand();
-                    emit += (rand / 0x2000) -
-                            ((rand / 0x2000) / (emit_max - emit)) * (emit_max - emit);
+                    emit +=
+                        (rand / 0x2000) - ((rand / 0x2000) / (emit_max - emit)) * (emit_max - emit);
                 }
 
                 reset_quadrants(emit, current_tweak->droplet.vel_angle);
@@ -4287,64 +4360,3 @@ template <class T> void basic_rect<T>::center(T x, T y)
     this->x = x - 0.5f * this->w;
     this->y = y - 0.5f * this->h;
 }
-
-namespace auto_tweak
-{
-    template <>
-    inline void load_param<U32, S32>(U32& value, S32 scale, S32 lo, S32 hi, xModelAssetParam* ap,
-                              U32 apsize, const char* name)
-    {
-        S32 v = zParamGetInt(ap, apsize, name, value);
-        if (v < lo)
-        {
-            v = lo;
-        }
-        else if (v > hi)
-        {
-            v = hi;
-        }
-        v = v * scale;
-        value = v;
-    }
-
-    template <>
-    inline void load_param<xVec3, S32>(xVec3& value, S32, S32, S32, xModelAssetParam* ap, U32 apsize,
-                                const char* name)
-    {
-        xVec3 def = value;
-        zParamGetVector(ap, apsize, name, def, &value);
-    }
-
-    template <>
-    inline void load_param<S32, S32>(S32& value, S32 scale, S32 lo, S32 hi, xModelAssetParam* ap,
-                              U32 apsize, const char* name)
-    {
-        S32 v = zParamGetInt(ap, apsize, name, value);
-        if (v < lo)
-        {
-            v = lo;
-        }
-        else if (v > hi)
-        {
-            v = hi;
-        }
-        v = v * scale;
-        value = v;
-    }
-
-    template <>
-    inline void load_param<F32, F32>(F32& value, F32 scale, F32 lo, F32 hi, xModelAssetParam* ap,
-                              U32 apsize, const char* name)
-    {
-        value = zParamGetFloat(ap, apsize, name, value);
-        if (value < lo)
-        {
-            value = lo;
-        }
-        else if (value > hi)
-        {
-            value = hi;
-        }
-        value = value * scale;
-    }
-} // namespace auto_tweak

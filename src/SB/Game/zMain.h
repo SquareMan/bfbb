@@ -16,7 +16,7 @@ enum eStartupErrors
     eNoController,
 };
 
-void main(S32 argc, char** argv);
+int main(S32 argc, char** argv);
 void iEnvStartup();
 static void zMainOutputMgrSetup();
 static void zMainInitGlobals();

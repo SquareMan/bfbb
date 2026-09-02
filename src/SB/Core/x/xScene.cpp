@@ -26,6 +26,7 @@ static U8 sNearestChk;
 static U8 sNearestCollType;
 static RpIntersection sSphereIsx;
 
+
 namespace
 {
     struct cb_ray_hits_ent
@@ -1188,21 +1189,6 @@ bool cb_ray_hits_ent::operator()(xEnt& ent, xGridBound& gridb)
 void xEntEnable(xEnt* ent)
 {
     xBaseEnable(ent);
-}
-
-template <> U16 range_limit<U16>(U16 v, U16 minv, U16 maxv)
-{
-    if (v <= minv)
-    {
-        return minv;
-    }
-
-    if (v >= maxv)
-    {
-        return maxv;
-    }
-
-    return v;
 }
 
 void xBoxFromRay(xBox& box, const xRay3& ray)

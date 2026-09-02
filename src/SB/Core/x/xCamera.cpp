@@ -23,6 +23,24 @@
 #define CAMERAFX_TYPE_ZOOM 1
 #define CAMERAFX_TYPE_SHAKE 2
 
+// SLOP: put in header
+template <>
+inline F32 range_limit<F32>(F32 v, F32 minv, F32 maxv)
+{
+    if (v <= minv)
+    {
+        return minv;
+    }
+
+    if (v >= maxv)
+    {
+        return maxv;
+    }
+
+    return v;
+}
+
+
 void xCameraFXZoomUpdate(cameraFX* f, F32 dt, const xMat4x3*, xMat4x3* m);
 void xCameraFXShakeUpdate(cameraFX* f, F32 dt, const xMat4x3*, xMat4x3* m);
 
@@ -1836,23 +1854,6 @@ xVec3& xVec3::safe_normalize(const xVec3& val)
         return (*this *= 1.0f / xsqrt(len));
     }
 }
-
-template <>
-inline F32 range_limit<F32>(F32 v, F32 minv, F32 maxv)
-{
-    if (v <= minv)
-    {
-        return minv;
-    }
-
-    if (v >= maxv)
-    {
-        return maxv;
-    }
-
-    return v;
-}
-
 xVec2& xVec2::operator=(F32 f)
 {
     this->x = this->y = f;

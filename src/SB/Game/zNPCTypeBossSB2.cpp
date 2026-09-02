@@ -83,6 +83,63 @@ U8 xOBBHitsOBB(const xBox& a, const xMat4x3& amat, const xBox& b, const xMat4x3&
 
 zNPCB_SB2* zNPCB_SB2::_singleton;
 
+// SLOP: This needs to be part of the header to prevent explicit specialization after instantiation errors
+namespace auto_tweak
+{
+    template <>
+    inline void load_param<S32, S32>(S32& value, S32 scale, S32 lo, S32 hi, xModelAssetParam* ap,
+                              U32 apsize, const char* name)
+    {
+        S32 v = zParamGetInt(ap, apsize, name, value);
+
+        if (v < lo)
+        {
+            v = lo;
+        }
+        else if (v > hi)
+        {
+            v = hi;
+        }
+
+        v *= scale;
+
+        value = v;
+    }
+
+    template <>
+    inline void load_param<bool, S32>(bool& value, S32, S32, S32, xModelAssetParam* ap, U32 apsize,
+                               const char* name)
+    {
+        value = zParamGetInt(ap, apsize, name, value) != 0;
+    }
+
+    template <>
+    inline void load_param<xVec3, S32>(xVec3& value, S32, S32, S32, xModelAssetParam* ap, U32 apsize,
+                                const char* name)
+    {
+        xVec3 def = value;
+        zParamGetVector(ap, apsize, name, def, &value);
+    }
+
+    template <>
+    inline void load_param<F32, F32>(F32& value, F32 scale, F32 lo, F32 hi, xModelAssetParam* ap,
+                              U32 apsize, const char* name)
+    {
+        value = zParamGetFloat(ap, apsize, name, value);
+
+        if (value < lo)
+        {
+            value = lo;
+        }
+        else if (value > hi)
+        {
+            value = hi;
+        }
+
+        value = value * scale;
+    }
+} // namespace auto_tweak
+
 namespace
 {
     struct node
@@ -3492,7 +3549,7 @@ void zNPCB_SB2::say(int which)
 
 xFactoryInst* zNPCGoalBossSB2Intro::create(S32 who, RyzMemGrow* grow, void* info)
 {
-    return new (who, grow) zNPCGoalBossSB2Intro(who, (zNPCB_SB2&)*info);
+    return new (who, grow) zNPCGoalBossSB2Intro(who, *(zNPCB_SB2*)info);
 }
 
 S32 zNPCGoalBossSB2Intro::Enter(F32 dt, void* updCtxt)
@@ -3526,7 +3583,7 @@ S32 zNPCGoalBossSB2Intro::Exit(F32 dt, void* updCtxt)
 
 xFactoryInst* zNPCGoalBossSB2Idle::create(S32 who, RyzMemGrow* grow, void* info)
 {
-    return new (who, grow) zNPCGoalBossSB2Idle(who, (zNPCB_SB2&)*info);
+    return new (who, grow) zNPCGoalBossSB2Idle(who, *(zNPCB_SB2*)info);
 }
 
 S32 zNPCGoalBossSB2Idle::Enter(F32 dt, void* updCtxt)
@@ -3572,7 +3629,7 @@ S32 zNPCGoalBossSB2Idle::Process(en_trantype* trantype, F32 dt, void* updCtxt, x
 
 xFactoryInst* zNPCGoalBossSB2Taunt::create(S32 who, RyzMemGrow* grow, void* info)
 {
-    return new (who, grow) zNPCGoalBossSB2Taunt(who, (zNPCB_SB2&)*info);
+    return new (who, grow) zNPCGoalBossSB2Taunt(who, *(zNPCB_SB2*)info);
 }
 
 S32 zNPCGoalBossSB2Taunt::Enter(F32 dt, void* updCtxt)
@@ -3600,7 +3657,7 @@ S32 zNPCGoalBossSB2Taunt::Exit(F32 dt, void* updCtxt)
 
 xFactoryInst* zNPCGoalBossSB2Dizzy::create(S32 who, RyzMemGrow* grow, void* info)
 {
-    return new (who, grow) zNPCGoalBossSB2Dizzy(who, (zNPCB_SB2&)*info);
+    return new (who, grow) zNPCGoalBossSB2Dizzy(who, *(zNPCB_SB2*)info);
 }
 
 S32 zNPCGoalBossSB2Dizzy::Enter(F32 dt, void* updCtxt)
@@ -3650,7 +3707,7 @@ S32 zNPCGoalBossSB2Dizzy::Process(en_trantype* trantype, F32 dt, void* updCtxt, 
 
 xFactoryInst* zNPCGoalBossSB2Hit::create(S32 who, RyzMemGrow* grow, void* info)
 {
-    return new (who, grow) zNPCGoalBossSB2Hit(who, (zNPCB_SB2&)*info);
+    return new (who, grow) zNPCGoalBossSB2Hit(who, *(zNPCB_SB2*)info);
 }
 
 S32 zNPCGoalBossSB2Hit::Enter(F32 dt, void* updCtxt) 
@@ -3686,7 +3743,7 @@ S32 zNPCGoalBossSB2Hit::Exit(F32 dt, void* updCtxt)
 
 xFactoryInst* zNPCGoalBossSB2Hunt::create(S32 who, RyzMemGrow* grow, void* info)
 {
-    return new (who, grow) zNPCGoalBossSB2Hunt(who, (zNPCB_SB2&)*info);
+    return new (who, grow) zNPCGoalBossSB2Hunt(who, *(zNPCB_SB2*)info);
 }
 
 S32 zNPCGoalBossSB2Hit::Process(en_trantype* trantype, F32 dt, void* updCtxt, xScene* xscn)
@@ -3809,7 +3866,7 @@ S32 zNPCGoalBossSB2Hunt::Process(en_trantype* trantype, F32 dt, void* updCtxt, x
 
 xFactoryInst* zNPCGoalBossSB2Swipe::create(S32 who, RyzMemGrow* grow, void* info)
 {
-    return new (who, grow) zNPCGoalBossSB2Swipe(who, (zNPCB_SB2&)*info);
+    return new (who, grow) zNPCGoalBossSB2Swipe(who, *(zNPCB_SB2*)info);
 }
 
 S32 zNPCGoalBossSB2Swipe::Enter(F32 dt, void* updCtxt)
@@ -3906,7 +3963,7 @@ bool zNPCGoalBossSB2Swipe::can_start() const
 
 xFactoryInst* zNPCGoalBossSB2Chop::create(S32 who, RyzMemGrow* grow, void* info)
 {
-    return new (who, grow) zNPCGoalBossSB2Chop(who, (zNPCB_SB2&)*info);
+    return new (who, grow) zNPCGoalBossSB2Chop(who, *(zNPCB_SB2*)info);
 }
 
 S32 zNPCGoalBossSB2Chop::Enter(F32 dt, void* updCtxt)
@@ -4025,7 +4082,7 @@ bool zNPCGoalBossSB2Chop::can_start() const
 
 xFactoryInst* zNPCGoalBossSB2Karate::create(S32 who, RyzMemGrow* grow, void* info)
 {
-    return new (who, grow) zNPCGoalBossSB2Karate(who, (zNPCB_SB2&)*info);
+    return new (who, grow) zNPCGoalBossSB2Karate(who, *(zNPCB_SB2*)info);
 }
 
 S32 zNPCGoalBossSB2Karate::Enter(F32 dt, void* updCtxt)
@@ -4156,7 +4213,7 @@ bool zNPCGoalBossSB2Karate::can_start() const
 
 xFactoryInst* zNPCGoalBossSB2Death::create(S32 who, RyzMemGrow* grow, void* info)
 {
-    return new (who, grow) zNPCGoalBossSB2Death(who, (zNPCB_SB2&)*info);
+    return new (who, grow) zNPCGoalBossSB2Death(who, *(zNPCB_SB2*)info);
 }
 
 S32 zNPCGoalBossSB2Death::Enter(F32 dt, void* updCtxt)
@@ -4175,61 +4232,6 @@ S32 zNPCGoalBossSB2Death::Process(en_trantype*, F32, void*, xScene*)
     return 0;
 }
 
-namespace auto_tweak
-{
-    template <>
-    inline void load_param<S32, S32>(S32& value, S32 scale, S32 lo, S32 hi, xModelAssetParam* ap,
-                              U32 apsize, const char* name)
-    {
-        S32 v = zParamGetInt(ap, apsize, name, value);
-
-        if (v < lo)
-        {
-            v = lo;
-        }
-        else if (v > hi)
-        {
-            v = hi;
-        }
-
-        v *= scale;
-
-        value = v;
-    }
-
-    template <>
-    inline void load_param<bool, S32>(bool& value, S32, S32, S32, xModelAssetParam* ap, U32 apsize,
-                               const char* name)
-    {
-        value = zParamGetInt(ap, apsize, name, value) != 0;
-    }
-
-    template <>
-    inline void load_param<xVec3, S32>(xVec3& value, S32, S32, S32, xModelAssetParam* ap, U32 apsize,
-                                const char* name)
-    {
-        xVec3 def = value;
-        zParamGetVector(ap, apsize, name, def, &value);
-    }
-
-    template <>
-    inline void load_param<F32, F32>(F32& value, F32 scale, F32 lo, F32 hi, xModelAssetParam* ap,
-                              U32 apsize, const char* name)
-    {
-        value = zParamGetFloat(ap, apsize, name, value);
-
-        if (value < lo)
-        {
-            value = lo;
-        }
-        else if (value > hi)
-        {
-            value = hi;
-        }
-
-        value = value * scale;
-    }
-} // namespace auto_tweak
 
 void zNPCB_SB2::choose_hand()
 {

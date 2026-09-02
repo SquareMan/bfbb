@@ -178,7 +178,7 @@ void zSaveLoad_Tick()
     xParMgrUpdate(time_elapsed);
     zSceneUpdate(time_elapsed);
 
-    xMat4x3 playerMat = *xEntGetFrame(&(xEnt)globals.player.ent);
+    xMat4x3 playerMat = *xEntGetFrame(&globals.player.ent);
     playerMat.pos.y += 0.6f;
 
     xSndSetListenerData(SND_LISTENER_CAMERA, &globals.camera.mat);
@@ -362,6 +362,7 @@ S32 format(S32 num, S32 mode)
         }
         break;
     case 1:
+    {
         S32 tgtslot = xSGTgtPhysSlotIdx(data, 0);
         if (tgtslot != num)
         {
@@ -386,6 +387,7 @@ S32 format(S32 num, S32 mode)
             }
         }
         break;
+    }
     case 0:
         rc = 5;
         zSaveLoadSGDone(data);
@@ -753,6 +755,7 @@ S32 zSaveLoad_CardCheckSingle(S32 num)
         xSGDone(ldinst);
         return 1;
     case 1:
+    {
         int tgtslot = xSGTgtPhysSlotIdx(ldinst, 0);
         xSGDone(ldinst);
         wrongDevice = iSGCheckForWrongDevice();
@@ -771,6 +774,7 @@ S32 zSaveLoad_CardCheckSingle(S32 num)
                 return 0;
             }
         }
+    }
     case 0:
         wrongDevice = iSGCheckForWrongDevice();
         if (wrongDevice >= 0)
@@ -809,6 +813,7 @@ S32 zSaveLoad_CardCheckFormattedSingle(S32 num)
         }
         break;
     case 1:
+    {
         S32 tgtslot = xSGTgtPhysSlotIdx(ldinst, 0);
         if (tgtslot != num)
         {
@@ -831,6 +836,7 @@ S32 zSaveLoad_CardCheckFormattedSingle(S32 num)
             }
         }
         break;
+    }
     case 0:
         rc = -1;
         break;
@@ -885,6 +891,7 @@ S32 zSaveLoad_CardCheckSpaceSingle(S32 num)
         }
         break;
     case 1:
+    {
         S32 tgtslot = xSGTgtPhysSlotIdx(ldinst, 0);
         if (tgtslot != num)
         {
@@ -895,6 +902,7 @@ S32 zSaveLoad_CardCheckSpaceSingle(S32 num)
             rc = zSaveLoad_CardCheckSpaceSingle_doCheck(ldinst, 0);
         }
         break;
+    }
     case 0:
         rc = 5;
         break;
@@ -947,6 +955,7 @@ S32 zSaveLoad_CardCheckGamesSingle(S32 num)
         }
         break;
     case 1:
+    {
         S32 tgtslot = xSGTgtPhysSlotIdx(ldinst, 0);
         if (tgtslot != num)
         {
@@ -957,6 +966,7 @@ S32 zSaveLoad_CardCheckGamesSingle(S32 num)
             rc = zSaveLoad_CardCheckGamesSingle_doCheck(ldinst, 0);
         }
         break;
+    }
     case 0:
         rc = 5;
         break;
@@ -1007,6 +1017,7 @@ S32 zSaveLoad_CardCheckSlotEmpty_hasGame(S32 num, S32 game)
         }
         break;
     case 1:
+    {
         S32 tgtslot = xSGTgtPhysSlotIdx(ldinst, 0);
         if (tgtslot != num)
         {
@@ -1017,6 +1028,7 @@ S32 zSaveLoad_CardCheckSlotEmpty_hasGame(S32 num, S32 game)
             rc = zSaveLoad_CardCheckSlotEmpty_hasGame_doCheck(ldinst, 0, game);
         }
         break;
+    }
     case 0:
         rc = -1;
         break;
@@ -2268,6 +2280,7 @@ void zSaveLoad_DispatchCB(U32 dispatchEvent, const F32* toParam)
         promptSel = 3;
         break;
     case 0xab:
+    {
         currentCard = (int)*toParam;
         en_SAVEGAME_MODE mode = XSG_MODE_LOAD;
         if (gGameMode == eGameMode_Save)
@@ -2278,6 +2291,7 @@ void zSaveLoad_DispatchCB(U32 dispatchEvent, const F32* toParam)
         zSaveLoad_CardCheckSpaceSingle_doCheck(inst, currentCard);
         xSGDone(inst);
         break;
+    }
     case 0xac:
         currentGame = (int)*toParam;
         break;

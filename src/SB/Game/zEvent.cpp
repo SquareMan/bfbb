@@ -1,7 +1,7 @@
 #include "zEvent.h"
 
 // NOTE (Square): Some of these strings appear to be incorrectly written given the enum value they correspond to.
-char* sEventTable[eEventCount] = {
+const char* sEventTable[eEventCount] = {
     "Unknown",
     "Enable",
     "Disable",
@@ -545,7 +545,7 @@ char* sEventTable[eEventCount] = {
     "Restore Options",
 };
 
-char* zEventName(U32 eventEnum)
+const char* zEventName(U32 eventEnum)
 {
     return sEventTable[eventEnum];
 }
