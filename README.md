@@ -9,6 +9,29 @@ of Treedome may be transferred here manually if they turn out to have been the b
 If this project succeds, the plan will be to replace the base game code with the more highly audited and validated code
 that will eventually make it's way into the main upstream decomp repo.
 
+## Building with CMake
+
+There are three cmake presets configured:
+
+```bash
+cmake --list-presets
+```
+```text
+Available configure presets:
+
+  "Debug"
+  "RelWithDebInfo"
+  "Release"
+```
+
+To make a build with one of these presets:
+```bash
+cmake --preset Debug
+cmake --build --preset Debug
+```
+
+Binaries will be in `build-pc/bin`
+
 ### Original Readme
 
 # SpongeBob SquarePants: Battle for Bikini Bottom
