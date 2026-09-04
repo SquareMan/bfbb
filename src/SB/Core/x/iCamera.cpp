@@ -294,7 +294,7 @@ void iCameraSetFogParams(iFogParams* fp, F32 time)
         xglobals->fogB = *fp;
 
         xglobals->fog_t0 = iTimeGet();
-        xglobals->fog_t1 = xglobals->fog_t0 + (iTime)(time * (GET_BUS_FREQUENCY() / 4));
+        xglobals->fog_t1 = xglobals->fog_t0 + (iTime)(ITIME_FROM_SECS(time));
     }
 }
 

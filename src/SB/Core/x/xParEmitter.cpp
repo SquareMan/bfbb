@@ -1,16 +1,17 @@
 #include "xParEmitter.h"
 
 #include <types.h>
-#include <zScene.h>
-#include <iModel.h>
-#include <xMathInlines.h>
-#include <xMath.h>
-#include <xGroup.h>
-#include <xMovePoint.h>
-#include <zGlobals.h>
-#include <xDebug.h>
-#include <xEvent.h>
-#include <PowerPC_EABI_Support\MSL_C\MSL_Common\cmath>
+#include "zScene.h"
+#include "iModel.h"
+#include "xMathInlines.h"
+#include "xMath.h"
+#include "xGroup.h"
+#include "xMovePoint.h"
+#include "zGlobals.h"
+#include "xDebug.h"
+#include "xEvent.h"
+
+#include <cmath>
 
 static xParEmitterAsset sSaveEmmiterSettings;
 static xParEmitterPropsAsset sSaveEmmiterPropSettings;

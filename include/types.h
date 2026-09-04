@@ -19,6 +19,8 @@ typedef unsigned long long U64;
 typedef float F32;
 typedef double F64;
 
+typedef U32 uintptr_t;
+
 #ifdef NULL
 #undef NULL
 #endif
@@ -50,7 +52,7 @@ typedef wchar_t wint_t;
 #endif
 
 // stupid hack
-#include <dolphin/types.h>
+#include "../src/dolphin/include/dolphin/types.h"
 
 // Basic defines to allow newer-like C++ code to be written
 #define TRUE 1

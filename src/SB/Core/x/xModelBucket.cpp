@@ -8,7 +8,7 @@
 #include "zGlobals.h"
 
 #include <types.h>
-#include <PowerPC_EABI_Support\MSL_C\MSL_Common\stdlib.h>
+#include <stdlib.h>
 #include <rwsdk\driver\gcn\dlrendst.h>
 
 static RpWorld* sBucketDummyWorld;
@@ -517,13 +517,17 @@ void xModelBucket_RenderAlphaLayer(S32 maxLayer)
             {
                 if (curPipeFlags >> 24)
                 {
+#ifdef GAMECUBE
                     RwGameCubeSetAlphaCompare(GX_ALWAYS, 0, GX_AOP_AND, GX_GEQUAL,
                                               curPipeFlags >> 24);
+#endif
                     _rwDlRenderStateSetZCompLoc(FALSE);
                 }
                 else
                 {
+#ifdef GAMECUBE
                     RwGameCubeSetAlphaCompare(GX_GEQUAL, 1, GX_AOP_AND, GX_ALWAYS, 0);
+#endif
                     _rwDlRenderStateSetZCompLoc(TRUE);
                 }
             }
@@ -593,7 +597,9 @@ void xModelBucket_RenderAlphaLayer(S32 maxLayer)
         }
         if (lastPipeFlags & 0xFF000000)
         {
+#ifdef GAMECUBE
             RwGameCubeSetAlphaCompare(GX_GEQUAL, 1, GX_AOP_AND, GX_ALWAYS, 0);
+#endif
             _rwDlRenderStateSetZCompLoc(TRUE);
         }
         if (lastPipeFlags & 0x10000)

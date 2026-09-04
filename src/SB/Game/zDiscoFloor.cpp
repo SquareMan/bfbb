@@ -17,7 +17,7 @@
 
 #include <string.h>
 #include <stdio.h>
-#include <PowerPC_EABI_Support\MSL_C\MSL_Common\stdlib.h>
+#include <stdlib.h>
 
 // SLOP: put in header
 template <> size_t range_limit(size_t v, size_t minv, size_t maxv)

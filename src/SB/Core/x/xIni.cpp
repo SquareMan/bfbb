@@ -3,8 +3,8 @@
 #include <rwplcore.h>
 
 #include <types.h>
-#include <PowerPC_EABI_Support\MSL_C\MSL_Common\cstdlib>
-#include <PowerPC_EABI_Support\MSL_C\MSL_Common\cstring>
+#include <cstdlib>
+#include <cstring>
 
 char* TrimWhitespace(char* string)
 {
@@ -181,7 +181,6 @@ S32 xIniGetInt(xIniFile* ini, const char* tok, S32 def)
     return atoi(ini->Values[index].val);
 }
 
-F32 atof(const char*);
 F32 xIniGetFloat(xIniFile* ini, const char* tok, F32 def)
 {
     S32 index = xIniGetIndex(ini, tok);

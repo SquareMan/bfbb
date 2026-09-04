@@ -16,7 +16,8 @@
 #define NOVEMBER 11
 #define DECEMBER 12
 
-typedef S64 iTime;
+#include "iSystem.h"
+#define ITIME_FROM_SECS(s) (iTime)((s) * (GET_BUS_FREQUENCY() / 4))
 
 S32 iGetMinute();
 S32 iGetHour();

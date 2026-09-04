@@ -20,7 +20,7 @@
 #include <rpmatfx.h>
 #include <rwplcore.h>
 #include <rpskin.h>
-#include <PowerPC_EABI_Support/MSL_C/MSL_Common/stdlib.h>
+#include <stdlib.h>
 
 // SLOP: put in header
 template<>

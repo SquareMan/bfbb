@@ -1101,7 +1101,7 @@ namespace oob_state
             cruise_bubble::reset();
 
             shared.flags |= 0x4;
-            shared.vertical = FABS(fixed.in_loc.y - fixed.out_loc.y) > 0.01f;
+            shared.vertical = xabs(fixed.in_loc.y - fixed.out_loc.y) > 0.01f;
             shared.control = TRUE;
             
             this->move_substate = shared.model != NULL ? SS_REORIENT : SS_INVALID;

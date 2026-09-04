@@ -20,7 +20,7 @@
 
 #include <types.h>
 #include <string.h>
-#include <PowerPC_EABI_Support\MSL_C\MSL_Common\cmath>
+#include <cmath>
 
 struct xCutsceneMphFrame
 {
@@ -323,11 +323,6 @@ F32 xlog(F32 x)
     return std::logf(x);
 }
 
-float std::logf(float x)
-{
-    return (float)log((double)x);
-}
-
 // A camera chunk's payload sits directly after its xCutsceneData header: the
 // number of fly keys, then the keys themselves.
 struct xCutsceneCameraData
@@ -469,7 +464,7 @@ static void xcsCalcAnimMatrices(RwMatrixTag* animMat, RpAtomic* model, xCutscene
             ttt->y = 0.0f;
             ttt->z = 0.0f;
 
-            if (FABS(qqq->s) < 0.9999f)
+            if (xabs(qqq->s) < 0.9999f)
             {
                 break;
             }
@@ -1032,19 +1027,4 @@ void xCutscene_Render(xCutscene* csn, xEnt**, S32*, F32*)
 xCutscene* xCutscene_CurrentCutscene()
 {
     return &sActiveCutscene;
-}
-
-namespace std
-{
-    float atanf(float x);
-}
-
-float std::atan(float x)
-{
-    return std::atanf(x);
-}
-
-float std::atanf(float x)
-{
-    return (float)::atan((double)x);
 }

@@ -2885,7 +2885,7 @@ void NPCHazard::ReconChuck()
 
         F32 dot = xVec3Dot(&dir_norm, &g_Y3);
 
-        if (FABS(dot) < 0.86f)
+        if (xabs(dot) < 0.86f)
         {
             ball->rad_max *= 0.5f;
             ball->rad_min *= 0.5f;
@@ -3364,7 +3364,7 @@ void NPCHazard::ReconSlickOil()
 
         F32 dot = xVec3Dot(&dir_norm, &g_Y3);
 
-        if (FABS(dot) < 0.86f)
+        if (xabs(dot) < 0.86f)
         {
             ball->rad_max *= 0.5f;
             ball->rad_min *= 0.5f;

@@ -10,7 +10,7 @@
 #include "xScene.h"
 #include "zGrid.h"
 
-#include <PowerPC_EABI_Support/MSL_C/MSL_Common/cmath>
+#include <cmath>
 #include <types.h>
 
 static S32 sSweptSphereHitFound;
@@ -1588,6 +1588,7 @@ void xsqrtfast(F32& out, F32 in)
     out = std::sqrtf(in);
 }
 
+#ifdef GAMECUBE
 // We don't have the implementation provided
 F32 std::sqrtf(F32 x)
 {
@@ -1607,6 +1608,7 @@ F32 std::sqrtf(F32 x)
         return x;
     }
 }
+#endif
 
 S32 xSweptSphereToSphere(xSweptSphere* sws, xSphere* sph)
 {

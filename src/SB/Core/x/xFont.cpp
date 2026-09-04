@@ -14,7 +14,7 @@
 
 #include <string.h>
 #include <stdio.h>
-#include <PowerPC_EABI_Support\MSL_C\MSL_Common\strtoul.h>
+#include <cstdlib>
 
 /* xtextbox flags */
 
@@ -1432,7 +1432,7 @@ namespace
 
 xtextbox::layout& xtextbox::temp_layout(bool cache) const
 {
-    iTime max_time = (iTime)(F32)(GET_BUS_FREQUENCY() / 4);
+    iTime max_time = (iTime)(F32)(ITIME_FROM_SECS(1));
     iTime cur_time = iTimeGet();
     bool refresh = false;
     U32 index = 0;

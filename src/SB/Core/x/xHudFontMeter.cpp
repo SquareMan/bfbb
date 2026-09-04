@@ -1,9 +1,11 @@
 #include "xHudFontMeter.h"
 
 #include <types.h>
-#include <xMath2.h>
+
+#include "xMath2.h"
+
 #include <stdio.h>
-#include <PowerPC_EABI_Support\MSL_C++\MSL_Common\Include\new.h>
+#include <new.h>
 
 void xhud::font_meter_widget::load(xBase& data, xDynAsset& asset, size_t)
 {

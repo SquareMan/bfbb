@@ -1,4 +1,4 @@
-#include <PowerPC_EABI_Support\MSL_C\MSL_Common\cmath>
+#include <cmath>
 #include <rpskin.h>
 #include <stdio.h>
 #include <string.h>

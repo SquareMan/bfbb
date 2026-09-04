@@ -10,6 +10,7 @@
 #include "xTRC.h"
 #include "xEvent.h"
 #include "xColor.h"
+#include "xPad.h"
 
 extern F32 _930;
 extern F64 _932_0;

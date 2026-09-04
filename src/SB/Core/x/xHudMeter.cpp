@@ -8,17 +8,6 @@
 
 #include <math.h>
 
-// NOTE: these two belong in headers (std::powf in <math.h>, xpow in
-// xMathInlines.h). They are inline, so the compiler emits a weak out-of-line
-// copy into every translation unit that calls them.
-namespace std
-{
-    extern inline float powf(float x, float y)
-    {
-        return ::pow(x, y);
-    }
-}
-
 inline F32 xpow(F32 x, F32 y)
 {
     return std::powf(x, y);

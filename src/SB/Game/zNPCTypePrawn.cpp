@@ -333,7 +333,7 @@ bool aqua_beam::hits_sphere(const xSphere& o) const
         F32 maxdist = hit_radius * (grow * ring.dist + 1.0f) + radius;
         xVec3 delta = center - *(xVec3*)&ring.model->Mat->pos;
 
-        if (!(delta.length2() > maxdist * maxdist) && FABS(delta.dot(ring.mat.at)) < maxdist)
+        if (!(delta.length2() > maxdist * maxdist) && xabs(delta.dot(ring.mat.at)) < maxdist)
         {
             return true;
         }
@@ -363,7 +363,7 @@ void aqua_beam::update_rings(F32 dt)
             ++it;
         }
 
-        while (!ring.queue.empty() && FABS(ring.queue.back().dist) >= cfg.ring.kill_dist)
+        while (!ring.queue.empty() && xabs(ring.queue.back().dist) >= cfg.ring.kill_dist)
         {
             kill_ring();
         }
@@ -434,7 +434,7 @@ void aqua_beam::render_ring(aqua_beam::ring_segment& r)
     xModelInstance* model = r.model;
     model->Alpha = cfg.ring.alpha;
 
-    F32 fade_dist = FABS(r.dist) - cfg.ring.fade_dist;
+    F32 fade_dist = xabs(r.dist) - cfg.ring.fade_dist;
     if (fade_dist > 0.0f)
     {
         F32 max_fade_dist = cfg.ring.kill_dist - cfg.ring.fade_dist;
@@ -1413,7 +1413,7 @@ void zNPCPrawn::update_turn(F32 dt)
 
     bool decel = true;
 
-    if (!(FABS(this->turn.vel) < 0.001f) && (diff < 0.0f ? 1 : 0) == (this->turn.vel < 0.0f ? 1 : 0))
+    if (!(xabs(this->turn.vel) < 0.001f) && (diff < 0.0f ? 1 : 0) == (this->turn.vel < 0.0f ? 1 : 0))
     {
         decel = false;
     }
@@ -1427,7 +1427,7 @@ void zNPCPrawn::update_turn(F32 dt)
         time_to_target = diff / this->turn.vel;
     }
 
-    F32 time_to_stop = FABS(this->turn.vel / this->turn.accel);
+    F32 time_to_stop = xabs(this->turn.vel / this->turn.accel);
 
     F32 dir = (time_to_target > time_to_stop) ? 1.0f : -1.0f;
     F32 sign = (diff >= 0.0f) ? 1.0f : -1.0f;
@@ -1437,11 +1437,11 @@ void zNPCPrawn::update_turn(F32 dt)
     F32 vel = this->turn.vel + dvel;
     F32 max_vel = this->turn.max_vel;
 
-    if (FABS(vel) <= max_vel)
+    if (xabs(vel) <= max_vel)
     {
         this->turn.vel = vel;
     }
-    else if (FABS(this->turn.vel) <= max_vel)
+    else if (xabs(this->turn.vel) <= max_vel)
     {
         this->turn.vel = range_limit<F32>(vel, -max_vel, max_vel);
     }
@@ -1453,7 +1453,7 @@ void zNPCPrawn::update_turn(F32 dt)
     F32 step = this->turn.vel * dt;
     if (time_to_target > time_to_stop)
     {
-        if ((step < 0.0f ? 1 : 0) == (diff < 0.0f ? 1 : 0) && FABS(step) > FABS(diff))
+        if ((step < 0.0f ? 1 : 0) == (diff < 0.0f ? 1 : 0) && xabs(step) > xabs(diff))
         {
             this->turn.vel = 0.0f;
             step = diff;
@@ -2286,8 +2286,8 @@ bool zNPCPrawn::turning() const
     if (!(this->turn.vel >= -1.0e-05f && this->turn.vel <= 1.0e-05f) ||
         (!(this->turn.accel >= -1.0e-05f && this->turn.accel <= 1.0e-05f) &&
          (!(this->look_dir.x > this->look_dir.y) ||
-          !(FABS(this->look_dir.x - facing.x) < 0.001f)) &&
-         (!(this->look_dir.x < this->look_dir.y) || !(FABS(this->look_dir.y - facing.y) < 0.001f))))
+          !(xabs(this->look_dir.x - facing.x) < 0.001f)) &&
+         (!(this->look_dir.x < this->look_dir.y) || !(xabs(this->look_dir.y - facing.y) < 0.001f))))
     {
         result = true;
     }

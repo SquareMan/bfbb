@@ -15,12 +15,6 @@
 #include <types.h>
 #include <rwplcore.h>
 
-// MSL's <cmath> is not reachable from here; the target calls floorf__3stdFf.
-namespace std
-{
-    float floorf(float x);
-}
-
 U32 xShadowReceiveShadowSetup(xEnt* ent);
 void xShadowReceiveShadow(xEnt* ent, F32 factor, S32 flags, RwMatrixTag* mat, RwRaster* rast);
 

@@ -396,7 +396,8 @@ void zGameLoop()
     gGameWhereAmI = eGameWhere_LoopStart;
     zGameStateSwitch(eGameState_Play);
 
-    iTime bus = (iTime)((GET_BUS_FREQUENCY() / 4) / 60.0f);
+    // iTime bus = (iTime)((GET_BUS_FREQUENCY() / 4) / 60.0f);
+    iTime bus = (iTime)(ITIME_FROM_SECS(1) / 60.0f);
     sTimeLast = iTimeGet() - bus;
 
     gGameWhereAmI = eGameWhere_CutsceneFinish;
@@ -1066,7 +1067,7 @@ static void zGameUpdateMode()
             gPendingPlayer = eCurrentPlayerCount;
         }
 
-        iTime bus = (iTime)((GET_BUS_FREQUENCY() / 4) / 60.0f);
+        iTime bus = (iTime)((ITIME_FROM_SECS(1)) / 60.0f);
         sTimeLast = iTimeGet() - bus;
 
         zGameStateSwitch(eGameState_Play);

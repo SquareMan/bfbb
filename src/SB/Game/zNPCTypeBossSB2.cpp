@@ -1,6 +1,5 @@
 
 #include "zNPCTypeBossSB2.h"
-#include "PowerPC_EABI_Support/MSL_C++/MSL_Common/Include/new.h"
 #include "xLightKit.h"
 #include "zNPCGoalCommon.h"
 #include <types.h>
@@ -30,7 +29,9 @@
 #include "zScene.h"
 #include "zEnv.h"
 #include "zNPCTypeVillager.h"
-#include <xMathInlines.h>
+#include "xMathInlines.h"
+
+#include <new.h>
 
 #define ANIM_Unknown 0 //0x0
 #define ANIM_Idle01 1 // 0x4

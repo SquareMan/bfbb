@@ -21,7 +21,11 @@
 //     #define PI _771_1
 //     #define ONEEIGHTY _778_0
 #define PI 3.1415927f
+#define HALF_PI 1.5707964f
 #define ONEEIGHTY 180.0f
+
+#define TAU 6.2831855f
+#define LONG_TAU 6.2831854820251465
 
 #define DEG2RAD(x) ((PI) * (x) / (ONEEIGHTY))
 #define RAD2DEG(x) ((ONEEIGHTY) * (x) / (PI))

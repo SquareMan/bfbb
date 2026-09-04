@@ -33,8 +33,6 @@ extern "C" int sprintf(char*, const char*, ...);
 #include "iFile.h"
 #include "zScene.h"
 #include "zGameState.h"
-#include <dolphin/card.h>
-#include <dolphin/os.h>
 // from zAssetTypes.h - see the note above
 void zAssetStartup();
 void zAssetShutdown();
@@ -999,6 +997,7 @@ void zMainMemCardSpaceQuery()
     eStartupErrors startupError = eNoError;
     S32 fullCard = -1;
     S32 startBytes = 0;
+#ifdef GAMECUBE
     void* workArea = RwMalloc(CARD_WORKAREA_SIZE);
 
     while (1)
@@ -1231,13 +1230,16 @@ void zMainMemCardSpaceQuery()
             }
         }
     }
+#endif
 
     zMainMemCardQueryPost(0, 0, 0, 0);
 
+#ifdef GAMECUBE
     if (workArea)
     {
         RwFree(workArea);
     }
+#endif
 }
 
 static void zMainMemCardQueryPost(S32 needed, S32 available, S32 neededFiles, S32 unk0)

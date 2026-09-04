@@ -59,9 +59,6 @@ struct xMemInfo_tag
 {
     xMemArea_tag system;
 
-    // Offset: 0xC
-    xMemArea_tag stack;
-
     // Offset: 0x18
     xMemArea_tag DRAM;
 

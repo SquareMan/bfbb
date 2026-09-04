@@ -118,7 +118,7 @@ U32 zMenuLoop()
         zMusicNotify(0);
     }
 
-    time_last = 1.0f / float(GET_BUS_FREQUENCY() >> 2) * iTimeGet() - 1.0f / 60.f;
+    time_last = 1.0f / F32(ITIME_FROM_SECS(1)) * iTimeGet() - 1.0f / 60.f;
 
     zGameExtras_NewGameReset();
 
@@ -127,7 +127,7 @@ U32 zMenuLoop()
     xScrFxFade(&black, &clear, 0.0f, NULL, 1);
     S32 ostrich_delay = 0xa;
 
-    time_last = 1.0f / float(GET_BUS_FREQUENCY() >> 2) * iTimeGet() - 1.0f / 60.f;
+    time_last = 1.0f / F32(ITIME_FROM_SECS(1)) * iTimeGet() - 1.0f / 60.f;
 
     S32 draw_black;
 
@@ -153,12 +153,12 @@ U32 zMenuLoop()
                 zGameStateSwitch(1);
                 xScrFxFade(&black, &clear, 0.1f, NULL, 1);
 
-                time_last = 1.0f / float(GET_BUS_FREQUENCY() >> 2) * iTimeGet() - 1.0f / 60.f;
+                time_last = 1.0f / float(ITIME_FROM_SECS(1)) * iTimeGet() - 1.0f / 60.f;
                 break;
             }
         }
 
-        time_current = 1.0f / float(GET_BUS_FREQUENCY() >> 2) * iTimeGet();
+        time_current = 1.0f / float(ITIME_FROM_SECS(1)) * iTimeGet();
 
         F32 current = time_current;
 

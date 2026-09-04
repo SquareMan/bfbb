@@ -18,9 +18,10 @@
 #include "xSnd.h"
 #include "xCollide.h"
 #include "zNPCTypes.h"
-#include <PowerPC_EABI_Support\MSL_C\MSL_Common\cstring>
+
 #include <stdio.h>
-#include <PowerPC_EABI_Support\MSL_C\MSL_Common\stdlib.h>
+#include <cstring>
+#include <stdlib.h>
 
 void zEntInit(zEnt* ent, xEntAsset* asset, U32 type)
 {

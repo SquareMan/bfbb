@@ -11,8 +11,8 @@
 
 #include "iMath.h"
 
-#include <PowerPC_EABI_Support\MSL_C\MSL_Common\cmath>
-#include <PowerPC_EABI_Support\MSL_C\MSL_Common\cstring>
+#include <cmath>
+#include <cstring>
 
 #define CAMERAFX_ZOOM_MODE_0 0
 #define CAMERAFX_ZOOM_MODE_1 1
@@ -930,11 +930,13 @@ void xCameraUpdate(xCamera* cam, F32 dt)
     }
 }
 
+#ifdef GAMECUBE
 #ifndef INLINE
 float std::ceilf(float x)
 {
     return (float)ceil((double)x);
 }
+#endif
 #endif
 
 void xCameraBegin(xCamera* cam, S32 clear)
@@ -1460,11 +1462,13 @@ F32 xasin(F32 x)
     return std::asinf(x);
 }
 
+#ifdef GAMECUBE
 #ifndef INLINE
 float std::asinf(float x)
 {
     return (float)asin((double)x);
 }
+#endif
 #endif
 
 F32 xQuatGetAngle(const xQuat* q)
@@ -1774,13 +1778,6 @@ F32 xacos(F32 x)
     return std::acosf(x);
 }
 
-#ifndef INLINE
-float std::acosf(float x)
-{
-    return (float)acos((double)x);
-}
-#endif
-
 void xVec3AddTo(xVec3* o, const xVec3* v)
 {
     o->x += v->x;
@@ -1801,13 +1798,6 @@ F32 xexp(F32 x)
 {
     return std::expf(x);
 }
-
-#ifndef INLINE
-float std::expf(float x)
-{
-    return (float)exp((double)x);
-}
-#endif
 
 F32 xrmod(F32 ang)
 {

@@ -4,14 +4,7 @@
 #include <rwplcore.h>
 #include <xMathInlines.h>
 #include <xMemMgr.h>
-#include <mem.h>
 #include <xVec3.h>
-
-// MSL's <cmath> is not reachable from here; the target calls floorf__3stdFf.
-namespace std
-{
-    float floorf(float x);
-}
 
 static F32 sBasisUniformBspline[4][4];
 static F32 sBasisBezier[4][4] = { { -1.0f, 3.0f, -3.0f, 1.0f },

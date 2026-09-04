@@ -17,7 +17,7 @@
 
 #include <types.h>
 #include <stdio.h>
-#include <PowerPC_EABI_Support\MSL_C\MSL_Common\cmath>
+#include <cmath>
 
 // These structs were used in deadstripped functions.
 // This function is here to force the symbols to be linked.

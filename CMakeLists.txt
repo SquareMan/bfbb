@@ -27,19 +27,45 @@ add_executable(bfbb)
 # FIXME: This should be removable after getting the build fully linking and removing the dependency on gc headers
 # silence warning from RenderWare macros doing cursed enum stuff
 target_compile_options(bfbb PRIVATE -Wno-deprecated-enum-enum-conversion)
+target_compile_definitions(bfbb PRIVATE _CRT_SECURE_NO_WARNINGS _CRT_NONSTDC_NO_WARNINGS)
 
 target_include_directories(bfbb SYSTEM PRIVATE
     include/
     include/rwsdk
-    src/dolphin/include
-    src/PowerPC_EABI_Support/include
     src/bink/include
     include/inline
+)
+set(PLATFORM_SOURCES
+    src/SB/core/sdl/iAnim.cpp
+    src/SB/core/sdl/iAnimSKB.cpp
+    src/SB/core/sdl/iCollide.cpp
+    src/SB/core/sdl/iCollideFast.cpp
+    src/SB/core/sdl/iCutscene.cpp
+    src/SB/core/sdl/iDraw.cpp
+    src/SB/core/sdl/iEnv.cpp
+    src/SB/core/sdl/iFile.cpp
+    src/SB/core/sdl/iFMV.cpp
+    src/SB/core/sdl/iFX.cpp
+    src/SB/core/sdl/iLight.cpp
+    src/SB/core/sdl/iMath.cpp
+    src/SB/core/sdl/iMath3.cpp
+    src/SB/core/sdl/iMemMgr.cpp
+    src/SB/core/sdl/iModel.cpp
+    src/SB/core/sdl/iMorph.cpp
+    src/SB/core/sdl/iPad.cpp
+    src/SB/core/sdl/iParMgr.cpp
+    src/SB/core/sdl/isavegame.cpp
+    src/SB/core/sdl/iScrFX.cpp
+    src/SB/core/sdl/iSnd.cpp
+    src/SB/core/sdl/iSystem.cpp
+    src/SB/core/sdl/iTime.cpp
+    src/SB/core/sdl/iTRC.cpp
+    src/SB/core/sdl/ngcrad3d.cpp
 )
 target_sources(bfbb
     PUBLIC
     FILE_SET headers TYPE HEADERS
-    BASE_DIRS src/SB/Game/ src/SB/core/x src/SB/core/gc
+    BASE_DIRS src/SB/Game/ src/SB/core/x src/SB/core/sdl
     FILES
     src/SB/Game/zVolume.h
     src/SB/Game/zVar.h
@@ -264,34 +290,34 @@ target_sources(bfbb
     src/SB/core/x/xVec3Inlines.h
     src/SB/core/x/xVolume.h
 
-    src/SB/core/gc/iAnim.h
-    src/SB/core/gc/iAnimSKB.h
-    src/SB/core/gc/iCollide.h
-    src/SB/core/gc/iCollideFast.h
-    src/SB/core/gc/iColor.h
-    src/SB/core/gc/iCutscene.h
-    src/SB/core/gc/iDraw.h
-    src/SB/core/gc/iEnv.h
-    src/SB/core/gc/iFile.h
-    src/SB/core/gc/iFMV.h
-    src/SB/core/gc/iFX.h
-    src/SB/core/gc/iLight.h
-    src/SB/core/gc/iMath.h
-    src/SB/core/gc/iMath3.h
-    src/SB/core/gc/iMemMgr.h
-    src/SB/core/gc/iMix.c
-    src/SB/core/gc/iModel.h
-    src/SB/core/gc/iMorph.h
-    src/SB/core/gc/iPad.h
-    src/SB/core/gc/iParMgr.h
-    src/SB/core/gc/isavegame.h
-    src/SB/core/gc/iScrFX.h
-    src/SB/core/gc/iSnd.h
-    src/SB/core/gc/iSystem.h
-    src/SB/core/gc/iTime.h
-    src/SB/core/gc/iTRC.h
-    src/SB/core/gc/ngcrad3d.c
-    src/SB/core/gc/ngcrad3d.h
+    src/SB/core/sdl/iAnim.h
+    src/SB/core/sdl/iAnimSKB.h
+    src/SB/core/sdl/iCollide.h
+    src/SB/core/sdl/iCollideFast.h
+    src/SB/core/sdl/iColor.h
+    src/SB/core/sdl/iCutscene.h
+    src/SB/core/sdl/iDraw.h
+    src/SB/core/sdl/iEnv.h
+    src/SB/core/sdl/iFile.h
+    src/SB/core/sdl/iFMV.h
+    src/SB/core/sdl/iFX.h
+    src/SB/core/sdl/iLight.h
+    src/SB/core/sdl/iMath.h
+    src/SB/core/sdl/iMath3.h
+    src/SB/core/sdl/iMemMgr.h
+    src/SB/core/sdl/iMix.c
+    src/SB/core/sdl/iModel.h
+    src/SB/core/sdl/iMorph.h
+    src/SB/core/sdl/iPad.h
+    src/SB/core/sdl/iParMgr.h
+    src/SB/core/sdl/isavegame.h
+    src/SB/core/sdl/iScrFX.h
+    src/SB/core/sdl/iSnd.h
+    src/SB/core/sdl/iSystem.h
+    src/SB/core/sdl/iTime.h
+    src/SB/core/sdl/iTRC.h
+    src/SB/core/sdl/ngcrad3d.c
+    src/SB/core/sdl/ngcrad3d.h
 
     PRIVATE
     src/SB/Game/zActionLine.cpp
@@ -494,29 +520,5 @@ target_sources(bfbb
     src/SB/core/x/xVec3.cpp
     src/SB/core/x/xVolume.cpp
 
-    src/SB/core/gc/iAnim.cpp
-    src/SB/core/gc/iAnimSKB.cpp
-    src/SB/core/gc/iCollide.cpp
-    src/SB/core/gc/iCollideFast.cpp
-    src/SB/core/gc/iCutscene.cpp
-    src/SB/core/gc/iDraw.cpp
-    src/SB/core/gc/iEnv.cpp
-    src/SB/core/gc/iFile.cpp
-    src/SB/core/gc/iFMV.cpp
-    src/SB/core/gc/iFX.cpp
-    src/SB/core/gc/iLight.cpp
-    src/SB/core/gc/iMath.cpp
-    src/SB/core/gc/iMath3.cpp
-    src/SB/core/gc/iMemMgr.cpp
-    src/SB/core/gc/iModel.cpp
-    src/SB/core/gc/iMorph.cpp
-    src/SB/core/gc/iPad.cpp
-    src/SB/core/gc/iParMgr.cpp
-    src/SB/core/gc/isavegame.cpp
-    src/SB/core/gc/iScrFX.cpp
-    src/SB/core/gc/iSnd.cpp
-    src/SB/core/gc/iSystem.cpp
-    src/SB/core/gc/iTime.cpp
-    src/SB/core/gc/iTRC.cpp
-    src/SB/core/gc/ngcrad3d.cpp
+    ${PLATFORM_SOURCES}
 )

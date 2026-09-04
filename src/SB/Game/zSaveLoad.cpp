@@ -153,7 +153,7 @@ void zUpdateThumbIcon()
 
 void zSaveLoad_Tick()
 {
-    time_current = (1.0f / (GET_BUS_FREQUENCY() / 4)) * (float)iTimeGet();
+    time_current = (1.0f / (U32)(ITIME_FROM_SECS(1))) * (F32)iTimeGet();
 
     time_elapsed = time_current - time_last;
     if (time_elapsed < 0.0f)
@@ -1680,7 +1680,13 @@ void zSaveLoadAutoSaveUpdate()
     if (physicalSlot >= 0)
     {
         autoSaveCard = physicalSlot;
+#ifdef GAMECUBE
         switch (CARDProbeEx(physicalSlot, &out1, &out2))
+#else
+        // FIXME: Using this means that the save UI will never detect a failed save
+        // 99% of the time on modern platforms that's probably fine but we probably do want to detect it eventually
+        switch(0)
+#endif
         {
         case 0:
         case -1:

@@ -233,7 +233,7 @@ F32 xMat3x3LookVec(xMat3x3* m, const xVec3* at)
     F32 vec_len = xVec3Normalize(&m->at, at);
     xVec3Inv(&m->at, &m->at);
 
-    if (FABS(1.0f - m->at.y) < 0.00001f)
+    if (xabs(1.0f - m->at.y) < 0.00001f)
     {
         m->right.x = 1.0f;
         m->right.y = 0.0f;
@@ -246,7 +246,7 @@ F32 xMat3x3LookVec(xMat3x3* m, const xVec3* at)
         m->at.z = 0.0f;
         return vec_len;
     }
-    if (FABS(1.0f + m->at.y) < 0.00001f)
+    if (xabs(1.0f + m->at.y) < 0.00001f)
     {
         m->right.x = -1.0f;
         m->right.y = 0.0f;
@@ -259,7 +259,7 @@ F32 xMat3x3LookVec(xMat3x3* m, const xVec3* at)
         m->at.z = 0.0f;
         return vec_len;
     }
-    if ((FABS(at->z) < 0.00001f) && (FABS(at->x) < 0.00001f))
+    if ((xabs(at->z) < 0.00001f) && (xabs(at->x) < 0.00001f))
     {
         m->right.x = 1.0f;
         m->right.y = 0.0f;

@@ -35,7 +35,7 @@
 #include "zSurface.h"
 #include "zTextBox.h"
 #include "zEntButton.h"
-#include <PowerPC_EABI_Support\MSL_C\MSL_Common\cstring>
+#include <cstring>
 #include <types.h>
 
 
