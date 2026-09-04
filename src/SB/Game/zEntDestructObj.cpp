@@ -3,6 +3,7 @@
 #define XSNDPLAY3D_OUT_OF_LINE
 
 #include "zEntDestructObj.h"
+#include "xSnd.h"
 
 #include <types.h>
 

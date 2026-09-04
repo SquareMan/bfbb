@@ -11,6 +11,7 @@
 #include "xMath.h"
 #include "xMathInlines.h"
 #include "xutil.h"
+#include "xSnd.h"
 #include "xordarray.h"
 #include "zRenderState.h"
 

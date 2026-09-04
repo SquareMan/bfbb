@@ -18,6 +18,7 @@
 #include "xutil.h"
 #include "xQuickCull.h"
 #include "xCollide.h"
+#include "xSnd.h"
 
 // These structs were used in deadstripped functions.
 // This function is here to force the symbols to be linked.

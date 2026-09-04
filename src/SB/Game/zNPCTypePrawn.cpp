@@ -72,8 +72,6 @@ namespace auto_tweak
     }
 } // namespace auto_tweak
 
-U32 xSndPlay3DFade(U32 id, F32 vol, F32 pitch, U32 priority, U32 flags, const xVec3* pos,
-                   F32 innerRadius, F32 outerRadius, sound_category category, F32 fade, F32 delay);
 void xDebugAddTweak(const char*, xVec3*, const tweak_callback*, void*, U32);
 
 namespace

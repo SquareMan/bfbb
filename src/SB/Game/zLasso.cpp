@@ -11,6 +11,7 @@
 #include "iModel.h"
 #include "xstransvc.h"
 #include "iParMgr.h"
+#include "xSnd.h"
 
 #include <types.h>
 

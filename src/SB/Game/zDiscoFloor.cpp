@@ -11,6 +11,7 @@
 #include "xDebug.h"
 #include "xMath.h"
 #include "xMathInlines.h"
+#include "xSnd.h"
 
 #include "iModel.h"
 #include "iMath.h"

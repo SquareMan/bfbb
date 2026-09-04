@@ -72,8 +72,6 @@
 #define SOUND_HIT_SLAP 8
 #define SOUND_HIT_FLAIL 9
 
-U32 xSndPlay3DFade(U32 id, F32 vol, F32 pitch, U32 priority, U32 flags, const xVec3* pos,
-                   F32 innerRadius, F32 outerRadius, sound_category category, F32 fade, F32 delay);
 F32 xSCurveInverse(F32 val);
 bool xSphereHitsBound(const xSphere& o, const xBound& b);
 void xBoundGetSphere(xSphere& o, const xBound& bound);

@@ -8,9 +8,6 @@
 #include <types.h>
 #include <string.h>
 
-U32 xSndPlay3DFade(U32 id, F32 vol, F32 pitch, U32 priority, U32 flags, const xVec3* pos,
-                   F32 innerRadius, F32 outerRadius, sound_category category, F32 fade, F32 delay);
-
 #define ANIM_Unknown 0
 #define ANIM_Idle01 1 // 0x4
 #define ANIM_Taunt01 3 // 0xC

@@ -27,6 +27,7 @@
 #include "zGameExtras.h"
 #include "zNPCSupplement.h"
 #include "zParPTank.h"
+#include "xSnd.h"
 #include <stdlib.h>
 
 enum en_copcntr

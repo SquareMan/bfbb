@@ -2,6 +2,7 @@
 #include "xMath3.h"
 #include "xMathInlines.h"
 #include "xDebug.h"
+#include "xSnd.h"
 #include "zGlobals.h"
 #include "zNPCTypeDutchman.h"
 
@@ -72,9 +73,6 @@ inline void xFXRibbon::init(S32, const char* name)
     init(name, NULL);
 }
 
-U32 xSndPlay3DFade(U32 id, F32 vol, F32 pitch, U32 priority, U32 flags, const xVec3* pos,
-                   F32 innerRadius, F32 outerRadius, sound_category category, F32 fadeTime,
-                   F32 delay);
 
 // xCollide.h declares neither of these; retail's header carried the xSphere overload inline.
 bool xSphereHitsCapsule(const xVec3& center, F32 radius, const xVec3& v1, const xVec3& v2,

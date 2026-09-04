@@ -191,7 +191,7 @@ struct grid_index
 };
 
 // SLOP: put in CORRECT header
-template <> U16 range_limit<U16>(U16 v, U16 minv, U16 maxv)
+template <> inline U16 range_limit<U16>(U16 v, U16 minv, U16 maxv)
 {
     if (v <= minv)
     {
@@ -205,6 +205,7 @@ template <> U16 range_limit<U16>(U16 v, U16 minv, U16 maxv)
 
     return v;
 }
+
 inline grid_index get_grid_index(const xGrid& grid, F32 x, F32 z)
 {
     grid_index index;

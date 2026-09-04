@@ -941,12 +941,6 @@ xMat4x3* xEntGetFrame(const xEnt* ent)
     return xModelGetFrame(ent->model);
 }
 
-void xSndPlay3D(U32 id, F32 vol, F32 pitch, U32 priority, U32 flags, const xVec3* pos, F32 radius,
-                sound_category category, F32 delay)
-{
-    xSndPlay3D(id, vol, pitch, priority, flags, pos, radius / 4.0f, radius, category, delay);
-}
-
 S32 xNPCBasic::SelfType() const
 {
     return myNPCType;

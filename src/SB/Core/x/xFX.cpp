@@ -8,6 +8,7 @@
 #include "xMathInlines.h"
 #include "xstransvc.h"
 #include "xScrFx.h"
+#include "xSnd.h"
 
 #include "zEntPickup.h"
 #include "zParEmitter.h"

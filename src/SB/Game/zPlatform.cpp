@@ -12,6 +12,7 @@
 #include "zFX.h"
 #include "zCollGeom.h"
 #include "zGoo.h"
+#include "xSnd.h"
 #include "xSkyDome.h"
 #include "zShrapnel.h"
 #include "xEntMotionAsset.h"

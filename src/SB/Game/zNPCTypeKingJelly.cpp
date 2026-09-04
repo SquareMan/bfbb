@@ -9,6 +9,7 @@
 #include "zScene.h"
 #include "zNPCSndLists.h"
 #include "xDebug.h"
+#include "xSnd.h"
 
 typedef void (*tweak_change_cb)(tweak_info&);
 #include "zMusic.h"

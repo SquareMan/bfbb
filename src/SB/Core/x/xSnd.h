@@ -121,10 +121,23 @@ void xSndSelectListenerMode(sound_listener_game_mode listenerMode);
 void xSndExit();
 U32 xSndPlay(U32 id, F32 vol, F32 pitch, U32 priority, U32 flags, U32 parentID,
              sound_category category, F32 delay);
+
 U32 xSndPlay3D(U32 id, F32 vol, F32 pitch, U32 priority, U32 flags, xEnt* parent, F32 innerRadius,
                F32 outerRadius, sound_category category, F32 delay);
-U32 xSndPlay3D(U32 id, F32 vol, F32 pitch, U32 priority, U32 flags, const xVec3* pos,
-               F32 innerRadius, F32 outerRadius, sound_category category, F32 delay);
+inline U32 xSndPlay3D(U32 id, F32 vol, F32 pitch, U32 priority, U32 flags, xEnt* ent, F32 radius,
+                      sound_category category, F32 delay)
+{
+    return xSndPlay3D(id, vol, pitch, priority, flags, ent, radius / 4.0f, radius, category, delay);
+}
+U32 xSndPlay3D(U32 id, F32 vol, F32 pitch, U32 priority, U32 flags, const xVec3* pos, F32 innerRadius,
+               F32 outerRadius, sound_category category, F32 delay);
+inline U32 xSndPlay3D(U32 id, F32 vol, F32 pitch, U32 priority, U32 flags, const xVec3* pos,
+                       F32 radius, sound_category category, F32 delay)
+{
+    return xSndPlay3D(id, vol, pitch, priority, flags, pos, radius / 4.0f, radius, category, delay);
+}
+U32 xSndPlay3DFade(U32 id, F32 vol, F32 pitch, U32 priority, U32 flags, const xVec3* pos,
+                   F32 innerRadius, F32 outerRadius, sound_category category, F32 fade, F32 delay);
 U32 xSndPlayInternal(U32 id, F32 vol, F32 pitch, U32 priority, U32 flags, U32 parentID,
                      xEnt* parentEnt, const xVec3* pos, F32 innerRadius, F32 outerRadius,
                      sound_category category, F32 delay);
@@ -140,11 +153,7 @@ void xSndSetPitch(U32 snd, F32 pitch);
 void xSndSetCategoryVol(sound_category category, F32 vol);
 void xSndSetExternalCallback(void (*callback)(U32));
 
-inline U32 xSndPlay3D(U32 id, F32 vol, F32 pitch, U32 priority, U32 flags, xEnt* ent, F32 radius,
-                      sound_category category, F32 delay)
-{
-    return xSndPlay3D(id, vol, pitch, priority, flags, ent, radius / 4.0f, radius, category, delay);
-}
+
 
 inline U32 xSndIsPlaying(U32 assetID, U32 parid)
 {

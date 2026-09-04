@@ -7,6 +7,7 @@
 #include "xMath3.h"
 #include "xNPCBasic.h"
 #include "xShadow.h"
+#include "xSnd.h"
 #include "xVec3.h"
 
 #include "zEntButton.h"
