@@ -32,7 +32,6 @@ target_compile_definitions(bfbb PRIVATE _CRT_SECURE_NO_WARNINGS _CRT_NONSTDC_NO_
 target_include_directories(bfbb SYSTEM PRIVATE
     include/
     include/rwsdk
-    src/bink/include
 )
 set(PLATFORM_SOURCES
     src/SB/core/sdl/iAnim.cpp
