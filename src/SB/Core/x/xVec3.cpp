@@ -5,7 +5,6 @@
 #include "xMath.h"
 
 #include <types.h>
-#include <fastmath.h>
 
 const xVec3 xVec3::m_Null = { 0.0f, 0.0f, 0.0f };
 const xVec3 xVec3::m_UnitAxisX = { 1.0f, 0.0f, 0.0f };
@@ -85,12 +84,23 @@ F32 xVec3NormalizeFast(xVec3* o, const xVec3* v)
     return len;
 }
 
+#ifdef GAMECUBE
+#include <fastmath.h>
+#endif
 void xVec3Copy(xVec3* dst, const xVec3* src)
 {
+    #ifdef GAMECUBE
     PSVECCopy(dst, src);
+    #else
+    *dst = *src;
+    #endif
 }
 
 F32 xVec3Dot(const xVec3* a, const xVec3* b)
 {
-    return PSVECDotProduct((Vec*)a, (Vec*)b);
+    #ifdef GAMECUBE
+    return PSVECDotProduct(a, b);
+    #else
+    return a->x * b->x + a->y * b->y + a->z * b->z;
+    #endif
 }

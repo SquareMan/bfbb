@@ -33,7 +33,6 @@ target_include_directories(bfbb SYSTEM PRIVATE
     include/
     include/rwsdk
     src/bink/include
-    include/inline
 )
 set(PLATFORM_SOURCES
     src/SB/core/sdl/iAnim.cpp
