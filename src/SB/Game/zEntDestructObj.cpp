@@ -35,7 +35,7 @@ namespace
                 s->camcollModel = NULL;
             }
 
-            RwMatrixCopyMacro(model->Mat, s->model->Mat);
+            RwMatrixCopy(model->Mat, s->model->Mat);
 
             model->Flags &= 0xBBFC;
             model->Flags |= (u16)(s->model->Flags & 0x4403);
@@ -204,7 +204,7 @@ void zEntDestructObj_Init(zEntDestructObj* ent, xEntAsset* asset)
         if (hitModelInst != NULL)
         {
             ent->hit_model = xEntLoadModel(NULL, (RpAtomic*)hitModelInst);
-            RwMatrixCopyMacro(ent->hit_model->Mat, ent->model->Mat);
+            RwMatrixCopy(ent->hit_model->Mat, ent->model->Mat);
             xModelInstance* hitModel = ent->hit_model;
             hitModel->Flags = (U16)hitModel->Flags & 0xFBFF;
         }
@@ -218,7 +218,7 @@ void zEntDestructObj_Init(zEntDestructObj* ent, xEntAsset* asset)
         if (destroyModelInst != NULL)
         {
             ent->destroy_model = xEntLoadModel(NULL, (RpAtomic*)destroyModelInst);
-            RwMatrixCopyMacro(ent->destroy_model->Mat, ent->model->Mat);
+            RwMatrixCopy(ent->destroy_model->Mat, ent->model->Mat);
             xModelInstance* destroyModel = ent->destroy_model;
             destroyModel->Flags = (U16)destroyModel->Flags & 0xFBFF;
         }

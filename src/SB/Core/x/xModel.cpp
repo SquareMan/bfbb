@@ -492,7 +492,7 @@ static RwCamera* CameraCreate(S32 a, S32 b, S32 c)
     RwCamera* camera = RwCameraCreate();
     if (camera != NULL)
     {
-        _rwObjectHasFrameSetFrame(camera, RwFrameCreate());
+        RwCameraSetFrame(camera, RwFrameCreate());
         camera->frameBuffer = RwRasterCreate(a, b, 0, 2);
         if (c != 0)
         {
@@ -518,11 +518,11 @@ void CameraDestroy(RwCamera* cam)
     RwFrame* frame;
     if (cam != NULL)
     {
-        _rwFrameSyncDirty();
+        RwFrameSyncDirty();
         frame = (RwFrame*)cam->object.object.parent;
         if (frame != NULL)
         {
-            _rwObjectHasFrameSetFrame(cam, 0);
+            RwCameraSetFrame(cam, NULL);
             RwFrameDestroy(frame);
         }
         if (cam->frameBuffer != NULL)
@@ -591,7 +591,7 @@ void xModelAnimCollRefresh(const xModelInstance& cm)
     m.Flags |= 0x1000;
 }
 
-xVec3 xModelGetBoneLocation(const xModelInstance& model, size_t index)
+xVec3 xModelGetBoneLocation(const xModelInstance& model, u32 index)
 {
     xMat4x3& root_mat = *(xMat4x3*)model.Mat;
     xMat4x3& anim_mat = *(xMat4x3*)(model.Mat + index);
@@ -604,7 +604,7 @@ xVec3 xModelGetBoneLocation(const xModelInstance& model, size_t index)
     return ret;
 }
 
-void xModelGetBoneMat(xMat4x3& mat, const xModelInstance& model, size_t index)
+void xModelGetBoneMat(xMat4x3& mat, const xModelInstance& model, u32 index)
 {
     const xMat4x3& root_mat = *(xMat4x3*)model.Mat;
     if (index == 0)

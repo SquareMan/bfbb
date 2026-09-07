@@ -188,7 +188,7 @@ xAnimTable* ZNPC_AnimTable_BossSBobbyArm()
     xAnimTableNewState(table, g_strz_bossanim[1], 0x10, 0, 1.0f, NULL, NULL, 0.0f, NULL, NULL,
                        xAnimDefaultBeforeEnter, NULL, NULL);
 
-    NPCC_BuildStandardAnimTran(table, (char**)g_strz_bossanim, &ourAnims[0], 1, 0.2f);
+    NPCC_BuildStandardAnimTran(table, g_strz_bossanim, &ourAnims[0], 1, 0.2f);
 
     return table;
 }

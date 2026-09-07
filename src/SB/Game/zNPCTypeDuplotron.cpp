@@ -25,7 +25,7 @@ static xParEmitterCustomSettings g_parf_overheat;
 void __deadstripped_zNPCTypeDuplotron()
 {
     // Also exists in NPCBlinker::Render
-    static RxObjSpace3DVertex blink_vtxbuf[2][14];
+    static RwIm3DVertex blink_vtxbuf[2][14];
 }
 
 void ZNPC_Duplotron_Startup()

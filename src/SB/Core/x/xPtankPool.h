@@ -2,8 +2,6 @@
 #define XPTANKPOOL_H
 
 #include <types.h>
-#include <rwplcore.h>
-#include <rwcore.h>
 #include <rpworld.h>
 #include <rpptank.h>
 
@@ -12,7 +10,6 @@
 
 struct xVec2;
 struct xVec3;
-struct RpAtomic;
 
 enum ptank_group_type
 {

@@ -96,7 +96,7 @@ void iEnvLoad(iEnv* env, const void* data, U32, S32 dataType)
 
 void iEnvFree(iEnv* env)
 {
-    _rwFrameSyncDirty();
+    RwFrameSyncDirty();
 
     RpWorldDestroy(env->world);
     env->world = NULL;

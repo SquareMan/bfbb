@@ -135,7 +135,7 @@ U32 xMathSolveCubic(F32 a, F32 b, F32 c, F32 d, F32* x1, F32* x2, F32* x3)
     fOffset = 0.33333334f * b;
     fDiscr = (0.25f * (fB * fB)) + (0.037037037f * (fA * (fA * fA)));
     fHalfB = 0.5f * fB;
-    if ((F32)__fabs(fDiscr) < 0.000001f)
+    if (xabs(fDiscr) < 0.000001f)
     {
         fDiscr = 0.0f;
     }
@@ -266,7 +266,7 @@ void xAccelMove(F32& x, F32& v, F32 a, F32 dt, F32 endx, F32 maxv)
 
     temp_f29 = endx - x;
     var_r3 = 1; // Possible missing debug subroutine
-    if (!((F32)__fabs(v) < 0.001f))
+    if (!(xabs(v) < 0.001f))
     {
         if (v < 0.0f)
         {
@@ -297,7 +297,7 @@ void xAccelMove(F32& x, F32& v, F32 a, F32 dt, F32 endx, F32 maxv)
     {
         var_f31 = temp_f29 / v;
     }
-    temp_f28 = (F32)__fabs(v / a);
+    temp_f28 = xabs(v / a);
     if (var_f31 < temp_f28)
     {
         a *= -1.0f;
@@ -310,14 +310,14 @@ void xAccelMove(F32& x, F32& v, F32 a, F32 dt, F32 endx, F32 maxv)
     oldv = v;
     newv = oldv + dv;
 
-    if ((F32)__fabs(newv) <= maxv)
+    if (xabs(newv) <= maxv)
     {
         v = newv;
         var_f0 = 0.5f * dv * dt;
     }
     else
     {
-        if ((F32)__fabs(oldv) <= maxv)
+        if (xabs(oldv) <= maxv)
         {
             v = range_limit(newv, -maxv, maxv);
             if (oldv != v)
@@ -378,7 +378,7 @@ void xAccelMove(F32& x, F32& v, F32 a, F32 dt, F32 endx, F32 maxv)
         {
             var_r0_3 = 0;
         }
-        if ((var_r0_3 == var_r3_3) && ((F32)__fabs(var_f2) > (F32)__fabs(temp_f29)))
+        if ((var_r0_3 == var_r3_3) && (xabs(var_f2) > xabs(temp_f29)))
         {
             var_f2 = temp_f29;
             v = 0.0f;
@@ -431,7 +431,7 @@ void xAccelMove(F32& x, F32& v, F32 a, F32 dt, F32 maxv)
     F32 diff;
     F32 dv;
 
-    if ((F32)__fabs(v) > (F32)__fabs(maxv))
+    if (xabs(v) > xabs(maxv))
     {
         if (v < 0.0f)
         {
@@ -459,7 +459,7 @@ void xAccelMove(F32& x, F32& v, F32 a, F32 dt, F32 maxv)
     }
     diff = maxv - v;
     dv = a * dt;
-    if ((F32)__fabs(diff) < (F32)__fabs(dv))
+    if (xabs(diff) < xabs(dv))
     {
         x += (v * dt) + ((0.5f * diff * diff) / a);
         v = maxv;

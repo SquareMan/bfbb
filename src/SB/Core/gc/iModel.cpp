@@ -282,7 +282,7 @@ U32 iModelNumBones(RpAtomic* model)
     return obj != 0 ? (U32)obj->numNodes : 0;
 }
 
-void iModelQuatToMat(xQuat* q, xVec3* a, RwMatrixTag* t)
+void iModelQuatToMat(xQuat* q, xVec3* a, RwMatrix* t)
 {
     q->s = -q->s;
     xQuatToMat(q, (xMat3x3*)t);
@@ -292,15 +292,15 @@ void iModelQuatToMat(xQuat* q, xVec3* a, RwMatrixTag* t)
     t->pos.z = a->z;
 }
 
-void iModelAnimMatrices(RpAtomic* model, xQuat* quat, xVec3* tran, RwMatrixTag* mat)
+void iModelAnimMatrices(RpAtomic* model, xQuat* quat, xVec3* tran, RwMatrix* mat)
 {
-    RwMatrixTag* pMatrixArray;
+    RwMatrix* pMatrixArray;
     RpHAnimNodeInfo* iVar1;
-    RwMatrixTag matrixStack[33];
+    RwMatrix matrixStack[33];
     U32 pCurrentFrameFlags;
     RpHAnimNodeInfo* pCurrentFrame;
     S32 numFrames;
-    RwMatrixTag* pMatrixStackTop;
+    RwMatrix* pMatrixStackTop;
 
     pCurrentFrame = (RpHAnimNodeInfo*)GetHierarchy(model);
 
@@ -339,10 +339,10 @@ void iModelAnimMatrices(RpAtomic* model, xQuat* quat, xVec3* tran, RwMatrixTag* 
                 *pMatrixArray++ = matrixStack[0];
             }
 
-            RwMatrixTag afStack_8e8;
+            RwMatrix afStack_8e8;
             iModelQuatToMat(quat, tran, &afStack_8e8);
 
-            RwMatrixTag auStack_8a8;
+            RwMatrix auStack_8a8;
             xMat4x3Mul((xMat4x3*)&auStack_8a8, (xMat4x3*)&afStack_8e8, (xMat4x3*)&matrixStack[0]);
 
             *mat = auStack_8a8;
@@ -353,7 +353,7 @@ void iModelAnimMatrices(RpAtomic* model, xQuat* quat, xVec3* tran, RwMatrixTag* 
             }
             else
             {
-                pMatrixStackTop = (RwMatrixTag*)&auStack_8a8;
+                pMatrixStackTop = (RwMatrix*)&auStack_8a8;
             }
             matrixStack[0] = *pMatrixStackTop;
             mat++;
@@ -370,11 +370,11 @@ RpAtomic* iModelCacheAtomic(RpAtomic* model)
     return model;
 }
 
-void iModelRender(RpAtomic* model, RwMatrixTag* mat)
+void iModelRender(RpAtomic* model, RwMatrix* mat)
 {
     RpHAnimHierarchy* hierarchy;
     RpGeometry* geom;
-    RwMatrixTag* pAnimOldMatrix;
+    RwMatrix* pAnimOldMatrix;
     RwFrame* frame;
 
     hierarchy = (RpHAnimHierarchy*)GetHierarchy(model);
@@ -695,7 +695,7 @@ static inline void SkinNormals(xVec3* dest, const xVec3* normal, const RwMatrix*
     }
 }
 
-U32 iModelNormalEval(xVec3* out, const RpAtomic& m, const RwMatrixTag* mat, size_t index, S32 size,
+U32 iModelNormalEval(xVec3* out, const RpAtomic& m, const RwMatrix* mat, size_t index, S32 size,
                      const xVec3* in)
 {
     RpGeometry* geom = RpAtomicGetGeometry(&m);

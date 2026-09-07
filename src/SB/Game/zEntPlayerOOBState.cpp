@@ -1,4 +1,5 @@
 #include "zEntPlayerOOBState.h"
+#include "rwcore.h"
 #include "zGlobals.h"
 
 #include "xMath.h"
@@ -11,6 +12,7 @@
 #include "xScrFx.h"
 #include "zSaveLoad.h"
 
+#include <rwcore.h>
 #include <types.h>
 #include <rwplcore.h>
 
@@ -237,9 +239,9 @@ namespace oob_state
             shared.loc += shared.dir * (0.5f * shared.accel * dt * dt + old_vel * dt);
         }
 
-        static void set_rect_verts(rwGameCube2DVertex*, F32, F32, F32, F32, iColor_tag c, F32 nsz,
+        static void set_rect_verts(RwIm2DVertex*, F32, F32, F32, F32, iColor_tag c, F32 nsz,
                                    F32 rcz);
-        static void set_rect_vert(rwGameCube2DVertex&, F32 x, F32 y, F32 z, iColor_tag c, F32 rcz);
+        static void set_rect_vert(RwIm2DVertex&, F32 x, F32 y, F32 z, iColor_tag c, F32 rcz);
         static void render_fade()
         {
             iColor_tag color = {};
@@ -247,15 +249,15 @@ namespace oob_state
 
             zRenderState(SDRS_OOBFade);
             RwRenderStateSet(rwRENDERSTATETEXTURERASTER, NULL);
-            F32 nsz = 1.0f / ((RwCamera*)RWSRCGLOBAL(curCamera))->farPlane;
+            F32 nsz = 1.0f / RwCameraGetCurrentCamera()->farPlane;
             F32 rcz = RwIm2DGetFarScreenZ();
 
             RwIm2DVertex vert[4];
-            set_rect_verts((rwGameCube2DVertex*)vert, 0.0f, 0.0f, 640.0f, 480.0f, color, rcz, nsz);
+            set_rect_verts((RwIm2DVertex*)vert, 0.0f, 0.0f, 640.0f, 480.0f, color, rcz, nsz);
             RwIm2DRenderPrimitive(rwPRIMTYPETRISTRIP, (RwIm2DVertex*)vert, 4);
         }
 
-        static void set_rect_verts(rwGameCube2DVertex* verts, F32 x, F32 y, F32 w, F32 h,
+        static void set_rect_verts(RwIm2DVertex* verts, F32 x, F32 y, F32 w, F32 h,
                                    iColor_tag c, F32 rcz, F32 nsz)
         {
             set_rect_vert(verts[0], x, y, rcz, c, nsz);
@@ -264,16 +266,11 @@ namespace oob_state
             set_rect_vert(verts[3], x + w, y + h, rcz, c, nsz);
         }
 
-        static void set_rect_vert(rwGameCube2DVertex& vert, F32 x, F32 y, F32 z, iColor_tag c,
+        static void set_rect_vert(RwIm2DVertex& vert, F32 x, F32 y, F32 z, iColor_tag c,
                                   F32 rcz)
         {
-            vert.x = x;
-            vert.y = y;
-            vert.z = z;
-            vert.emissiveColor.red = c.r;
-            vert.emissiveColor.green = c.g;
-            vert.emissiveColor.blue = c.b;
-            vert.emissiveColor.alpha = c.a;
+            RwIm2DVertexSetPos(&vert, x, y, z);
+            RwIm2DVertexSetRGBA(&vert, c.r, c.g, c.b, c.a);
         }
 
         static void render_ghost()

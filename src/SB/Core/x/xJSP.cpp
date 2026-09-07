@@ -38,7 +38,7 @@ static RpAtomic* AddAtomicCB(RpAtomic* atomic, void* data)
     sAtomicStartVert[--sAtomicStartCount] = *(RwV3d**)data;
 #pragma clang diagnostic pop
     sCurrVert = atomic->geometry->morphTarget->verts;
-    _rpMeshHeaderForAllMeshes(atomic->geometry->mesh, (RpMeshCallBack)&AddMeshCB, data);
+    RpMeshHeaderForAllMeshes(atomic->geometry->mesh, (RpMeshCallBack)&AddMeshCB, data);
     return atomic;
 }
 

@@ -1,5 +1,6 @@
 // Retail called the 9-argument xVec3* xSndPlay3D out of line from this TU (see
 // zEntPlayerDriveUpdate), so opt out of zEnt.h's inline definition of it.
+#include "rwcore.h"
 #define XSNDPLAY3D_OUT_OF_LINE
 
 #include "xAnim.h"
@@ -8547,7 +8548,7 @@ catchtunnel_done:
                 xVec3SubFrom(&objMat.pos, &rotatedLC);
             }
 
-            *globals.player.carry.grabbed->model->Mat = *(RwMatrixTag*)&objMat;
+            *globals.player.carry.grabbed->model->Mat = *(RwMatrix*)&objMat;
 
             if (globals.player.carry.grabbed->frame)
             {
@@ -8665,7 +8666,7 @@ catchtunnel_done:
         globals.player.ControlOnEvent = 0;
     }
 
-    RwMatrixTag rootOldMat = *ent->model->Mat;
+    RwMatrix rootOldMat = *ent->model->Mat;
 
     if (1.0f != globals.player.RootUp.y)
     {
@@ -9407,7 +9408,7 @@ static void zEntPlayer_BubbleBowlLaneRender(zEnt* ent)
     xMat3x3SMul(&matrix, &matrix, 1.0f);
 
     gShadowObjectRadius = 0.5f * factor + 0.7f;
-    xShadowVertical_DrawCache(&cache, factor, 0.0f, 1, (RwMatrixTag*)&matrix, sBowlingLaneRast);
+    xShadowVertical_DrawCache(&cache, factor, 0.0f, 1, (RwMatrix*)&matrix, sBowlingLaneRast);
 
     for (i = 0; i < cache.entCount; i++)
     {
@@ -9415,7 +9416,7 @@ static void zEntPlayer_BubbleBowlLaneRender(zEnt* ent)
 
         if (xShadowReceiveShadowSetup(ep))
         {
-            xShadowReceiveShadow(ep, factor, 1, (RwMatrixTag*)&matrix, sBowlingLaneRast);
+            xShadowReceiveShadow(ep, factor, 1, (RwMatrix*)&matrix, sBowlingLaneRast);
         }
     }
 }
@@ -9474,9 +9475,9 @@ static void zEntPlayer_ReticleRender(zEnt* ent)
 
         sReticleMat.pos.y = sReticleMat.pos.y + (radius + bob);
 
-        if (!iModelCull(sReticleModel, (RwMatrixTag*)&sReticleMat))
+        if (!iModelCull(sReticleModel, (RwMatrix*)&sReticleMat))
         {
-            iModelRender(sReticleModel, (RwMatrixTag*)&sReticleMat);
+            iModelRender(sReticleModel, (RwMatrix*)&sReticleMat);
         }
 
         sReticleMat.up.y = -scale;
@@ -9484,9 +9485,9 @@ static void zEntPlayer_ReticleRender(zEnt* ent)
         sReticleMat.right.z = -sReticleMat.right.z;
         sReticleMat.pos.y -= 2.0f * (radius + bob);
 
-        if (!iModelCull(sReticleModel, (RwMatrixTag*)&sReticleMat))
+        if (!iModelCull(sReticleModel, (RwMatrix*)&sReticleMat))
         {
-            iModelRender(sReticleModel, (RwMatrixTag*)&sReticleMat);
+            iModelRender(sReticleModel, (RwMatrix*)&sReticleMat);
         }
 
         sReticleMat.up.y = 1.0f;
@@ -9780,7 +9781,7 @@ void zEntPlayer_Render(zEnt* ent)
 
     F32 lerp = 0.0f;
 
-    RwMatrixTag rootOldMat = *ent->model->Mat;
+    RwMatrix rootOldMat = *ent->model->Mat;
 
     xAnimSingle* single = ent->model->Anim->Single;
     xAnimSingle* blend = single->Blend;
@@ -9955,11 +9956,11 @@ void zEntPlayer_Render(zEnt* ent)
         xModelInstance* m = ent->model->Next;
         m->Flags |= 1;
 
-        RwRenderStateSet((RwRenderState)0x14, (void*)3);
+        RwRenderStateSet(rwRENDERSTATECULLMODE, (void*)3);
         xModelRenderSingle(m);
-        RwRenderStateSet((RwRenderState)0x14, (void*)2);
+        RwRenderStateSet(rwRENDERSTATECULLMODE, (void*)2);
         xModelRenderSingle(m);
-        RwRenderStateSet((RwRenderState)0x14, (void*)1);
+        RwRenderStateSet(rwRENDERSTATECULLMODE, (void*)1);
     }
 
     if (dot > 0.0f)
@@ -15559,7 +15560,7 @@ static void PlayerLedgeUpdate(xEnt* ent, xScene* sc, F32 dt)
         {
             xMat4x3 delta;
 
-            RwMatrixInvert((RwMatrixTag*)&delta, (RwMatrixTag*)&ledge->omat);
+            RwMatrixInvert((RwMatrix*)&delta, (RwMatrix*)&ledge->omat);
             xMat4x3Mul(&delta, &delta, (xMat4x3*)ledge->optr->model->Mat);
             xMat4x3Toworld(&ledge->spos, &delta, &ledge->spos);
             xMat4x3Toworld(&ledge->epos, &delta, &ledge->epos);
@@ -16283,7 +16284,7 @@ void zEntPlayer_MinimalRender(zEnt* ent)
     }
 }
 
-S32 zEntPlayerDyingInGoo()
+bool zEntPlayerDyingInGoo()
 {
     return in_goo != 0;
 }

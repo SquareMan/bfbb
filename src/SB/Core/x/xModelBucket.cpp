@@ -9,7 +9,6 @@
 
 #include <types.h>
 #include <stdlib.h>
-#include <rwsdk\driver\gcn\dlrendst.h>
 
 static RpWorld* sBucketDummyWorld;
 static RwCamera* sBucketDummyCamera;
@@ -159,7 +158,7 @@ void FullAtomicDupe(RpAtomic* atomic, S32 count, RpAtomic** output)
         }
         RwFree((void*)rwmemB.start);
 
-        _rwFrameSyncDirty();
+        RwFrameSyncDirty();
         RwFrame* temp_frame = RpAtomicGetFrame(tempAtom);
         if (temp_frame)
         {
@@ -520,15 +519,15 @@ void xModelBucket_RenderAlphaLayer(S32 maxLayer)
 #ifdef GAMECUBE
                     RwGameCubeSetAlphaCompare(GX_ALWAYS, 0, GX_AOP_AND, GX_GEQUAL,
                                               curPipeFlags >> 24);
-#endif
                     _rwDlRenderStateSetZCompLoc(FALSE);
+#endif
                 }
                 else
                 {
 #ifdef GAMECUBE
                     RwGameCubeSetAlphaCompare(GX_GEQUAL, 1, GX_AOP_AND, GX_ALWAYS, 0);
-#endif
                     _rwDlRenderStateSetZCompLoc(TRUE);
+#endif
                 }
             }
             if (xorPipeFlags & 0x10000)
@@ -599,8 +598,8 @@ void xModelBucket_RenderAlphaLayer(S32 maxLayer)
         {
 #ifdef GAMECUBE
             RwGameCubeSetAlphaCompare(GX_GEQUAL, 1, GX_AOP_AND, GX_ALWAYS, 0);
-#endif
             _rwDlRenderStateSetZCompLoc(TRUE);
+#endif
         }
         if (lastPipeFlags & 0x10000)
         {
@@ -621,7 +620,7 @@ void xModelBucket_Deinit()
     {
         if (sBucketList[i].Data != sBucketList[i].OriginalData)
         {
-            _rwFrameSyncDirty();
+            RwFrameSyncDirty();
             RwFrame* tframe = RpAtomicGetFrame(sBucketList[i].Data);
             if (tframe)
             {

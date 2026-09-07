@@ -38,7 +38,7 @@ void iScrFxEnd()
 void iScrFxDrawBox(F32 x1, F32 y1, F32 x2, F32 y2, U8 red, U8 green, U8 blue, U8 alpha)
 {
     U16 indices[4] = { 0, 1, 2, 3 };
-    rwGameCube2DVertex v[4];
+    RwIm2DVertex v[4];
     F32 nearZ = RwIm2DGetNearScreenZ();
 
     RwIm2DVertexSetScreenX(&v[0], x1);
@@ -120,10 +120,7 @@ static void iCameraOverlayRender(RwCamera* pCamera, RwRaster* ras, RwRGBA col)
 
     for (S32 i = 0; i < 4; i++)
     {
-        sMBD.vertex[i].emissiveColor.red = col.red;
-        sMBD.vertex[i].emissiveColor.green = col.green;
-        sMBD.vertex[i].emissiveColor.blue = col.blue;
-        sMBD.vertex[i].emissiveColor.alpha = col.alpha;
+        RwIm2DVertexSetRGBA(&sMBD.vertex[i], col.red, col.green, col.blue, col.alpha);
     }
 
     RwRenderStateSet(rwRENDERSTATETEXTUREFILTER, (void*)TRUE);
@@ -136,7 +133,7 @@ static void iCameraOverlayRender(RwCamera* pCamera, RwRaster* ras, RwRGBA col)
     RwRenderStateSet(rwRENDERSTATEDESTBLEND, (void*)rwBLENDINVSRCALPHA);
     if (raster != 0)
     {
-        RwRasterLock(raster, 0, 2);
+        RwRasterLock(raster, 0, rwRASTERLOCKREAD);
     }
     RwIm2DRenderIndexedPrimitive(rwPRIMTYPETRILIST, sMBD.vertex, 4, sMBD.index, 6);
     if (raster != 0)
@@ -202,9 +199,5 @@ void GCMB_SiphonFrameBuffer(const RwCamera* camera)
     if ((g_rast_gctapdance == NULL) && (g_alreadyTriedAlloc == 0))
     {
         GCMB_MakeFrameBufferCopy(camera);
-    }
-    if (g_rast_gctapdance != NULL)
-    {
-        RwGameCubeCameraTextureFlush(g_rast_gctapdance, 0);
     }
 }

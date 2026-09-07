@@ -179,6 +179,7 @@ F32 ArcLength3(xCoef3* coef, F64 ustart, F64 uend)
            3.0;
 }
 
+#ifdef GAMECUBE
 // We don't have the implementation provided
 double sqrt(double x)
 {
@@ -206,6 +207,7 @@ double sqrt(double x)
         return INFINITY;
     }
 }
+#endif
 
 void EvalCoef3(xCoef3* coef, F32 u, U32 deriv, xVec3* o)
 {

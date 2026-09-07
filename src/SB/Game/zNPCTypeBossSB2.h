@@ -45,7 +45,7 @@ struct zNPCB_SB2 : zNPCBoss
         F32 pulse;
         xLightKit* old_light_kit;
         RpAtomic* skin_model;
-        RwMatrixTag* skin_mat;
+        RwMatrix* skin_mat;
         union
         {
             struct
@@ -222,7 +222,7 @@ struct zNPCB_SB2 : zNPCBoss
     void move_nodes();
     void render_nodes();
     void bind_nodes();
-    void rebind_nodes(RpAtomic*, RwMatrixTag*);
+    void rebind_nodes(RpAtomic*, RwMatrix*);
     void setup_node_tags();
     void move_hand(zNPCB_SB2::hand_data&, F32);
     void spin_platform(zNPCB_SB2::platform_data& p, const xVec3& axis, F32 accel, F32 max_vel);

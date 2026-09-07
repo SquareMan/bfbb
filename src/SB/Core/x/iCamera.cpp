@@ -49,7 +49,7 @@ void iCameraDestroy(RwCamera* camera)
     RwRaster* raster;
     RwFrame* frame;
 
-    _rwFrameSyncDirty();
+    RwFrameSyncDirty();
 
     pWorld = RwCameraGetWorld(camera);
 

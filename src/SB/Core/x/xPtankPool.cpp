@@ -19,7 +19,7 @@ namespace
     struct ptank_context
     {
         ptank_context* next;
-        class RpAtomic* ptank;
+        RpAtomic* ptank;
         U32 flags;
         U32 src_blend;
         U32 dst_blend;

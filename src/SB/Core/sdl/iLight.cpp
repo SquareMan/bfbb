@@ -120,7 +120,7 @@ void iLightDestroy(iLight* light)
 
     light->type = ILIGHT_TYPE_NONE;
 
-    _rwFrameSyncDirty();
+    RwFrameSyncDirty();
 
     frame = RpLightGetFrame(light->hw);
 

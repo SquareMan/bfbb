@@ -972,7 +972,7 @@ static void SpringRender(SandyLimbSpring* spring)
     F32 step;
     F32 node1Dist;
     F32 node2Dist;
-    RxObjSpace3DVertex* verts = gRenderArr.m_vertex;
+    RwIm3DVertex* verts = gRenderArr.m_vertex;
     U32 numVerts = 0;
     S32 done = 0;
     S32 currSin = 0;

@@ -160,7 +160,9 @@ RpAtomic* HackBoundCB(RpAtomic* atomic, void* data)
     atomic->worldBoundingSphere.radius = *(RwReal*)data;
     atomic->boundingSphere.radius = *(RwReal*)data;
     atomic->geometry->morphTarget->boundingSphere.radius = *(RwReal*)data;
+#ifndef WITH_LIBRW
     atomic->interpolator.flags = atomic->interpolator.flags & 0xfffffffd;
+#endif
     return atomic;
 }
 

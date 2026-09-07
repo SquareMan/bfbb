@@ -76,7 +76,7 @@ F32 xSCurveInverse(F32 val);
 bool xSphereHitsBound(const xSphere& o, const xBound& b);
 void xBoundGetSphere(xSphere& o, const xBound& bound);
 U32 iModelTagSetup(xModelTagWithNormal* tag, RpAtomic* model, F32 x, F32 y, F32 z);
-void iModelTagEval(RpAtomic* model, const xModelTagWithNormal* tag, RwMatrixTag* mat, xVec3* dest,
+void iModelTagEval(RpAtomic* model, const xModelTagWithNormal* tag, RwMatrix* mat, xVec3* dest,
                    xVec3* normal);
 U8 xOBBHitsOBB(const xBox& a, const xMat4x3& amat, const xBox& b, const xMat4x3& bmat);
 
@@ -2474,7 +2474,7 @@ void zNPCB_SB2::move_nodes()
         xVec3 norm;
         xVec3 uploc;
         RpAtomic* m = n.skin_model;
-        RwMatrixTag* skin_mat = n.skin_mat;
+        RwMatrix* skin_mat = n.skin_mat;
 
         if (node_hooks[i].points == 3)
         {
@@ -2556,7 +2556,7 @@ void zNPCB_SB2::bind_nodes()
     setup_node_tags();
 }
 
-void zNPCB_SB2::rebind_nodes(RpAtomic* skin_model, RwMatrixTag* skin_mat)
+void zNPCB_SB2::rebind_nodes(RpAtomic* skin_model, RwMatrix* skin_mat)
 {
     RpAtomic* skin_models[4];
 

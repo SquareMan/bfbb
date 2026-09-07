@@ -16,7 +16,7 @@
 #include <rwplcore.h>
 
 U32 xShadowReceiveShadowSetup(xEnt* ent);
-void xShadowReceiveShadow(xEnt* ent, F32 factor, S32 flags, RwMatrixTag* mat, RwRaster* rast);
+void xShadowReceiveShadow(xEnt* ent, F32 factor, S32 flags, RwMatrix* mat, RwRaster* rast);
 
 static const NPARParmOilBub g_parm_oilbub[4] = {
     {
@@ -751,7 +751,7 @@ void NPCC_RenderProjTexture(RwRaster* rast, F32 factor, xMat4x3* mat, F32 radius
     }
 
     gShadowObjectRadius = radius;
-    xShadowVertical_DrawCache(cache, factor, 0.0f, 1, (RwMatrixTag*)mat, rast);
+    xShadowVertical_DrawCache(cache, factor, 0.0f, 1, (RwMatrix*)mat, rast);
 
     for (U32 i = 0; i < cache->entCount; i++)
     {
@@ -759,7 +759,7 @@ void NPCC_RenderProjTexture(RwRaster* rast, F32 factor, xMat4x3* mat, F32 radius
 
         if (ep != ent && ep->baseType != eBaseTypeNPC && xShadowReceiveShadowSetup(ep))
         {
-            xShadowReceiveShadow(ep, factor, 1, (RwMatrixTag*)mat, rast);
+            xShadowReceiveShadow(ep, factor, 1, (RwMatrix*)mat, rast);
         }
     }
 }
@@ -790,7 +790,7 @@ void NPCC_RenderProjTextureFaceCamera(RwRaster* rast, F32 factor, xVec3* pos, F3
     xVec3Init(&matrix.at, 0.0f, -1.0f, 0.0f);
     xVec3Init(&matrix.up, -matrix.right.z, 0.0f, matrix.right.x);
 
-    RwMatrixUpdate((RwMatrixTag*)&matrix);
+    RwMatrixUpdate((RwMatrix*)&matrix);
 
     NPCC_RenderProjTexture(rast, factor, &matrix, radius, height, cache, fillCache, ent);
 }

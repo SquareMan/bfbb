@@ -647,17 +647,17 @@ static S32 LeafNodeLinePolyIntersect(xClumpCollBSPTriangle* triangles, void* dat
                 v1 = &triangles->v.p[1];
                 v2 = &triangles->v.p[2];
             }
-            RwV3dSubMacro(&edge1, v1, v0);
-            RwV3dSubMacro(&edge2, v2, v0);
-            RwV3dCrossProductMacro(&pVec, &isData->delta, &edge2);
-            det = RwV3dDotProductMacro(&edge1, &pVec);
+            RwV3dSub(&edge1, v1, v0);
+            RwV3dSub(&edge2, v2, v0);
+            RwV3dCrossProduct(&pVec, &isData->delta, &edge2);
+            det = RwV3dDotProduct(&edge1, &pVec);
             if (det < -1e-8f)
             {
                 RwV3d edgetmp = edge1;
                 edge1 = edge2;
                 edge2 = edgetmp;
-                RwV3dCrossProductMacro(&pVec, &isData->delta, &edge2);
-                det = RwV3dDotProductMacro(&edge1, &pVec);
+                RwV3dCrossProduct(&pVec, &isData->delta, &edge2);
+                det = RwV3dDotProduct(&edge1, &pVec);
             }
             result = (det > 1e-8f);
             if (result)
@@ -665,17 +665,17 @@ static S32 LeafNodeLinePolyIntersect(xClumpCollBSPTriangle* triangles, void* dat
                 F32 lo, hi, u, v;
                 lo = 0.00001f * -det;
                 hi = det - lo;
-                RwV3dSubMacro(&tVec, &isData->start, v0);
-                u = RwV3dDotProductMacro(&tVec, &pVec);
+                RwV3dSub(&tVec, &isData->start, v0);
+                u = RwV3dDotProduct(&tVec, &pVec);
                 result = (u >= lo && u <= hi);
                 if (result)
                 {
-                    RwV3dCrossProductMacro(&qVec, &tVec, &edge1);
-                    v = RwV3dDotProductMacro(&isData->delta, &qVec);
+                    RwV3dCrossProduct(&qVec, &tVec, &edge1);
+                    v = RwV3dDotProduct(&isData->delta, &qVec);
                     result = (v >= lo && u + v <= hi);
                     if (result)
                     {
-                        distance = RwV3dDotProductMacro(&edge2, &qVec);
+                        distance = RwV3dDotProduct(&edge2, &qVec);
                         result = (distance >= lo && distance <= hi);
                         if (result)
                         {
@@ -694,12 +694,12 @@ static S32 LeafNodeLinePolyIntersect(xClumpCollBSPTriangle* triangles, void* dat
                 collisionTri.vertices[0] = v0;
                 collisionTri.vertices[1] = v1;
                 collisionTri.vertices[2] = v2;
-                RwV3dSubMacro(&vTmp, collisionTri.vertices[1], collisionTri.vertices[0]);
-                RwV3dSubMacro(&vTmp2, collisionTri.vertices[2], collisionTri.vertices[0]);
-                RwV3dCrossProductMacro(&collisionTri.normal, &vTmp, &vTmp2);
-                lengthSq = RwV3dDotProductMacro(&collisionTri.normal, &collisionTri.normal);
+                RwV3dSub(&vTmp, collisionTri.vertices[1], collisionTri.vertices[0]);
+                RwV3dSub(&vTmp2, collisionTri.vertices[2], collisionTri.vertices[0]);
+                RwV3dCrossProduct(&collisionTri.normal, &vTmp, &vTmp2);
+                lengthSq = RwV3dDotProduct(&collisionTri.normal, &collisionTri.normal);
                 recipLength = _rwInvSqrt(lengthSq);
-                RwV3dScaleMacro(&collisionTri.normal, &collisionTri.normal, recipLength);
+                RwV3dScale(&collisionTri.normal, &collisionTri.normal, recipLength);
                 if (!cbParam->u.worldCB(cbParam->intersection, NULL, &collisionTri, distance,
                                         cbParam->data))
                 {
@@ -781,14 +781,14 @@ static S32 LeafNodeBoxPolyIntersect(xClumpCollBSPTriangle* triangles, void* data
 
                 collisionTri.point = *v0;
                 collisionTri.index = (RwInt32)triangles;
-                RwV3dSubMacro(&vTmp, v1, v0);
-                RwV3dSubMacro(&vTmp2, v2, v0);
-                RwV3dCrossProductMacro(&collisionTri.normal, &vTmp, &vTmp2);
+                RwV3dSub(&vTmp, v1, v0);
+                RwV3dSub(&vTmp2, v2, v0);
+                RwV3dCrossProduct(&collisionTri.normal, &vTmp, &vTmp2);
 
-                F32 lengthSq = RwV3dDotProductMacro(&collisionTri.normal, &collisionTri.normal);
+                F32 lengthSq = RwV3dDotProduct(&collisionTri.normal, &collisionTri.normal);
                 F32 recipLength = _rwInvSqrt(lengthSq);
 
-                RwV3dScaleMacro(&collisionTri.normal, &collisionTri.normal, recipLength);
+                RwV3dScale(&collisionTri.normal, &collisionTri.normal, recipLength);
 
                 collisionTri.vertices[0] = v0;
                 collisionTri.vertices[1] = v1;
@@ -826,7 +826,7 @@ xClumpCollBSPTree* xClumpColl_ForAllIntersections(xClumpCollBSPTree* tree,
             F32 recip;
 
             isData.start = line->start;
-            RwV3dSubMacro(&isData.delta, &line->end, &line->start);
+            RwV3dSub(&isData.delta, &line->end, &line->start);
             isData.cbParam = &cbParam;
             isData.line = *line;
 

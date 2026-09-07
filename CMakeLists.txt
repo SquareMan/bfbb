@@ -15,6 +15,7 @@ set(CMAKE_C_FLAGS -m32)
 # ------------------ librw --------------------------------
 set(LIBRW_TOOLS OFF CACHE BOOL "" FORCE)
 set(LIBRW_INSTALL OFF CACHE BOOL "" FORCE)
+set(LIBRW_PLATFORM "D3D9" CACHE STRING "" FORCE)
 add_subdirectory(third_party/librw)
 
 # suppress librw warnings
@@ -23,15 +24,39 @@ target_compile_options(librw PRIVATE -Wno-everything)
 # ------------------ sdl ----------------------------------
 add_subdirectory(third_party/sdl)
 
+# ----------------- librw c-style wrapper ------------------
+add_library(librwc STATIC)
+target_link_libraries(librwc PUBLIC librw)
+target_sources(librwc
+    PUBLIC
+    FILE_SET headers TYPE HEADERS
+    BASE_DIRS src/librwc/include/
+    FILES
+    src/librwc/include/rpcollis.h
+    src/librwc/include/rphanim.h
+    src/librwc/include/rpmatfx.h
+    src/librwc/include/rpskin.h
+    src/librwc/include/rpworld.h
+    src/librwc/include/rtintsec.h
+    src/librwc/include/rwcore.h
+    src/librwc/include/rwplcore.h
+    src/librwc/include/rpcollbsptree.h
+    src/librwc/include/rpptank.h
+    src/librwc/include/rtquat.h
+    src/librwc/include/rtslerp.h
+)
+
+# ----------------- Main Game Executable ------------------
 add_executable(bfbb)
+target_link_libraries(bfbb PUBLIC librwc)
 # FIXME: This should be removable after getting the build fully linking and removing the dependency on gc headers
 # silence warning from RenderWare macros doing cursed enum stuff
 target_compile_options(bfbb PRIVATE -Wno-deprecated-enum-enum-conversion)
 target_compile_definitions(bfbb PRIVATE _CRT_SECURE_NO_WARNINGS _CRT_NONSTDC_NO_WARNINGS)
+target_compile_definitions(bfbb PRIVATE WITH_LIBRW)
 
 target_include_directories(bfbb SYSTEM PRIVATE
     include/
-    include/rwsdk
 )
 set(PLATFORM_SOURCES
     src/SB/core/sdl/iAnim.cpp

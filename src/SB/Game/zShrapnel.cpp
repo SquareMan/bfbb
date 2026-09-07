@@ -447,7 +447,7 @@ static void CinFragCB(zFrag* frag, zFragAsset* asset)
 }
 
 // equivalent
-void zShrapnel_CinematicInit(zShrapnelAsset* shrap, RpAtomic* cinModel, RwMatrixTag* animMat,
+void zShrapnel_CinematicInit(zShrapnelAsset* shrap, RpAtomic* cinModel, RwMatrix* animMat,
                              xVec3* initVel, void (*cb)(zFrag*, zFragAsset*))
 {
     S32 i;

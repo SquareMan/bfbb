@@ -496,7 +496,7 @@ S32 zNPCGoalTalk::Process(en_trantype* trantype, F32 dt, void* updCtxt, xScene* 
 
     ds2_plyr = npc->XYZDstSqToPlayer(&dir_plyr);
 
-    if (!((F32)__fabs(dir_plyr.y) > 6.0f))
+    if (!(xabs(dir_plyr.y) > 6.0f))
     {
         SQ(dir_plyr.z);
         SQ(dir_plyr.x);

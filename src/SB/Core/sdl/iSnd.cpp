@@ -8,6 +8,7 @@
 #include "xstransvc.h"
 #include "xMath.h"
 
+#include <cassert>
 #include <rwplcore.h>
 
 #include <cmath>
@@ -534,15 +535,18 @@ void iSndMessWithEA(sDSPADPCM* param1)
 
 U32 SampleToNybbleAddress(U32 sample)
 {
-    U32 a = __mulhwu(0x24924925, sample);
-    U32 b = (sample - a) >> 1;
+    // U32 a = __mulhwu(0x24924925, sample);
+    // U32 b = (sample - a) >> 1;
 
-    a = b + a;
-    b = (a >> 3);
-    a = (a << 1) & 0xfffffff0;
-    a = a + (sample - (b * 0xe)) + 2;
+    // a = b + a;
+    // b = (a >> 3);
+    // a = (a << 1) & 0xfffffff0;
+    // a = a + (sample - (b * 0xe)) + 2;
 
-    return a;
+    // return a;
+
+    assert(false && "TODO");
+    return 0;
 }
 
 void sndloadcb(tag_xFile* tag)

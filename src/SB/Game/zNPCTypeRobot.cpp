@@ -3697,7 +3697,7 @@ void zNPCSleepy::RenderExtra()
     }
 }
 
-static RxObjSpace3DVertex g_vert_list[34];
+static RwIm3DVertex g_vert_list[34];
 
 void zNPCSleepy::RendConeOfDeath(S32 tgt_isBowlingBall)
 {
@@ -3731,7 +3731,7 @@ void zNPCSleepy::RendConeOfDeath(S32 tgt_isBowlingBall)
     F32 u_end = zNPCSleepy::uv_deathcone[0] + zNPCSleepy::uv_slice_deathcone[0];
     F32 v_end = zNPCSleepy::uv_deathcone[1] + zNPCSleepy::uv_slice_deathcone[1];
 
-    RxObjSpace3DVertex* vtx = g_vert_list;
+    RwIm3DVertex* vtx = g_vert_list;
 
     for (S32 i = 0; i < 16; i++)
     {
@@ -3835,7 +3835,7 @@ void zNPCSleepy::RendConeRange()
 
     xVec3 vec_ray = { 0.0f, 0.0f, 1.0f };
 
-    RxObjSpace3DVertex* vtx = g_vert_list;
+    RwIm3DVertex* vtx = g_vert_list;
 
     uv_top[0] = zNPCSleepy::uv_nightlight[0];
     uv_top[1] = zNPCSleepy::uv_nightlight[1];

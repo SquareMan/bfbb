@@ -10,7 +10,7 @@ struct zSimpleMgr
     U8 lastlod; // 0x22
     U8 padA; // 0x23
     xModelBucket** lodBucket[4]; // 0x24
-    RwMatrixTag* mat; // 0x34
+    RwMatrix* mat; // 0x34
     zEntSimpleObj* ent; // 0x38
     U32 padB; // 0x3C
 };
@@ -129,7 +129,7 @@ void zEntSimpleObj_MgrInit(zEntSimpleObj** entList, U32 entCount)
             zLODTable* lod = zLOD_Get(*tempEntPtr);
             if (lod != NULL)
             {
-                RwMatrixTag* m = (*tempEntPtr)->model->Mat;
+                RwMatrix* m = (*tempEntPtr)->model->Mat;
                 F32 distscale = SQR(m->right.x) + SQR(m->right.y) + SQR(m->right.z);
 
                 if (distscale < 0.0001f)

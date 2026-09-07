@@ -1,4 +1,5 @@
 #include "xCutscene.h"
+#include "rwcore.h"
 #include "xSnd.h"
 #include "xAnim.h"
 #include "xDebug.h"
@@ -56,7 +57,6 @@ void xShadowCameraUpdate(void* model, void (*renderCB)(void*), xVec3* center, F3
 xCutscene sActiveCutscene;
 U32 sCutTocCount;
 xCutsceneInfo* sCutTocInfo;
-extern RwGlobals* RwEngineInstance;
 static xModelInstance sCutsceneFakeModel[8];
 
 void xCutscene_Init(void* toc)
@@ -76,7 +76,7 @@ void xCutscene_Init(void* toc)
     for (i = 0; i < 8; i++)
     {
         sCutsceneFakeModel[i].Mat =
-            (RwMatrix*)xMemAlloc(gActiveHeap, sizeof(RwMatrixTag) * 65, 0);
+            (RwMatrix*)xMemAlloc(gActiveHeap, sizeof(RwMatrix) * 65, 0);
         sCutsceneFakeModel[i].Bucket =
             (xModelBucket**)xMemAlloc(gActiveHeap, sizeof(xModelBucket*) * 2, 0);
         sCutsceneFakeModel[i].Bucket[0] =
@@ -405,7 +405,7 @@ void xCutscene_SetCamera(xCutscene* csn, xCamera* cam)
     }
 }
 
-static void xcsCalcAnimMatrices(RwMatrixTag* animMat, RpAtomic* model, xCutsceneAnimHdr* ahdr,
+static void xcsCalcAnimMatrices(RwMatrix* animMat, RpAtomic* model, xCutsceneAnimHdr* ahdr,
                                 F32 time, U32 tworoot)
 {
     xQuat quatresult[65];
@@ -672,7 +672,7 @@ void xCutscene_Render(xCutscene* csn, xEnt**, S32*, F32*)
     xCutsceneData* data;
     RpAtomic* model;
     RpAtomic* shadowModel;
-    RwMatrixTag animMat[65];
+    RwMatrix animMat[65];
     xVec3* camVec;
     U32 tempSize;
     F32 radius;
@@ -699,8 +699,8 @@ void xCutscene_Render(xCutscene* csn, xEnt**, S32*, F32*)
 
     fakeCount = 0;
     XCSNNosey* nosey = csn->cb_nosey;
-    camVec = (xVec3*)&((RwFrame*)((RwCamera*)RwEngineInstance->curCamera)->object.object.parent)
-                 ->modelling.pos;
+    
+    camVec = (xVec3*)&RwCameraGetFrame(RwCameraGetCurrentCamera())->modelling.pos;
     data = (xCutsceneData*)&csn->Play[1];
     animIndex = 0;
 
@@ -926,7 +926,7 @@ void xCutscene_Render(xCutscene* csn, xEnt**, S32*, F32*)
                                         sCutsceneFakeModel[fakeCount].BoneCount =
                                             iModelNumBones(model);
                                         memcpy(sCutsceneFakeModel[fakeCount].Mat, animMat,
-                                               sizeof(RwMatrixTag) * 65);
+                                               sizeof(RwMatrix) * 65);
                                         sCutsceneFakeModel[fakeCount].Flags = 1;
                                         sCutsceneFakeModel[fakeCount].FadeStart = 100.0f;
                                         sCutsceneFakeModel[fakeCount].FadeEnd = 100.0f;
@@ -963,7 +963,7 @@ void xCutscene_Render(xCutscene* csn, xEnt**, S32*, F32*)
                                 sCutsceneFakeModel[fakeCount].Data = model;
                                 sCutsceneFakeModel[fakeCount].BoneCount = iModelNumBones(model);
                                 memcpy(sCutsceneFakeModel[fakeCount].Mat, animMat,
-                                       sizeof(RwMatrixTag) * 65);
+                                       sizeof(RwMatrix) * 65);
                                 sCutsceneFakeModel[fakeCount].Flags = 1;
                                 sCutsceneFakeModel[fakeCount].FadeStart = 100.0f;
                                 sCutsceneFakeModel[fakeCount].FadeEnd = 100.0f;

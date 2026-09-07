@@ -17,7 +17,6 @@ void zEntPlayerSpeakStart(U32 sound, U32 param_2, S32 param_3);
 void zEntPlayer_SNDStopStream();
 U8 xSndStreamLock(U32 lock, sound_category category, bool enable);
 void xSndStreamUnlock(U32 lock);
-U8 xSndStreamReady(U32 lock);
 S32 zGameIsPaused();
 namespace
 {

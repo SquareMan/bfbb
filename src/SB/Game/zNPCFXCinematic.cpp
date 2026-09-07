@@ -42,7 +42,7 @@ void __deadstripped_zNPCFXCinematic()
 
 static NCINBeNosey* g_noz_ncin;
 
-void get_bone_matrix(xMat4x3& mat, const NCINEntry* fxrec, const RwMatrixTag* animMat);
+void get_bone_matrix(xMat4x3& mat, const NCINEntry* fxrec, const RwMatrix* animMat);
 void clamp_bone_index(NCINEntry* fxrec, RpAtomic* model);
 
 // belongs in xDebug.h next to the other xDebugAddTweak overloads
@@ -480,7 +480,7 @@ void NCINBeNosey::CanRenderNow()
     }
 }
 
-void NCINBeNosey::UpdatedAnimated(RpAtomic* model, RwMatrixTag* animMat, U32 animIndex,
+void NCINBeNosey::UpdatedAnimated(RpAtomic* model, RwMatrix* animMat, U32 animIndex,
                                   U32 dataIndex)
 {
     zCutsceneMgr* csnmgr = (zCutsceneMgr*)this->use_csnmgr;
@@ -530,7 +530,7 @@ struct NCINCutMap
 };
 
 typedef void (*NCINUpdCB)(zCutsceneMgr*, NCINEntry*, U32);
-typedef void (*NCINAnimCB)(zCutsceneMgr*, NCINEntry*, RpAtomic*, RwMatrixTag*, U32, U32);
+typedef void (*NCINAnimCB)(zCutsceneMgr*, NCINEntry*, RpAtomic*, RwMatrix*, U32, U32);
 
 static void NCIN_ArfDogBoom(const zCutsceneMgr*, NCINEntry*, S32);
 static void NCIN_B101Shockwave_Upd(const zCutsceneMgr*, NCINEntry*, S32);
@@ -578,29 +578,29 @@ static void NCIN_SleepyLamp_Upd(const zCutsceneMgr*, NCINEntry*, S32);
 static void NCIN_SpatGlow_Upd(const zCutsceneMgr*, NCINEntry*, S32);
 static void NCIN_WaterSplash(const zCutsceneMgr*, NCINEntry*, S32);
 static void NCIN_Zapper(const zCutsceneMgr*, NCINEntry*, S32);
-static void NCIN_BombTrail_AR(const zCutsceneMgr*, NCINEntry*, RpAtomic*, RwMatrixTag*, U32, U32);
-static void NCIN_BoneTrail_AR(const zCutsceneMgr*, NCINEntry*, RpAtomic*, RwMatrixTag*, U32, U32);
-static void NCIN_BubTrailBone_AR(const zCutsceneMgr*, NCINEntry*, RpAtomic*, RwMatrixTag*, U32, U32);
-static void NCIN_BubbleTrail_AR(const zCutsceneMgr*, NCINEntry*, RpAtomic*, RwMatrixTag*, U32, U32);
-static void NCIN_EntityBonePar_AR(const zCutsceneMgr*, NCINEntry*, RpAtomic*, RwMatrixTag*, U32, U32);
-static void NCIN_FireSpiral_AR(const zCutsceneMgr*, NCINEntry*, RpAtomic*, RwMatrixTag*, U32, U32);
-static void NCIN_FodProdBone_AR(const zCutsceneMgr*, NCINEntry*, RpAtomic*, RwMatrixTag*, U32, U32);
-static void NCIN_FodProd_AR(const zCutsceneMgr*, NCINEntry*, RpAtomic*, RwMatrixTag*, U32, U32);
-static void NCIN_FreezeBreath_AR(const zCutsceneMgr*, NCINEntry*, RpAtomic*, RwMatrixTag*, U32, U32);
-static void NCIN_GloveShrapnel_AR(const zCutsceneMgr*, NCINEntry*, RpAtomic*, RwMatrixTag*, U32, U32);
-static void NCIN_GooLever_AR(const zCutsceneMgr*, NCINEntry*, RpAtomic*, RwMatrixTag*, U32, U32);
-static void NCIN_HammerStreak_AR(const zCutsceneMgr*, NCINEntry*, RpAtomic*, RwMatrixTag*, U32, U32);
-static void NCIN_HazTTSteam_AR(const zCutsceneMgr*, NCINEntry*, RpAtomic*, RwMatrixTag*, U32, U32);
-static void NCIN_HookRecoil_AR(const zCutsceneMgr*, NCINEntry*, RpAtomic*, RwMatrixTag*, U32, U32);
-static void NCIN_Lightnin2Bones_AR(const zCutsceneMgr*, NCINEntry*, RpAtomic*, RwMatrixTag*, U32, U32);
-static void NCIN_LightninBone_AR(const zCutsceneMgr*, NCINEntry*, RpAtomic*, RwMatrixTag*, U32, U32);
-static void NCIN_MidFish_AR(const zCutsceneMgr*, NCINEntry*, RpAtomic*, RwMatrixTag*, U32, U32);
-static void NCIN_PatBossShrapnel_AR(const zCutsceneMgr*, NCINEntry*, RpAtomic*, RwMatrixTag*, U32, U32);
-static void NCIN_SBBNode_AR(const zCutsceneMgr*, NCINEntry*, RpAtomic*, RwMatrixTag*, U32, U32);
-static void NCIN_SleepyDRay_AR(const zCutsceneMgr*, NCINEntry*, RpAtomic*, RwMatrixTag*, U32, U32);
-static void NCIN_SleepyLamp_AR(const zCutsceneMgr*, NCINEntry*, RpAtomic*, RwMatrixTag*, U32, U32);
-static void NCIN_SpatGlow_AR(const zCutsceneMgr*, NCINEntry*, RpAtomic*, RwMatrixTag*, U32, U32);
-static void NCIN_TTGunSmoke_AR(const zCutsceneMgr*, NCINEntry*, RpAtomic*, RwMatrixTag*, U32, U32);
+static void NCIN_BombTrail_AR(const zCutsceneMgr*, NCINEntry*, RpAtomic*, RwMatrix*, U32, U32);
+static void NCIN_BoneTrail_AR(const zCutsceneMgr*, NCINEntry*, RpAtomic*, RwMatrix*, U32, U32);
+static void NCIN_BubTrailBone_AR(const zCutsceneMgr*, NCINEntry*, RpAtomic*, RwMatrix*, U32, U32);
+static void NCIN_BubbleTrail_AR(const zCutsceneMgr*, NCINEntry*, RpAtomic*, RwMatrix*, U32, U32);
+static void NCIN_EntityBonePar_AR(const zCutsceneMgr*, NCINEntry*, RpAtomic*, RwMatrix*, U32, U32);
+static void NCIN_FireSpiral_AR(const zCutsceneMgr*, NCINEntry*, RpAtomic*, RwMatrix*, U32, U32);
+static void NCIN_FodProdBone_AR(const zCutsceneMgr*, NCINEntry*, RpAtomic*, RwMatrix*, U32, U32);
+static void NCIN_FodProd_AR(const zCutsceneMgr*, NCINEntry*, RpAtomic*, RwMatrix*, U32, U32);
+static void NCIN_FreezeBreath_AR(const zCutsceneMgr*, NCINEntry*, RpAtomic*, RwMatrix*, U32, U32);
+static void NCIN_GloveShrapnel_AR(const zCutsceneMgr*, NCINEntry*, RpAtomic*, RwMatrix*, U32, U32);
+static void NCIN_GooLever_AR(const zCutsceneMgr*, NCINEntry*, RpAtomic*, RwMatrix*, U32, U32);
+static void NCIN_HammerStreak_AR(const zCutsceneMgr*, NCINEntry*, RpAtomic*, RwMatrix*, U32, U32);
+static void NCIN_HazTTSteam_AR(const zCutsceneMgr*, NCINEntry*, RpAtomic*, RwMatrix*, U32, U32);
+static void NCIN_HookRecoil_AR(const zCutsceneMgr*, NCINEntry*, RpAtomic*, RwMatrix*, U32, U32);
+static void NCIN_Lightnin2Bones_AR(const zCutsceneMgr*, NCINEntry*, RpAtomic*, RwMatrix*, U32, U32);
+static void NCIN_LightninBone_AR(const zCutsceneMgr*, NCINEntry*, RpAtomic*, RwMatrix*, U32, U32);
+static void NCIN_MidFish_AR(const zCutsceneMgr*, NCINEntry*, RpAtomic*, RwMatrix*, U32, U32);
+static void NCIN_PatBossShrapnel_AR(const zCutsceneMgr*, NCINEntry*, RpAtomic*, RwMatrix*, U32, U32);
+static void NCIN_SBBNode_AR(const zCutsceneMgr*, NCINEntry*, RpAtomic*, RwMatrix*, U32, U32);
+static void NCIN_SleepyDRay_AR(const zCutsceneMgr*, NCINEntry*, RpAtomic*, RwMatrix*, U32, U32);
+static void NCIN_SleepyLamp_AR(const zCutsceneMgr*, NCINEntry*, RpAtomic*, RwMatrix*, U32, U32);
+static void NCIN_SpatGlow_AR(const zCutsceneMgr*, NCINEntry*, RpAtomic*, RwMatrix*, U32, U32);
+static void NCIN_TTGunSmoke_AR(const zCutsceneMgr*, NCINEntry*, RpAtomic*, RwMatrix*, U32, U32);
 
 static NCINEntry g_JF01_cin_fodder[7] = {
     { NCIN_FXTYP_JELLYLIGHT_01, (NCINUpdCB)NCIN_Zapper,
@@ -2038,7 +2038,7 @@ static void NCIN_BubWipe(const zCutsceneMgr*, NCINEntry* fxrec, S32 killit)
     xMemPopTemp(pos);
 }
 
-static void NCIN_BubTrailBone_AR(const zCutsceneMgr*, NCINEntry* fxrec, RpAtomic*, RwMatrixTag* animMat,
+static void NCIN_BubTrailBone_AR(const zCutsceneMgr*, NCINEntry* fxrec, RpAtomic*, RwMatrix* animMat,
                           U32 num_1, U32 num_2)
 {
     S32 ifx = fxrec->pos_A[1].x;
@@ -2165,7 +2165,7 @@ static void NCIN_HammerStreak_Upd(const zCutsceneMgr*, NCINEntry* fxrec, S32 kil
     }
 }
 
-static void NCIN_HammerStreak_AR(const zCutsceneMgr*, NCINEntry* fxrec, RpAtomic*, RwMatrixTag* animMat,
+static void NCIN_HammerStreak_AR(const zCutsceneMgr*, NCINEntry* fxrec, RpAtomic*, RwMatrix* animMat,
                           U32 animIndex, U32 dataIndex)
 {
     S32 i;
@@ -2328,7 +2328,7 @@ static void NCIN_HazTTSteam_Upd(const zCutsceneMgr*, NCINEntry* fxrec, S32 killi
     }
 }
 
-static void NCIN_HazTTSteam_AR(const zCutsceneMgr*, NCINEntry* fxrec, RpAtomic*, RwMatrixTag* animMat,
+static void NCIN_HazTTSteam_AR(const zCutsceneMgr*, NCINEntry* fxrec, RpAtomic*, RwMatrix* animMat,
                         U32 animIndex, U32 dataIndex)
 {
     S32 idx_boneSign;
@@ -2347,7 +2347,7 @@ static void NCIN_HazTTSteam_AR(const zCutsceneMgr*, NCINEntry* fxrec, RpAtomic*,
 
     if (idx_boneSign > 0)
     {
-        RwMatrixTag* mat_bone = &animMat[idx_boneSign];
+        RwMatrix* mat_bone = &animMat[idx_boneSign];
 
         pos = *(const xVec3*)&mat_bone->pos;
         pos += *(const xVec3*)&mat_bone->right * vec_offset.x;
@@ -2368,7 +2368,7 @@ static void NCIN_HazTTSteam_AR(const zCutsceneMgr*, NCINEntry* fxrec, RpAtomic*,
 }
 
 static void NCIN_TTGunSmoke_AR(const zCutsceneMgr* csnmgr, NCINEntry* fxrec, RpAtomic*,
-                        RwMatrixTag* animMat, U32 animIndex, U32 dataIndex)
+                        RwMatrix* animMat, U32 animIndex, U32 dataIndex)
 {
     S32 idx_boneGun;
     F32 spd_blow;
@@ -2478,7 +2478,7 @@ static void NCIN_SleepyLamp_Upd(const zCutsceneMgr*, NCINEntry* fxrec, S32 killi
 }
 
 static void NCIN_SleepyLamp_AR(const zCutsceneMgr* csnmgr, NCINEntry* fxrec, RpAtomic*,
-                        RwMatrixTag* animMat, U32 animIndex, U32 dataIndex)
+                        RwMatrix* animMat, U32 animIndex, U32 dataIndex)
 {
     if (animIndex == 2)
     {
@@ -2573,7 +2573,7 @@ static void NCIN_SleepyDRay_Upd(const zCutsceneMgr*, NCINEntry* fxrec, S32 killi
 }
 
 static void NCIN_SleepyDRay_AR(const zCutsceneMgr* csnmgr, NCINEntry* fxrec, RpAtomic*,
-                        RwMatrixTag* animMat, U32 animIndex, U32 dataIndex)
+                        RwMatrix* animMat, U32 animIndex, U32 dataIndex)
 {
     static const F32 uv_scroll_dray[2] = { 0.0f, -4.55f };
     static const F32 uv_slice_dray[2] = { 0.25f, 0.25f };
@@ -2680,7 +2680,7 @@ static void NCIN_FireSpiral_Upd(const zCutsceneMgr*, NCINEntry* fxrec, S32 killi
     }
 }
 
-static void NCIN_FireSpiral_AR(const zCutsceneMgr*, NCINEntry* fxrec, RpAtomic*, RwMatrixTag* animMat,
+static void NCIN_FireSpiral_AR(const zCutsceneMgr*, NCINEntry* fxrec, RpAtomic*, RwMatrix* animMat,
                         U32 animIndex, U32 dataIndex)
 {
     F32 tym;
@@ -2846,7 +2846,7 @@ void __deadstripped2_zNPCFXCinematic()
     const xVec3 _1756 = { 0.25f, 0.0f, 0.0f };
 }
 
-static void NCIN_FodProd_AR(const zCutsceneMgr*, NCINEntry* fxrec, RpAtomic*, RwMatrixTag* animMat,
+static void NCIN_FodProd_AR(const zCutsceneMgr*, NCINEntry* fxrec, RpAtomic*, RwMatrix* animMat,
                      U32 animIndex, U32 dataIndex)
 {
     if (animIndex != 0)
@@ -2925,7 +2925,7 @@ static void NCIN_FodProdBone_Upd(const zCutsceneMgr*, NCINEntry* fxrec, S32 kill
     fxrec->fxdata.hazdata.npchaz = haz;
 }
 
-static void NCIN_FodProdBone_AR(const zCutsceneMgr*, NCINEntry* fxrec, RpAtomic*, RwMatrixTag* animMat,
+static void NCIN_FodProdBone_AR(const zCutsceneMgr*, NCINEntry* fxrec, RpAtomic*, RwMatrix* animMat,
                          U32 animIndex, U32 dataIndex)
 {
     xMat4x3* mat_bone;
@@ -2967,7 +2967,7 @@ static void NCIN_MidFish_Upd(const zCutsceneMgr* mgr, NCINEntry* e, S32 i)
     }
 }
 
-static void NCIN_MidFish_AR(const zCutsceneMgr*, NCINEntry* fxrec, RpAtomic*, RwMatrixTag* animMat,
+static void NCIN_MidFish_AR(const zCutsceneMgr*, NCINEntry* fxrec, RpAtomic*, RwMatrix* animMat,
                      U32 animIndex, U32 dataIndex)
 {
     static S32 g_idx_handbone[] = { 11, 16, 27, 36, 41, -1 };
@@ -3000,7 +3000,7 @@ static void NCIN_BombTrail_Upd(const zCutsceneMgr* mgr, NCINEntry* e, S32 i)
     }
 }
 
-static void NCIN_BombTrail_AR(const zCutsceneMgr* mgr, NCINEntry* e, RpAtomic* a, RwMatrixTag* t, U32 i1, U32 i2)
+static void NCIN_BombTrail_AR(const zCutsceneMgr* mgr, NCINEntry* e, RpAtomic* a, RwMatrix* t, U32 i1, U32 i2)
 {
     if (i1 == 0x4)
     {
@@ -3016,7 +3016,7 @@ static void NCIN_BoneTrail_Upd(const zCutsceneMgr* mgr, NCINEntry* e, S32 i)
     }
 }
 
-static void NCIN_BoneTrail_AR(const zCutsceneMgr* mgr, NCINEntry* e, RpAtomic* a, RwMatrixTag* t, U32 i1, U32 i2)
+static void NCIN_BoneTrail_AR(const zCutsceneMgr* mgr, NCINEntry* e, RpAtomic* a, RwMatrix* t, U32 i1, U32 i2)
 {
     if (i1 == 0x7)
     {
@@ -3033,7 +3033,7 @@ static void NCIN_HookRecoil_Upd(const zCutsceneMgr* mgr, NCINEntry* e, S32 i)
 }
 
 static void NCIN_HookRecoil_AR(const zCutsceneMgr* csnmgr, NCINEntry*, RpAtomic* model,
-                        RwMatrixTag* animMat, U32 animIndex, U32 dataIndex)
+                        RwMatrix* animMat, U32 animIndex, U32 dataIndex)
 {
     F32 tym = csnmgr->csn->Time;
     S32 idx_anim;
@@ -3102,7 +3102,7 @@ static void NCIN_Lightnin2Bones_Upd(const zCutsceneMgr*, NCINEntry* fxrec, S32 k
     fxrec->fxdata.arcdata.lightning = zLightningAdd(&addInfo);
 }
 
-static void NCIN_Lightnin2Bones_AR(const zCutsceneMgr*, NCINEntry* fxrec, RpAtomic*, RwMatrixTag* animMat,
+static void NCIN_Lightnin2Bones_AR(const zCutsceneMgr*, NCINEntry* fxrec, RpAtomic*, RwMatrix* animMat,
                             U32 animIndex, U32 dataIndex)
 {
     xVec3 begpos;
@@ -3211,7 +3211,7 @@ static void NCIN_LightninBone_Upd(const zCutsceneMgr*, NCINEntry* fxrec, S32 kil
     zLightningShow(light, 1);
 }
 
-static void NCIN_LightninBone_AR(const zCutsceneMgr*, NCINEntry* fxrec, RpAtomic*, RwMatrixTag* animMat,
+static void NCIN_LightninBone_AR(const zCutsceneMgr*, NCINEntry* fxrec, RpAtomic*, RwMatrix* animMat,
                           U32 animIndex, U32 dataIndex)
 {
     xVec3 pnt1;
@@ -3296,7 +3296,7 @@ static void NCIN_FreezeBreath_Upd(const zCutsceneMgr*, NCINEntry* fxrec, S32 kil
 }
 
 static void NCIN_FreezeBreath_AR(const zCutsceneMgr* csnmgr, NCINEntry* fxrec, RpAtomic*,
-                          RwMatrixTag* animMat, U32 animIndex, U32 dataIndex)
+                          RwMatrix* animMat, U32 animIndex, U32 dataIndex)
 {
     xVec3 pnt1;
     xVec3 pnt2;
@@ -3381,7 +3381,7 @@ static void NCIN_GooLever_Upd(const zCutsceneMgr*, NCINEntry* fxrec, S32 killit)
     }
 }
 
-static void NCIN_GooLever_AR(const zCutsceneMgr*, NCINEntry* fxrec, RpAtomic*, RwMatrixTag* animMat,
+static void NCIN_GooLever_AR(const zCutsceneMgr*, NCINEntry* fxrec, RpAtomic*, RwMatrix* animMat,
                       U32 animIndex, U32 dataIndex)
 {
     S32 ifx = fxrec->pos_A[1].x;
@@ -3431,7 +3431,7 @@ static void NCIN_PatBossShrapnel_Upd(const zCutsceneMgr*, NCINEntry* fxrec, S32 
 }
 
 static void NCIN_PatBossShrapnel_AR(const zCutsceneMgr*, NCINEntry* fxrec, RpAtomic* model,
-                             RwMatrixTag* animMat, U32 animIndex, U32 dataIndex)
+                             RwMatrix* animMat, U32 animIndex, U32 dataIndex)
 {
     S32 ifx = fxrec->pos_A[1].x;
 
@@ -3449,7 +3449,7 @@ static void NCIN_SpatGlow_Upd(const zCutsceneMgr* mgr, NCINEntry* e, S32 i)
     }
 }
 
-static void NCIN_SpatGlow_AR(const zCutsceneMgr*, NCINEntry* fxrec, RpAtomic* model, RwMatrixTag* animMat,
+static void NCIN_SpatGlow_AR(const zCutsceneMgr*, NCINEntry* fxrec, RpAtomic* model, RwMatrix* animMat,
                       U32 animIndex, U32 dataIndex)
 {
     S32 ifx = fxrec->pos_A[1].x;
@@ -3498,7 +3498,7 @@ static void NCIN_GloveShrapnel_Upd(const zCutsceneMgr*, NCINEntry* fxrec, S32 ki
 }
 
 static void NCIN_GloveShrapnel_AR(const zCutsceneMgr*, NCINEntry* fxrec, RpAtomic* model,
-                           RwMatrixTag* animMat, U32 animIndex, U32 dataIndex)
+                           RwMatrix* animMat, U32 animIndex, U32 dataIndex)
 {
     S32 ifx = fxrec->pos_A[1].x;
 
@@ -3511,7 +3511,7 @@ static void NCIN_GloveShrapnel_AR(const zCutsceneMgr*, NCINEntry* fxrec, RpAtomi
 }
 
 static void NCIN_EntityBonePar_AR(const zCutsceneMgr*, NCINEntry* fxrec, RpAtomic* model,
-                           RwMatrixTag* animMat, U32 animIndex, U32 dataIndex)
+                           RwMatrix* animMat, U32 animIndex, U32 dataIndex)
 {
     F32 dt;
     xParEmitter* pe;
@@ -3682,7 +3682,7 @@ static void NCIN_EntityBonePar_AR(const zCutsceneMgr*, NCINEntry* fxrec, RpAtomi
     }
 }
 
-void get_bone_matrix(xMat4x3& mat, const NCINEntry* fxrec, const RwMatrixTag* animMat)
+void get_bone_matrix(xMat4x3& mat, const NCINEntry* fxrec, const RwMatrix* animMat)
 {
     S32 idx = fxrec->pos_A[1].y;
 
@@ -3716,7 +3716,7 @@ static void NCIN_BubbleTrail_Upd(const zCutsceneMgr*, NCINEntry* fxrec, S32 kill
 }
 
 static void NCIN_BubbleTrail_AR(const zCutsceneMgr*, NCINEntry* fxrec, RpAtomic* model,
-                         RwMatrixTag* animMat, U32 animIndex, U32 dataIndex)
+                         RwMatrix* animMat, U32 animIndex, U32 dataIndex)
 {
     S32 ifx = fxrec->pos_A[1].x;
 
@@ -3805,7 +3805,7 @@ static void NCIN_SBBNode_Upd(const zCutsceneMgr*, NCINEntry* fxrec, S32 killit)
 }
 
 static void NCIN_SBBNode_AR(const zCutsceneMgr*, NCINEntry* fxrec, RpAtomic* model,
-                     RwMatrixTag* animMat, U32 animIndex, U32 dataIndex)
+                     RwMatrix* animMat, U32 animIndex, U32 dataIndex)
 {
     zNPCB_SB2* sb2;
     S32 bones;
@@ -3842,7 +3842,7 @@ static void NCIN_SBBNode_AR(const zCutsceneMgr*, NCINEntry* fxrec, RpAtomic* mod
 
     if (fxrec->flg_stat & 8)
     {
-        data.mat = (RwMatrixTag*)xMemPushTemp((bones + 1) * sizeof(RwMatrixTag));
+        data.mat = (RwMatrix*)xMemPushTemp((bones + 1) * sizeof(RwMatrix));
     }
 
     sb2->rebind_nodes(model, data.mat);

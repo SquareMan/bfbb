@@ -4,12 +4,12 @@
 #include "iCollide.h"
 #include "iMath3.h"
 #include "rpcollis.h"
-#include "rpcollbsptree.h"
 #include "rpworld.h"
 #include "xMathInlines.h"
 #include "xScene.h"
 #include "zGrid.h"
 
+#include <rpcollbsptree.h>
 #include <cmath>
 #include <types.h>
 
@@ -24,14 +24,13 @@ extern U8 xClumpColl_FilterFlags;
 
 #define rwInvSqrtMacro(_recip, _input) (*(_recip) = _rwInvSqrt(_input))
 
-#include <world/bageomet.h>
 
 // Same computation as xVec3NormalizeMacro in xVec3Inlines.h, but written the way the retail
 // object was built: the length is stored before the components are copied, and the squares are
 // held in named temporaries. Reproducing that here (rather than editing the shared header) takes
 // xSphereHitsOBB_nu from 94.075% to 99.661%.
 #define xVec3NormalizeTmpMacro(o, v, len)                                                          \
-    MACRO_START                                                                                    \
+    do                                                                                    \
     {                                                                                              \
         F32 x2__ = SQR((v)->x), y2__ = SQR((v)->y), z2__ = SQR((v)->z);                            \
         F32 len2 = x2__ + y2__ + z2__;                                                             \
@@ -59,7 +58,7 @@ extern U8 xClumpColl_FilterFlags;
             (o)->z = (v)->z * len_inv;                                                             \
         }                                                                                          \
     }                                                                                              \
-    MACRO_STOP
+    while (0)
 
 _xCollsIdx xCollideGetCollsIdx(const xCollis* coll, const xVec3* tohit, const xMat3x3* mat)
 {
@@ -672,7 +671,7 @@ U32 xBoxHitsSphere(const xBox* a, const xSphere* b, xCollis* coll)
 }
 
 #define NORMALIZE(v, s)                                                                            \
-    MACRO_START                                                                                    \
+    do                                                                                    \
     {                                                                                              \
         F32 _mag = SQR((v)->x) + SQR((v)->y) + SQR((v)->z);                                        \
         if (xabs(_mag - 1.0f) > 0.000001f && _mag > 0.00001f)                                      \
@@ -685,7 +684,7 @@ U32 xBoxHitsSphere(const xBox* a, const xSphere* b, xCollis* coll)
             (v)->z *= _mag;                                                                        \
         }                                                                                          \
     }                                                                                              \
-    MACRO_STOP
+    while (0)
 
 static U32 Mgc_BoxBoxTest(const xBox* a, const xMat4x3* matA, const xBox* b, const xMat4x3* matB)
 {
@@ -1402,12 +1401,12 @@ S32 xSweptSphereToTriangle(xSweptSphere* sws, xVec3* v0, xVec3* v1, xVec3* v2)
     xVec3 contact;
     RwV3d vTmp, vTmp2;
     F32 recipLength, lengthSq;
-    RwV3dSubMacro(&vTmp, (RwV3d*)&xform[1], (RwV3d*)&xform[0]);
-    RwV3dSubMacro(&vTmp2, (RwV3d*)&xform[2], (RwV3d*)&xform[0]);
-    RwV3dCrossProductMacro((RwV3d*)&xnorm, &vTmp, &vTmp2);
-    lengthSq = RwV3dDotProductMacro((RwV3d*)&xnorm, (RwV3d*)&xnorm);
+    RwV3dSub(&vTmp, (RwV3d*)&xform[1], (RwV3d*)&xform[0]);
+    RwV3dSub(&vTmp2, (RwV3d*)&xform[2], (RwV3d*)&xform[0]);
+    RwV3dCrossProduct((RwV3d*)&xnorm, &vTmp, &vTmp2);
+    lengthSq = RwV3dDotProduct((RwV3d*)&xnorm, (RwV3d*)&xnorm);
     recipLength = _rwInvSqrt(lengthSq);
-    RwV3dScaleMacro((RwV3d*)&xnorm, (RwV3d*)&xnorm, recipLength);
+    RwV3dScale((RwV3d*)&xnorm, (RwV3d*)&xnorm, recipLength);
     if (isnan(xnorm.x))
     {
         return 0;
@@ -2011,7 +2010,7 @@ S32 xSweptSphereToEnv(xSweptSphere* sws, xEnv* env)
         line.end = *(RwV3d*)&sws->end;
 
         RwV3d delta;
-        RwV3dSubMacro(&delta, &line.end, &line.start);
+        RwV3dSub(&delta, &line.end, &line.start);
 
         xClumpCollV3dGradient grad;
         F32 recip;
@@ -2098,7 +2097,7 @@ S32 xSweptSphereToModel(xSweptSphere* sws, RpAtomic* model, RwMatrix* mat)
         isData.sws = sws;
 
         RwV3d delta;
-        RwV3dSubMacro(&delta, &line.end, &line.start);
+        RwV3dSub(&delta, &line.end, &line.start);
 
         RpV3dGradient grad;
         F32 recip;

@@ -526,7 +526,7 @@ namespace
         void update(xModelInstance&, xLightKit*);
         void render_static();
         void render_background();
-        void set_vert(rwGameCube2DVertex&, F32, F32, F32, F32);
+        void set_vert(RwIm2DVertex&, F32, F32, F32, F32);
         void move(const xVec3&, const xVec3&);
     };
 
@@ -600,7 +600,7 @@ namespace
         }
 
         RpWorldAddCamera(world, cam);
-        _rwObjectHasFrameSetFrame(cam, RwFrameCreate());
+        RwCameraSetFrame(cam, RwFrameCreate());
 
         xVec2 windowSize = { 1.0f, 1.0f };
         RwCameraSetViewWindow(cam, (const RwV2d*)&windowSize);
@@ -613,7 +613,7 @@ namespace
         }
 
         raster =
-            RwRasterCreate(width, height, 32, rwRASTERGAMMACORRECTED | rwRASTERPIXELLOCKEDWRITE);
+            RwRasterCreate(width, height, 32, rwRASTERTYPEZBUFFER | rwRASTERTYPECAMERA);
         if (raster == NULL)
         {
             destroy();
@@ -654,7 +654,7 @@ namespace
             RwFrame* tmpframe = (RwFrame*)cam->object.object.parent;
             if (tmpframe != NULL)
             {
-                _rwObjectHasFrameSetFrame(cam, NULL);
+                RwCameraSetFrame(cam, NULL);
                 RwFrameDestroy(tmpframe);
             }
             RpWorldRemoveCamera(world, cam);
@@ -1750,11 +1750,13 @@ namespace
 
     void television::update(xModelInstance& model_inst, xLightKit* light_kit)
     {
-        RwCamera* globalCamera = (RwCamera*)(RwEngineInstance->curCamera);
+        RwCamera* globalCamera = (RwCamera*)(RwCameraGetCurrentCamera());
         if (globalCamera != NULL)
         {
             RwCameraEndUpdate(globalCamera);
+#ifdef GAMECUBE
             RwGameCubeCameraTextureFlush(globalCamera->frameBuffer, 0);
+#endif
         }
         if (this->bgraster == NULL)
         {
@@ -1794,7 +1796,9 @@ namespace
         }
         render_static();
         RwCameraEndUpdate(this->cam);
+#ifdef GAMECUBE
         RwGameCubeCameraTextureFlush(this->cam->frameBuffer, 0);
+#endif
         if (globalCamera != NULL)
         {
             RwCameraBeginUpdate(globalCamera);
@@ -1810,7 +1814,7 @@ namespace
         zRenderState(SDRS_Fill);
         RwRenderStateSet(rwRENDERSTATETEXTURERASTER, this->bgraster);
 
-        rwGameCube2DVertex* vert = (rwGameCube2DVertex*)xMemPushTemp(6 * sizeof(*vert));
+        RwIm2DVertex* vert = (RwIm2DVertex*)xMemPushTemp(6 * sizeof(*vert));
 
         set_vert(vert[0], 0.0f, 0.0f, 0.0f, 0.0f);
         set_vert(vert[1], 0.0f, this->h, 0.0f, 1.0f);
@@ -1823,17 +1827,11 @@ namespace
         xMemPopTemp(vert);
     }
 
-    void television::set_vert(rwGameCube2DVertex& vert, F32 x, F32 y, F32 u, F32 v)
+    void television::set_vert(RwIm2DVertex& vert, F32 x, F32 y, F32 u, F32 v)
     {
-        vert.x = x;
-        vert.y = y;
-        vert.z = 1.0f;
-        vert.u = u;
-        vert.v = v;
-        vert.emissiveColor.red = 0xff;
-        vert.emissiveColor.green = 0xff;
-        vert.emissiveColor.blue = 0xff;
-        vert.emissiveColor.alpha = 0xff;
+        RwIm2DVertexSetPos(&vert, x, y, 1.0f);
+        RwIm2DVertexSetUV(&vert, u, v);
+        RwIm2DVertexSetRGBA(&vert, 0xff, 0xff, 0xff, 0xff);
     }
 
     void television::move(const xVec3& v1, const xVec3& v2)

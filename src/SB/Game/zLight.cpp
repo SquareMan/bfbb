@@ -1,12 +1,12 @@
 #include "zLight.h"
 #include "zLightEffect.h"
 #include "zGlobals.h"
-#include "../rwsdk/rwplcore.h"
 #include "xShadow.h"
 #include "xPartition.h"
 #include "xString.h"
 #include "xPartition.h"
 
+#include <rwplcore.h>
 #include <types.h>
 #include <string.h>
 

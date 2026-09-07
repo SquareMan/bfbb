@@ -4,6 +4,7 @@
 #include "iParMgr.h"
 #include "iMath.h"
 
+#include "rwcore.h"
 #include "xDebug.h"
 #include "xMathInlines.h"
 #include "xstransvc.h"
@@ -207,8 +208,8 @@ static void DrawRing(xFXRing* m)
     F32 tilt;
     F32 dt;
     xVec3* center;
-    RxObjSpace3DVertex* Im3DBuffer;
-    RxObjSpace3DVertex* imv;
+    RwIm3DVertex* Im3DBuffer;
+    RwIm3DVertex* imv;
     F32 oour;
 
     if (m->time <= 0.0f)
@@ -718,7 +719,7 @@ RpMaterial* MaterialSetEnvMap2(RpMaterial* material, void* data)
     {
         RwTexture* texture = (RwTexture*)data;
         RwFrame* frame;
-        if (RwEngineInstance->stringFuncs.vecStrcmp(texture->name, "spec3") == 0)
+        if (rwstrcmp(texture->name, "spec3") == 0)
         {
             frame = (RwFrame*)globals.camera.lo_cam->object.object.parent;
         }
@@ -993,12 +994,12 @@ namespace
     void lerp(U8& v, F32 frac, U8 v0, U8 v1);
     void lerp(xVec3& v, F32 frac, const xVec3& v0, const xVec3& v1);
 
-    void set_vert(RxObjSpace3DVertex& vert, const vert_data& vd);
-    void set_vert(RxObjSpace3DVertex& vert, const xVec3& loc, const xVec3& norm,
+    void set_vert(RwIm3DVertex& vert, const vert_data& vd);
+    void set_vert(RwIm3DVertex& vert, const xVec3& loc, const xVec3& norm,
                   const RwTexCoords& uv, U8 alpha);
-    void push_triangle(RxObjSpace3DVertex*& vert, const tri_data& tri);
+    void push_triangle(RwIm3DVertex*& vert, const tri_data& tri);
     S32 clip_triangle(tri_data* out, const tri_data& in, F32 depth);
-    void refresh_vert_buffer(RxObjSpace3DVertex*& vert, bool flush);
+    void refresh_vert_buffer(RwIm3DVertex*& vert, bool flush);
     U32 count_alpha_triangles(const RpTriangle* tri, const F32* depth, u32 size);
     void depth_sort(U16* index, const tri_data* tri, u32 size);
 
@@ -1045,7 +1046,7 @@ void xFXRenderProximityFade(const xModelInstance& model, F32 near_dist, F32 far_
     F32 zfrac;
     S32 i;
     F32 a;
-    RxObjSpace3DVertex* out_vert;
+    RwIm3DVertex* out_vert;
     S32 tri_total;
     U16* alpha_tri_index;
     tri_data* alpha_tri;
@@ -1282,7 +1283,7 @@ cleanup:
 
 namespace
 {
-    void push_triangle(RxObjSpace3DVertex*& vert, const tri_data& tri)
+    void push_triangle(RwIm3DVertex*& vert, const tri_data& tri)
     {
         for (S32 i = 0; i < 3; i++)
         {
@@ -1291,7 +1292,7 @@ namespace
         }
     }
 
-    void set_vert(RxObjSpace3DVertex& vert, const vert_data& vd)
+    void set_vert(RwIm3DVertex& vert, const vert_data& vd)
     {
         U8 alpha;
         F32 a;
@@ -1445,7 +1446,7 @@ namespace
         }
     }
 
-    void set_vert(RxObjSpace3DVertex& vert, const xVec3& loc, const xVec3& norm,
+    void set_vert(RwIm3DVertex& vert, const xVec3& loc, const xVec3& norm,
                   const RwTexCoords& uv, U8 alpha)
     {
         F32 lx = loc.x;
@@ -1457,7 +1458,7 @@ namespace
         RwIm3DVertexSetUV(&vert, uv.u, uv.v);
     }
 
-    void refresh_vert_buffer(RxObjSpace3DVertex*& vert, bool flush)
+    void refresh_vert_buffer(RwIm3DVertex*& vert, bool flush)
     {
         S32 count = vert - gRenderBuffer.m_vertex;
 
@@ -2165,7 +2166,7 @@ void xFXShineRender()
     S32 shine;
     xFXShine* s;
     S32 j;
-    RxObjSpace3DVertex* vert;
+    RwIm3DVertex* vert;
     RwFrame* frame;
     xVec3 v;
     xVec3 w;
@@ -2571,7 +2572,7 @@ void xFXRibbon::start_render()
 
 void xFXRibbon::render()
 {
-    RxObjSpace3DVertex* verts = gRenderBuffer.m_vertex;
+    RwIm3DVertex* verts = gRenderBuffer.m_vertex;
 
     curve_index = curve_size - 2;
 
@@ -2758,13 +2759,13 @@ void xFXRibbon::eval_joint(const joint_data& joint, iColor_tag& color, F32& widt
 
 namespace
 {
-    void set_vert(RxObjSpace3DVertex& vert, const xVec3& loc, F32 u, F32 v, iColor_tag color);
+    void set_vert(RwIm3DVertex& vert, const xVec3& loc, F32 u, F32 v, iColor_tag color);
 }
 
-void xFXRibbon::render_strip(RxObjSpace3DVertex* verts, tier_queue<joint_data>::iterator first,
+void xFXRibbon::render_strip(RwIm3DVertex* verts, tier_queue<joint_data>::iterator first,
                              u32 size)
 {
-    RxObjSpace3DVertex* v = verts;
+    RwIm3DVertex* v = verts;
     S32 back = first.global_index() & 1;
     F32 ulookup[2] = { 0.0f, 1.0f };
     tier_queue<joint_data>::iterator last = first - size;
@@ -2812,7 +2813,7 @@ void xFXRibbon::render_strip(RxObjSpace3DVertex* verts, tier_queue<joint_data>::
 
 namespace
 {
-    void set_vert(RxObjSpace3DVertex& vert, const xVec3& loc, F32 u, F32 v, iColor_tag color)
+    void set_vert(RwIm3DVertex& vert, const xVec3& loc, F32 u, F32 v, iColor_tag color)
     {
         RwIm3DVertexSetPos(&vert, loc.x, loc.y, loc.z);
         RwIm3DVertexSetUV(&vert, u, v);
@@ -3070,11 +3071,11 @@ static void RenderRotatedBillboard(xVec3* pos, _xFXAuraAngle* rot, U32 count, F3
                                    iColor_tag tint, U32 flipUV)
 {
     U32 i;
-    RxObjSpace3DVertex vert[384];
+    RwIm3DVertex vert[384];
     xVec3 rtv;
     xVec3 upv;
     xVec3 v;
-    RxObjSpace3DVertex* vp;
+    RwIm3DVertex* vp;
     xMat4x3* cammat;
     xVec3* rt;
     xVec3* up;
@@ -3091,7 +3092,7 @@ static void RenderRotatedBillboard(xVec3* pos, _xFXAuraAngle* rot, U32 count, F3
     F32 dx;
     F32 dy;
 
-    RwCamera* cam = (RwCamera*)RwEngineInstance->curCamera;
+    RwCamera* cam = RwCameraGetCurrentCamera();
 
     cammat = (xMat4x3*)&((RwFrame*)cam->object.object.parent)->modelling;
 

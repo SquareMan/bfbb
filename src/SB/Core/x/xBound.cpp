@@ -97,7 +97,11 @@ F32 xsqrt(F32 x)
 
     // non-matching: frsp instruction
 
+#ifdef GAMECUBE
     F32 guess = __frsqrte(x);
+#else
+    F32 guess = sqrtf(x);
+#endif
     guess = half * guess * (three - guess * guess * x);
 
     if (guess > 0.0000099999997f)

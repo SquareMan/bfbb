@@ -10,6 +10,7 @@
 #include "zHud.h"
 #include "zFMV.h"
 #include "zSaveLoad.h"
+#include "zMenu.h"
 #include "xMemMgr.h"
 #include "xScrFx.h"
 #include "xCM.h"
@@ -29,7 +30,6 @@ S32 g_zdsp_init;
 
 st_ZDISPATCH_DEPOT g_zdsp_depot = { 0 };
 
-extern U8 menu_fmv_played;
 extern char zEventLogBuf[20][256];
 
 void zDispatcher_Startup()

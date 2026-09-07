@@ -105,8 +105,7 @@ xUpdateCullMgr* xUpdateCull_Init(void** ent, U32 entCount, xGroup** group, U32 g
 
     if (entCount > 0)
     {
-        tempEnt = (void**)(((((RwGlobals*)RwEngineInstance)->memoryFuncs).rwmalloc)(
-            (sizeof(void*) * entCount)));
+        tempEnt = (void**)RwMalloc(sizeof(void*) * entCount);
 
         for (U32 idx = 0; idx < entCount; idx++)
         {
@@ -125,8 +124,7 @@ xUpdateCullMgr* xUpdateCull_Init(void** ent, U32 entCount, xGroup** group, U32 g
     entsInGroups = 0;
     nonEmptyGroups = 0;
 
-    bool* inGroupArray = (bool*)(((((RwGlobals*)RwEngineInstance)->memoryFuncs).rwmalloc)(
-        (sizeof(bool) * entCount)));
+    bool* inGroupArray = (bool*)RwMalloc(sizeof(bool) * entCount);
     memset(inGroupArray, 0, sizeof(bool) * entCount);
 
     for (i = 0; i < groupCount; i++)

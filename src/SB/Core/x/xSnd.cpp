@@ -831,7 +831,7 @@ U8 xSndStreamLock(U32 owner, sound_category kill_cat, bool kill_nonlooping)
     return 0;
 }
 
-U32 xSndStreamReady(U32 owner)
+U8 xSndStreamReady(U32 owner)
 {
     xSndVoiceInfo* begin = gSnd.voice;
     xSndVoiceInfo* end = begin + 6;

@@ -198,8 +198,8 @@ void xLaserBoltEmitter::render()
     debug_render();
 
     S32 size;
-    RxObjSpace3DVertex* verts = get_vert_buffer(size);
-    RxObjSpace3DVertex* v = verts;
+    RwIm3DVertex* verts = get_vert_buffer(size);
+    RwIm3DVertex* v = verts;
 
     RwRenderStateSet(rwRENDERSTATETEXTURERASTER, bolt_raster);
 
@@ -303,7 +303,7 @@ void xLaserBoltEmitter::collide_update(bolt& b)
     log_collide_dynamics(scene_coll.flags & 0x1 || player_coll.flags & 0x1);
 }
 
-RxObjSpace3DVertex* xLaserBoltEmitter::render(bolt& b, RxObjSpace3DVertex *vert) 
+RwIm3DVertex* xLaserBoltEmitter::render(bolt& b, RwIm3DVertex *vert) 
 {       
     F32 dist0 = b.prev_dist - this->cfg.length; 
     if (dist0 < 0.0f)
@@ -360,7 +360,7 @@ RxObjSpace3DVertex* xLaserBoltEmitter::render(bolt& b, RxObjSpace3DVertex *vert)
     return vert + 6;
 }
 
-RxObjSpace3DVertex* xLaserBoltEmitter::get_vert_buffer(S32& dat)
+RwIm3DVertex* xLaserBoltEmitter::get_vert_buffer(S32& dat)
 {
     dat = (U32)0x1e0;
     return gRenderBuffer.m_vertex;

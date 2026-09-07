@@ -1,8 +1,5 @@
 #include "zFX.h"
 
-#include "rpworld.h"
-#include "rpskin.h"
-#include "rwplcore.h"
 #include "iAnim.h"
 #include "xDebug.h"
 #include "xDraw.h"
@@ -19,6 +16,7 @@
 #include "zScene.h"
 #include "zTextBox.h"
 
+#include <rpskin.h>
 #include <stdio.h>
 #include <types.h>
 #include <string.h>
@@ -276,7 +274,8 @@ void zFXGooEnable(RpAtomic* atomic, S32 freezeGroup)
     S32 numTriangles = geom->numTriangles;
     if (geom->preLitLum == NULL)
     {
-        RpGeometry* new_geom = RpGeometryCreate(numVertices, numTriangles, 0x7E);
+        RpGeometry* new_geom = RpGeometryCreate(numVertices, numTriangles,
+            rpGEOMETRYPOSITIONS | rpGEOMETRYTEXTURED | rpGEOMETRYPRELIT | rpGEOMETRYNORMALS | rpGEOMETRYLIGHT | rpGEOMETRYMODULATEMATERIALCOLOR);
         RpMorphTarget* new_morph = new_geom->morphTarget;
         RwV3d* verts = geom->morphTarget->verts;
         RwV3d* new_verts = new_morph->verts;
@@ -527,7 +526,7 @@ void zFXGooUpdate(F32 dt)
     }
 }
 
-RpAtomic* zFXGooRenderAtomic(class RpAtomic* atomic)
+RpAtomic* zFXGooRenderAtomic(RpAtomic* atomic)
 {
     if (g_txtr_gooFrozen == NULL)
     {
@@ -1354,7 +1353,7 @@ namespace
 
     bool model_is_preinstanced(RpAtomic* atomic)
     {
-        RpGeometry* geom = RpAtomicGetGeometryMacro(atomic);
+        RpGeometry* geom = RpAtomicGetGeometry(atomic);
         if (geom == NULL)
         {
             return TRUE;

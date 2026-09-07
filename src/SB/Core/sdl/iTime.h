@@ -22,12 +22,6 @@ typedef S64 iTime;
 typedef S64 iTime;
 #define ITIME_FROM_SECS(s) ((s) * (1'000'000'000))
 
-S32 iGetMinute();
-S32 iGetHour();
-S32 iGetDay();
-S32 iGetMonth();
-U32 iGetCurrFormattedDate(char* input);
-U32 iGetCurrFormattedTime(char* input);
 void iTimeInit();
 void iTimeExit();
 iTime iTimeGet();
@@ -38,5 +32,11 @@ void iTimeSetGame(F32 time);
 void iProfileClear(U32 sceneID);
 void iFuncProfileDump();
 void iFuncProfileParse(const char* elfPath, S32 profile);
+S32 iGetMinute();
+S32 iGetHour();
+S32 iGetDay();
+S32 iGetMonth();
+U32 iGetCurrFormattedDate(char* input);
+U32 iGetCurrFormattedTime(char* input);
 
 #endif

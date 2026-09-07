@@ -1078,7 +1078,7 @@ static void RecurseChild(xBase* child, xEntBoulder** boulList, S32& currBoul)
     }
 }
 
-void xBoulderGenerator_Init(xBase& data, xDynAsset& asset, unsigned long)
+void xBoulderGenerator_Init(xBase& data, xDynAsset& asset, size_t)
 {
     xBoulderGenerator_Init((xBoulderGenerator*)&data, (xBoulderGeneratorAsset*)&asset);
 }

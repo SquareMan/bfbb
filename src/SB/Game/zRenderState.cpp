@@ -1,6 +1,6 @@
 #include "zRenderState.h"
 
-#include "rwsdk/rwplcore.h"
+#include <rwplcore.h>
 
 #include "iCamera.h"
 

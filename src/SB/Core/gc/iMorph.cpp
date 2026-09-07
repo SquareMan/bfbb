@@ -12,7 +12,7 @@ static F32* s_vTemp;
 static F32* s_nTemp;
 static U32 s_numV;
 
-static void MorphCommon(RpAtomic* model, RwMatrixTag* mat, S16** v_array, S16* weight, U32 normals,
+static void MorphCommon(RpAtomic* model, RwMatrix* mat, S16** v_array, S16* weight, U32 normals,
                         F32 scale, S32 dorender)
 {
     U32 i;

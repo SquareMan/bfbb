@@ -75,10 +75,12 @@ void xCameraFXBegin(xCamera* cam);
 void xCameraFXUpdate(xCamera* cam, F32 dt);
 void xCameraFXEnd(xCamera* cam);
 
+#ifdef GAMECUBE
 extern "C"
 {
     void RwGameCubeSetMinRetraceCount(RwUInt8 count);
 }
+#endif
 
 // The target's .sdata opens gPendingPlayer, startPressed, black, clear,
 // soaklevels, soaktime - so all four of these are declared ahead of
@@ -592,7 +594,9 @@ void zGameLoop()
         gGameWhereAmI = eGameWhere_LoopCameraEnd;
         xCameraEnd(&globals.camera, sTimeElapsed, 1);
         iEnvEndRenderFX(NULL);
+#ifdef GAMECUBE
         RwGameCubeSetMinRetraceCount(globals.minVSyncCnt);
+#endif
 
         gGameWhereAmI = eGameWhere_LoopCameraShowRaster;
         xCameraShowRaster(&globals.camera);
@@ -735,55 +739,26 @@ void zGameStall()
     }
 }
 
-// 95.165%, pure scheduling: the target writes the quad's fields in strictly
-// ascending offset order, our compiler fills the load-use gap after each
-// `lfs` of a pool literal with the next vertex's `.x` store.  Same instruction
-// multiset.  Writing the u/v pairs as a chained assignment was measured and is
-// worse (95.154%) - it reverses the u/v store order.
 static void zGame_HackDrawCard(F32 x, F32 y, F32 w, F32 h, RwRaster* rast)
 {
     RwIm2DVertex quad[4];
     F32 screenZ = RwIm2DGetNearScreenZ();
 
-    quad[0].x = x;
-    quad[0].y = y;
-    quad[0].z = screenZ;
-    quad[0].emissiveColor.red = 255;
-    quad[0].emissiveColor.green = 255;
-    quad[0].emissiveColor.blue = 255;
-    quad[0].emissiveColor.alpha = 255;
-    quad[0].u = 0.0f;
-    quad[0].v = 0.0f;
+    RwIm2DVertexSetPos(&quad[0], x, y, screenZ);
+    RwIm2DVertexSetRGBA(&quad[0], 255, 255, 255, 255);
+    RwIm2DVertexSetUV(&quad[0], 0.0f, 0.0f);
 
-    quad[1].x = x;
-    quad[1].y = y + h;
-    quad[1].z = screenZ;
-    quad[1].emissiveColor.red = 255;
-    quad[1].emissiveColor.green = 255;
-    quad[1].emissiveColor.blue = 255;
-    quad[1].emissiveColor.alpha = 255;
-    quad[1].u = 0.0f;
-    quad[1].v = 1.0f;
+    RwIm2DVertexSetPos(&quad[1], x, y + h, screenZ);
+    RwIm2DVertexSetRGBA(&quad[1], 255, 255, 255, 255);
+    RwIm2DVertexSetUV(&quad[1], 0.0f, 1.0f);
 
-    quad[2].x = x + w;
-    quad[2].y = y;
-    quad[2].z = screenZ;
-    quad[2].emissiveColor.red = 255;
-    quad[2].emissiveColor.green = 255;
-    quad[2].emissiveColor.blue = 255;
-    quad[2].emissiveColor.alpha = 255;
-    quad[2].u = 1.0f;
-    quad[2].v = 0.0f;
+    RwIm2DVertexSetPos(&quad[2], x + w, y, screenZ);
+    RwIm2DVertexSetRGBA(&quad[2], 255, 255, 255, 255);
+    RwIm2DVertexSetUV(&quad[2], 1.0f, 0.0f);
 
-    quad[3].x = x + w;
-    quad[3].y = y + h;
-    quad[3].z = screenZ;
-    quad[3].emissiveColor.red = 255;
-    quad[3].emissiveColor.green = 255;
-    quad[3].emissiveColor.blue = 255;
-    quad[3].emissiveColor.alpha = 255;
-    quad[3].u = 1.0f;
-    quad[3].v = 1.0f;
+    RwIm2DVertexSetPos(&quad[3], x + w, y + h, screenZ);
+    RwIm2DVertexSetRGBA(&quad[3], 255, 255, 255, 255);
+    RwIm2DVertexSetUV(&quad[3], 1.0f, 1.0f);
 
     RwRenderStateSet(rwRENDERSTATESHADEMODE, (void*)rwSHADEMODEFLAT);
     RwRenderStateSet(rwRENDERSTATESRCBLEND, (void*)rwBLENDSRCALPHA);
@@ -805,7 +780,7 @@ static void zGame_HackPostPortalAutoSaveDraw()
     RwTexture* tex; 
     RwRGBA bg = {};
 	
-    cam = (RwCamera*)RwEngineInstance->curCamera;
+    cam = RwCameraGetCurrentCamera();
     if (cam != NULL)
     {
         RwCameraEndUpdate(cam);
@@ -1157,7 +1132,7 @@ void zGameScreenTransitionBegin()
     sGameScreenTransCam = iCameraCreate(640, 480, 0);
     if (sGameScreenTransCam != NULL)
     {
-        DirectionalLight = RpLightCreate(1);
+        DirectionalLight = RpLightCreate(rpLIGHTDIRECTIONAL);
         if (DirectionalLight != NULL)
         {
             RwRGBAReal col;
@@ -1165,7 +1140,7 @@ void zGameScreenTransitionBegin()
 			col.alpha = 0.0f;
             RpLightSetColor(DirectionalLight, &col);
             RwFrame* frame = RwFrameCreate();
-            _rwObjectHasFrameSetFrame(DirectionalLight, frame);
+            RpLightSetFrame(DirectionalLight, frame);
             RwBBox box;
 			box.sup.z = box.sup.y = box.sup.x =  10000.0f;
 			box.inf.z = box.inf.y = box.inf.x = -10000.0f;
@@ -1205,7 +1180,7 @@ void zGameScreenTransitionUpdate(F32 percentComplete, const char* msg, U8* rgba)
 {
     RwTexture* tex;
     RwRaster* ras;
-    rwGameCube2DVertex vx[4];
+    RwIm2DVertex vx[4];
 
     gGameWhereAmI = eGameWhere_TransitionUpdate;
 
@@ -1254,45 +1229,21 @@ void zGameScreenTransitionUpdate(F32 percentComplete, const char* msg, U8* rgba)
 
             F32 z = RwIm2DGetFarScreenZ();
 
-            vx[0].x = 0.0f;
-            vx[0].y = 0.0f;
-            vx[0].z = z;
-            vx[0].emissiveColor.red   = bgr;
-            vx[0].emissiveColor.green = bgb;
-            vx[0].emissiveColor.blue  = bgg;
-            vx[0].emissiveColor.alpha = bga;
-            vx[0].u = bgu1;
-            vx[0].v = bgv1;
+            RwIm2DVertexSetPos(&vx[0], 0.0f, 0.0f, z);
+            RwIm2DVertexSetRGBA(&vx[0], bgr, bgg, bgb, bga);
+            RwIm2DVertexSetUV(&vx[0], bgu1, bgv1);
 
-            vx[1].x = 0.0f;
-            vx[1].y = 480.0f;
-            vx[1].z = z;
-            vx[1].emissiveColor.red   = bgr;
-            vx[1].emissiveColor.green = bgb;
-            vx[1].emissiveColor.blue  = bgg;
-            vx[1].emissiveColor.alpha = bga;
-            vx[1].u = bgu1;
-            vx[1].v = bgv2;
+            RwIm2DVertexSetPos(&vx[1], 0.0f, 480.0f, z);
+            RwIm2DVertexSetRGBA(&vx[1], bgr, bgg, bgb, bga);
+            RwIm2DVertexSetUV(&vx[1], bgu1, bgv2);
 
-            vx[2].x = 640.0f;
-            vx[2].y = 0.0f;
-            vx[2].z = z;
-            vx[2].emissiveColor.red   = bgr;
-            vx[2].emissiveColor.green = bgb;
-            vx[2].emissiveColor.blue  = bgg;
-            vx[2].emissiveColor.alpha = bga;
-            vx[2].u = bgu2;
-            vx[2].v = bgv1;
+            RwIm2DVertexSetPos(&vx[2], 640.0f, 0.0f, z);
+            RwIm2DVertexSetRGBA(&vx[2], bgr, bgg, bgb, bga);
+            RwIm2DVertexSetUV(&vx[2], bgu2, bgv1);
 
-            vx[3].x = 640.0f;
-            vx[3].y = 480.0f;
-            vx[3].z = z;
-            vx[3].emissiveColor.red   = bgr;
-            vx[3].emissiveColor.green = bgb;
-            vx[3].emissiveColor.blue  = bgg;
-            vx[3].emissiveColor.alpha = bga;
-            vx[3].u = bgu2;
-            vx[3].v = bgv2;
+            RwIm2DVertexSetPos(&vx[3], 640.0f, 480.0f, z);
+            RwIm2DVertexSetRGBA(&vx[3], bgr, bgg, bgb, bga);
+            RwIm2DVertexSetUV(&vx[3], bgu2, bgv2);
 
             RwIm2DRenderPrimitive(rwPRIMTYPETRISTRIP, &vx[0], 4);
             RwRenderStateSet(rwRENDERSTATEZTESTENABLE, (void*)1);
@@ -1356,7 +1307,7 @@ void zGameScreenTransitionEnd()
 {
     RwFrame* frame;
     gGameWhereAmI = eGameWhere_TransitionEnd;
-    _rwFrameSyncDirty();
+    RwFrameSyncDirty();
     if (DirectionalLight != NULL)
     {
         frame = (RwFrame*)(DirectionalLight->object).object.parent;

@@ -152,6 +152,7 @@ void xSndSetVol(U32 snd, F32 vol);
 void xSndSetPitch(U32 snd, F32 pitch);
 void xSndSetCategoryVol(sound_category category, F32 vol);
 void xSndSetExternalCallback(void (*callback)(U32));
+U8 xSndStreamReady(U32 lock);
 
 
 

@@ -2798,9 +2798,9 @@ void zNPCDutchman::halt(F32 decel)
 
 namespace
 {
-    void set_vert(RxObjSpace3DVertex& vert, const xVec3& loc, F32 u, F32 v, U8 alpha);
+    void set_vert(RwIm3DVertex& vert, const xVec3& loc, F32 u, F32 v, U8 alpha);
 
-    void set_beam_verts(RxObjSpace3DVertex* vert, const xVec3& loc0, const xVec3& loc1, U8 a0,
+    void set_beam_verts(RwIm3DVertex* vert, const xVec3& loc0, const xVec3& loc1, U8 a0,
                         U8 a1, const xVec3& half_right)
     {
         set_vert(vert[0], loc0 - half_right, 0.0f, 0.0f, a0);
@@ -2811,7 +2811,7 @@ namespace
         set_vert(vert[5], loc1 + half_right, 1.0f, 1.0f, a1);
     }
 
-    void set_vert(RxObjSpace3DVertex& vert, const xVec3& loc, F32 u, F32 v, U8 alpha)
+    void set_vert(RwIm3DVertex& vert, const xVec3& loc, F32 u, F32 v, U8 alpha)
     {
         RwIm3DVertexSetPos(&vert, loc.x, loc.y, loc.z);
         RwIm3DVertexSetUV(&vert, u, v);
@@ -2835,7 +2835,7 @@ namespace
         return screen_loc;
     }
 
-    RxObjSpace3DVertex* render_beam(RxObjSpace3DVertex* vert, const zNPCDutchman::beam_info& beam,
+    RwIm3DVertex* render_beam(RwIm3DVertex* vert, const zNPCDutchman::beam_info& beam,
                                     unsigned long which, U8 alpha)
     {
         const xVec3& start_loc = beam.start_loc;
@@ -2870,7 +2870,7 @@ namespace
         return vert + 12;
     }
 
-    RxObjSpace3DVertex* render_beam(RxObjSpace3DVertex* vert, const zNPCDutchman::beam_info& beam)
+    RwIm3DVertex* render_beam(RwIm3DVertex* vert, const zNPCDutchman::beam_info& beam)
     {
         U32 segments = beam.segments;
         U8 alpha = (S32)(0.5f + 255.0f * beam.alpha / segments);
@@ -2886,12 +2886,12 @@ namespace
 
 void zNPCDutchman::render_beam()
 {
-    RxObjSpace3DVertex* verts =
-        (RxObjSpace3DVertex*)xMemPushTemp((beam[0].segments + beam[1].segments) * 0x1b0);
+    RwIm3DVertex* verts =
+        (RwIm3DVertex*)xMemPushTemp((beam[0].segments + beam[1].segments) * 0x1b0);
 
     RwRenderStateSet(rwRENDERSTATETEXTURERASTER, laser_raster);
 
-    RxObjSpace3DVertex* vert = ::render_beam(verts, beam[0]);
+    RwIm3DVertex* vert = ::render_beam(verts, beam[0]);
 
     vert = ::render_beam(vert, beam[1]);
 

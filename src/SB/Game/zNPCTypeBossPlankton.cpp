@@ -816,7 +816,7 @@ void zNPCBPlankton::Process(xScene* xscn, F32 dt)
 
     if (flag.face_player)
     {
-        RwMatrixTag* mat = globals.player.ent.model->Mat;
+        RwMatrix* mat = globals.player.ent.model->Mat;
         xVec3& loc = location();
 
         turn.dir.assign(mat->pos.x - loc.x, mat->pos.z - loc.z);

@@ -26,11 +26,11 @@ struct ShadowCBParam
 
 static xShadowSimpleQueue sCollQueue[2];
 static RxRenderStateVector xrsv;
-static RxObjSpace3DVertex sShadVert[384];
+static RwIm3DVertex sShadVert[384];
 static RwRaster* sShadRasters[64];
 static RwRaster* sShadRaster;
 static u32 sShadVertCount;
-static RwMatrixTag* sModelMat;
+static RwMatrix* sModelMat;
 
 inline void xQuickCullForLine(xQCData* q, const xLine3* ln)
 {
@@ -241,7 +241,7 @@ static void xShadowSimple_SceneCollide(xShadowSimpleCache* cache, xVec3* pos, F3
 
 static void xShadowSimple_CalcCorners(xShadowSimpleCache* cache, xEnt* ent, F32 radius, F32 ecc)
 {
-    RwMatrixTag* mat;
+    RwMatrix* mat;
     xVec3 tempnorm;
     F32 ax, az, ay;
     F32 bz, bx, by;

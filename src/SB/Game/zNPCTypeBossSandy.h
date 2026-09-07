@@ -46,7 +46,7 @@ struct zNPCBSandy : zNPCBoss
     RwRaster* helmetRaster;
     RwRaster* feetRaster;
     RwRaster* targetRaster;
-    RxObjSpace3DVertex iconVert[4];
+    RwIm3DVertex iconVert[4];
     xVec3 targetPos;
     xQuat qHead;
     xQuat qBoulder;

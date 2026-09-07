@@ -92,7 +92,7 @@ struct NCINRast
 
 struct NCINMat
 {
-    RwMatrixTag* mat;
+    RwMatrix* mat;
 };
 
 struct NCINData
@@ -184,7 +184,7 @@ struct NCINEntry
 {
     en_ncinfx typ_ncinfx;
     void (*cb_fxupd)(zCutsceneMgr*, NCINEntry*, U32);
-    void (*cb_fxanim)(zCutsceneMgr*, NCINEntry*, RpAtomic*, RwMatrixTag*, U32, U32);
+    void (*cb_fxanim)(zCutsceneMgr*, NCINEntry*, RpAtomic*, RwMatrix*, U32, U32);
     void (*cb_fxrend)(zCutsceneMgr*, NCINEntry*);
     F32 tym_beg;
     F32 tym_end; // 0x14
@@ -219,7 +219,7 @@ struct NCINBeNosey : XCSNNosey
     NCINEntry* use_fxtab;
 
     virtual void CanRenderNow();
-    virtual void UpdatedAnimated(RpAtomic* model, RwMatrixTag* animMat, U32 animIndex,
+    virtual void UpdatedAnimated(RpAtomic* model, RwMatrix* animMat, U32 animIndex,
                                  U32 dataIndex);
     void Init(const zCutsceneMgr* csnmgr, NCINEntry* fxtab, S32 x);
     void Done();

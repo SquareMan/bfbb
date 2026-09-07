@@ -3,6 +3,7 @@
 #include "rpworld.h"
 #include "rpcollbsptree.h"
 
+#include "rwcore.h"
 #include "xMath.h"
 #include "xRay3.h"
 #include "xQuickCull.h"
@@ -29,7 +30,7 @@ static F32 rscale = 1.0f;
 RpLight* volatile ShadowLight;
 static F32 SHADOW_BF_DOT;
 static F32 SHADOW_BOTH;
-static RxObjSpace3DVertex* Im3DBuffer;
+static RwIm3DVertex* Im3DBuffer;
 static U32 Im3DBufferPos;
 RwCamera* volatile ShadowCamera;
 RwRaster* volatile ShadowCameraRaster;
@@ -48,7 +49,7 @@ static xShadowCache sCacheList[6];
 struct _ProjectionParam
 {
     RwV3d at;
-    RwMatrixTag invMatrix;
+    RwMatrix invMatrix;
     U8 shadowValue;
     S32 fade;
     U32 numIm3DBatch;
@@ -88,7 +89,7 @@ void xShadowInit()
     ShadowLight = RpLightCreate(1);
     RpLightSetColor(ShadowLight, &ShadowLightColor);
     RwFrame* frame = RwFrameCreate();
-    _rwObjectHasFrameSetFrame(ShadowLight, frame);
+    RpLightSetFrame(ShadowLight, frame);
 }
 
 void xShadowRender(xVec3* center, F32 radius, F32 max_dist)
@@ -106,7 +107,7 @@ void xShadowSetLight(xVec3* target_pos, xVec3* in_vec, F32 dst_cast)
     matrix.pos = *target_pos;
 
     RwFrame* camFrame = (RwFrame*)ShadowCamera->object.object.parent;
-    RwMatrixTag* camMatrix = &camFrame->modelling;
+    RwMatrix* camMatrix = &camFrame->modelling;
 
     xMat4x3Copy((xMat4x3*)camMatrix, &matrix);
     RwFrameOrthoNormalize(camFrame);
@@ -166,7 +167,7 @@ static S32 ShadowRender(RwCamera* shadowCamera, RwRaster* shadowRast, RpIntersec
 void xShadowRenderWorld(xVec3* center, F32 radius, F32 max_dist)
 {
     RwFrame* camFrame = (RwFrame*)ShadowCamera->object.object.parent;
-    RwMatrixTag* camMatrix = &camFrame->modelling;
+    RwMatrix* camMatrix = &camFrame->modelling;
     xVec3* at = (xVec3*)&camMatrix->at;
     xVec3* up = (xVec3*)&camMatrix->up;
     xVec3* rt = (xVec3*)&camMatrix->right;
@@ -306,11 +307,11 @@ U32 xShadowReceiveShadowSetup(xEnt* ent)
     return 0;
 }
 
-void xShadowReceiveShadow(xEnt* ent, F32 shadowFactor, S32 shadowMode, RwMatrixTag* shadowMat,
+void xShadowReceiveShadow(xEnt* ent, F32 shadowFactor, S32 shadowMode, RwMatrix* shadowMat,
                           RwRaster* shadowRast)
 {
-    RwMatrixTag oldroot;
-    RwMatrixTag invMatrix;
+    RwMatrix oldroot;
+    RwMatrix invMatrix;
     RwV3d vShadOut[3];
     RwV3d vShad[3];
     RwV3d at;
@@ -393,7 +394,7 @@ void xShadowReceiveShadow(xEnt* ent, F32 shadowFactor, S32 shadowMode, RwMatrixT
 
     RwRenderStateSet(rwRENDERSTATEZWRITEENABLE, (void*)0);
 
-    RwMatrixTag* shadowMatrix;
+    RwMatrix* shadowMatrix;
     if (shadowMat != NULL)
     {
         shadowMatrix = shadowMat;
@@ -468,7 +469,7 @@ void xShadowReceiveShadow(xEnt* ent, F32 shadowFactor, S32 shadowMode, RwMatrixT
                     Im3DBufferPos = 0;
                 }
 
-                RxObjSpace3DVertex* imv = &Im3DBuffer[Im3DBufferPos];
+                RwIm3DVertex* imv = &Im3DBuffer[Im3DBufferPos];
                 xVec3* v0 = &xvert[tri->vertIndex[0]];
                 xVec3* v1 = &xvert[tri->vertIndex[1]];
                 xVec3* v2 = &xvert[tri->vertIndex[2]];
@@ -528,23 +529,17 @@ void xShadowReceiveShadow(xEnt* ent, F32 shadowFactor, S32 shadowMode, RwMatrixT
                 F32 t0x = v0->x + normal.x;
                 F32 t0y = v0->y + normal.y;
                 F32 t0z = v0->z + normal.z;
-                imv[0].x = t0x;
-                imv[0].y = t0y;
-                imv[0].z = t0z;
+                RwIm3DVertexSetPos(&imv[0], t0x, t0y, t0z);
 
                 F32 t1x = v1->x + normal.x;
                 F32 t1y = v1->y + normal.y;
                 F32 t1z = v1->z + normal.z;
-                imv[1].x = t1x;
-                imv[1].y = t1y;
-                imv[1].z = t1z;
+                RwIm3DVertexSetPos(&imv[1], t1x, t1y, t1z);
 
                 F32 t2x = v2->x + normal.x;
                 F32 t2y = v2->y + normal.y;
                 F32 t2z = v2->z + normal.z;
-                imv[2].x = t2x;
-                imv[2].y = t2y;
-                imv[2].z = t2z;
+                RwIm3DVertexSetPos(&imv[2], t2x, t2y, t2z);
 
                 imv[0].u = vShadOut[0].x;
                 imv[1].u = vShadOut[1].x;
@@ -553,18 +548,9 @@ void xShadowReceiveShadow(xEnt* ent, F32 shadowFactor, S32 shadowMode, RwMatrixT
                 imv[1].v = vShadOut[1].y;
                 imv[2].v = vShadOut[2].y;
 
-                imv[0].r = val;
-                imv[0].g = val;
-                imv[0].b = val;
-                imv[0].a = val;
-                imv[1].r = val;
-                imv[1].g = val;
-                imv[1].b = val;
-                imv[1].a = val;
-                imv[2].r = val;
-                imv[2].g = val;
-                imv[2].b = val;
-                imv[2].a = val;
+                RwIm3DVertexSetRGBA(&imv[0], val, val, val, val);
+                RwIm3DVertexSetRGBA(&imv[1], val, val, val, val);
+                RwIm3DVertexSetRGBA(&imv[2], val, val, val, val);
 
                 Im3DBufferPos += 3;
             }
@@ -682,11 +668,11 @@ void ShadowCameraDestroy(RwCamera* shadowCamera)
         return;
     }
 
-    _rwFrameSyncDirty();
+    RwFrameSyncDirty();
     RwFrame* parent = (RwFrame*)shadowCamera->object.object.parent;
     if (parent != NULL)
     {
-        _rwObjectHasFrameSetFrame(shadowCamera, NULL);
+        RwCameraSetFrame(shadowCamera, NULL);
         RwFrameDestroy(parent);
     }
 
@@ -761,7 +747,7 @@ static RwCamera* ShadowCameraUpdate(RwCamera* shadowCamera, void* model, void (*
                                     xVec3* center, F32 radius, S32 shadowMode)
 {
     RwRGBA bgColor = { 255, 255, 255, 0 };
-    RwCamera* camera = *(RwCamera**)RwEngineInstance;
+    RwCamera* camera = RwCameraGetCurrentCamera();
     S32 fogstate;
 
     RwRenderStateGet(rwRENDERSTATEFOGENABLE, &fogstate);
@@ -802,7 +788,9 @@ static RwCamera* ShadowCameraUpdate(RwCamera* shadowCamera, void* model, void (*
         RwRenderStateSet(rwRENDERSTATEZTESTENABLE, (void*)1);
 
         RwCameraEndUpdate(shadowCamera);
+#ifdef GAMECUBE
         RwGameCubeCameraTextureFlush(shadowCamera->frameBuffer, 0);
+#endif
     }
 
     if (camera != NULL)
@@ -820,7 +808,7 @@ static RwCamera* ShadowCameraUpdate(RwCamera* shadowCamera, void* model, void (*
 static RwCamera* ShadowCameraSetSpherePersp(RwCamera* camera, RwV3d* center, F32 radius)
 {
     RwFrame* camFrame = (RwFrame*)camera->object.object.parent;
-    RwMatrixTag* camMatrix = &camFrame->modelling;
+    RwMatrix* camMatrix = &camFrame->modelling;
     RwV3d* camPos = &camMatrix->pos;
 
     F32 objDepth = 572.95807f * radius;
@@ -833,7 +821,7 @@ static RwCamera* ShadowCameraSetSpherePersp(RwCamera* camera, RwV3d* center, F32
     RwCameraSetFarClipPlane(camera, farZ);
 
     *camPos = *center;
-    RwV3dIncrementScaledMacro(camPos, &camMatrix->at, -objDepth);
+    RwV3dIncrementScaled(camPos, &camMatrix->at, -objDepth);
     gCamPos = *camPos;
 
     RwMatrixUpdate(camMatrix);
@@ -930,7 +918,7 @@ static RpCollisionTriangle* ShadowRenderTriangleCB(RpIntersection* isx, RpWorldS
     }
 
     RwV3d* v = collTriangle->vertices[0];
-    RxObjSpace3DVertex* imv = &Im3DBuffer[Im3DBufferPos];
+    RwIm3DVertex* imv = &Im3DBuffer[Im3DBufferPos];
     xVec3 c;
 
     c.x = 0.008f * collTriangle->normal.x;
@@ -940,25 +928,19 @@ static RpCollisionTriangle* ShadowRenderTriangleCB(RpIntersection* isx, RpWorldS
     F32 t0x = v->x + c.x;
     F32 t0y = v->y + c.y;
     F32 t0z = v->z + c.z;
-    imv[0].x = t0x;
-    imv[0].y = t0y;
-    imv[0].z = t0z;
+    RwIm3DVertexSetPos(&imv[0], t0x, t0y, t0z);
 
     v = collTriangle->vertices[1];
     F32 t1x = v->x + c.x;
     F32 t1y = v->y + c.y;
     F32 t1z = v->z + c.z;
-    imv[1].x = t1x;
-    imv[1].y = t1y;
-    imv[1].z = t1z;
+    RwIm3DVertexSetPos(&imv[1], t1x, t1y, t1z);
 
     v = collTriangle->vertices[2];
     F32 t2x = v->x + c.x;
     F32 t2y = v->y + c.y;
     F32 t2z = v->z + c.z;
-    imv[2].x = t2x;
-    imv[2].y = t2y;
-    imv[2].z = t2z;
+    RwIm3DVertexSetPos(&imv[2], t2x, t2y, t2z);
 
     imv[0].u = vShadOut[0].x;
     imv[1].u = vShadOut[1].x;
@@ -969,18 +951,9 @@ static RpCollisionTriangle* ShadowRenderTriangleCB(RpIntersection* isx, RpWorldS
 
     U8 sw = param->shadowValue;
 
-    imv[0].r = sw;
-    imv[0].g = sw;
-    imv[0].b = sw;
-    imv[0].a = sw;
-    imv[1].r = sw;
-    imv[1].g = sw;
-    imv[1].b = sw;
-    imv[1].a = sw;
-    imv[2].r = sw;
-    imv[2].g = sw;
-    imv[2].b = sw;
-    imv[2].a = sw;
+    RwIm3DVertexSetRGBA(&imv[0], sw, sw, sw, sw);
+    RwIm3DVertexSetRGBA(&imv[1], sw, sw, sw, sw);
+    RwIm3DVertexSetRGBA(&imv[2], sw, sw, sw, sw);
 
     Im3DBufferPos += 3;
 
@@ -1013,7 +986,7 @@ static S32 ShadowRender(RwCamera* shadowCamera, RwRaster* shadowRast, RpIntersec
         RwRenderStateSet(rwRENDERSTATEDESTBLEND, (void*)rwBLENDINVSRCCOLOR);
     }
 
-    RwMatrixTag* shadowMatrix = &((RwFrame*)shadowCamera->object.object.parent)->modelling;
+    RwMatrix* shadowMatrix = &((RwFrame*)shadowCamera->object.object.parent)->modelling;
 
     param.at = shadowMatrix->at;
 
@@ -1079,12 +1052,14 @@ static S32 ShadowRender(RwCamera* shadowCamera, RwRaster* shadowRast, RpIntersec
 
 void GCSaveFrameBuffer()
 {
+#ifdef GAMECUBE
     RwGameCubeCameraTextureFlush(gc_saveraster, 0);
+#endif
 }
 
 static void GCRestoreFrameBuffer()
 {
-    RwCamera* cam = *(RwCamera**)RwEngineInstance;
+    RwCamera* cam = RwCameraGetCurrentCamera();
     F32 recipCamZ = (1.0f / cam->farPlane);
 
     RwRenderStateSet(rwRENDERSTATESRCBLEND,      (void*)2);
@@ -1107,7 +1082,7 @@ static RwCamera* ShadowCameraCreatePersp(S32 param)
     RwCamera* cam = RwCameraCreate();
     if (cam != NULL)
     {
-        _rwObjectHasFrameSetFrame(cam, RwFrameCreate());
+        RwCameraSetFrame(cam, RwFrameCreate());
 
         RwV2d viewWin;
         viewWin.x = 0.001745331f;
@@ -1403,7 +1378,7 @@ static S32 shadowCacheEntityCB(xEnt* ent, void* cbdata)
 {
     ShadowCBParam* cbparam = (ShadowCBParam*)cbdata;
     xCollis coll;
-    RwMatrixTag inverseLTM;
+    RwMatrix inverseLTM;
     RpV3dGradient grad;
     F32 recip;
 
@@ -1601,7 +1576,7 @@ void xShadowVertical_FillCache(xShadowCache* cache, xVec3* pos, F32 r, F32 depth
 }
 
 void xShadowVertical_DrawCache(xShadowCache* cache, F32 shadowFactor, F32 fadeDist, S32 shadowMode,
-                               RwMatrixTag* shadowMat, RwRaster* shadowRast)
+                               RwMatrix* shadowMat, RwRaster* shadowRast)
 {
     _ProjectionParam param;
     RpCollisionTriangle tri;
@@ -1664,7 +1639,7 @@ void xShadowVertical_DrawCache(xShadowCache* cache, F32 shadowFactor, F32 fadeDi
         }
     }
 
-    RwMatrixTag* shadowMatrix;
+    RwMatrix* shadowMatrix;
     if (shadowMat != NULL)
     {
         shadowMatrix = shadowMat;

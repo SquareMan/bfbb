@@ -8,7 +8,7 @@ struct _iMotionBlurData
 {
     S32 motionBlurAlpha;
     RwRaster* motionBlurFrontBuffer;
-    rwGameCube2DVertex vertex[4];
+    RwIm2DVertex vertex[4];
     U16 index[6];
     U32 w;
     U32 h;

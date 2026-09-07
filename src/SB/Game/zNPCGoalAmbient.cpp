@@ -118,7 +118,7 @@ S32 zNPCGoalJellyBumped::Process(en_trantype* trantyp, F32 dt, void* updCxt, xSc
 xVec3* NPCC_upDir(xEnt* ent);
 
 F32 SQ(F32 x);
-void LERP(float dt, xVec3* pos_update, const xVec3*, const xVec3*);
+xVec3* LERP(float dt, xVec3* pos_update, const xVec3*, const xVec3*);
 F32 SMOOTH(float, float, float);
 
 void zNPCGoalJellyBumped::MoveSwoosh(F32 dt)

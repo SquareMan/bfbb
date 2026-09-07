@@ -1193,7 +1193,7 @@ namespace bungee_state
             xQuatFromMat(&detach.end_dir, &mat);
 
             detach.time = 0.0f;
-            detach.end_time = xsqrt(__fabs(loc.length() / h.detach.accel));
+            detach.end_time = xsqrt(xabs(loc.length() / h.detach.accel));
             if (detach.end_time >= -1e-5f && detach.end_time <= 1e-5f)
             {
                 detach.end_time = 0.01f;
@@ -1244,7 +1244,7 @@ namespace bungee_state
         }
     } // namespace
 
-    void load(class xBase& data, class xDynAsset& asset, unsigned long)
+    void load(class xBase& data, class xDynAsset& asset, size_t)
     {
         xBaseInit(&data, &asset);
         hook_type& hook = (hook_type&)data;
