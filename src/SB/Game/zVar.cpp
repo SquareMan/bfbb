@@ -6,6 +6,7 @@
 #include <stdlib.h>
 
 #include "iTime.h"
+#include "iSystem.h"
 
 #include "xFont.h"
 #include "xString.h"

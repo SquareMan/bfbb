@@ -9,5 +9,7 @@ struct RwMemoryFunctions* psGetMemoryFunctions();
 void iVSync();
 void iSystemInit(U32 options);
 void iSystemExit();
+U32 iGetCurrFormattedDate(char* input);
+U32 iGetCurrFormattedTime(char* input);
 
 #endif

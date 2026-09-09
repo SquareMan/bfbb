@@ -29,7 +29,7 @@ void iEnvEndRenderFX(iEnv*);
 
 inline RwBBox* iEnvGetBBox(iEnv* r3)
 {
-    return &r3->world->boundingBox;
+    return &PLUGINOFFSET(RpWorldExt, r3->world, rpWorldPluginOffset)->boundingBox;
 }
 
 #endif

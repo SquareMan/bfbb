@@ -484,12 +484,14 @@ static void zParPTankSpawnBubbles(xVec3* pos, xVec3* vel, U32 count, float scale
 
 void zParPTankSpawnBubbles(xVec3* pos, xVec3* vel, U32 count, float scale)
 {
+#ifdef PC_TODO
     if (zGameIsPaused())
     {
         return;
     }
 
     zParPTankSpawnBubbles(pos, vel, count, scale, sBubblePTank);
+#endif
 }
 
 S32 zParPTankBubblesAvailable()
@@ -499,7 +501,9 @@ S32 zParPTankBubblesAvailable()
 
 void zParPTankSpawnMenuBubbles(xVec3* pos, xVec3* vel, U32 count)
 {
+#ifdef PC_TODO
     zParPTankSpawnBubbles(pos, vel, count, 1.0f, sMenuBubblePTank);
+#endif
 }
 
 // Equivalent: Scheduling
@@ -579,6 +583,7 @@ static void zParPTankSnowUpdate(zParPTank* zp, float dt)
 
 void zParPTankSpawnSnow(xVec3* pos, xVec3* vel, U32 count)
 {
+#ifdef PC_TODO
     if (zGameIsPaused())
     {
         return;
@@ -608,6 +613,7 @@ void zParPTankSpawnSnow(xVec3* pos, xVec3* vel, U32 count)
         pos++;
         vel++;
     }
+#endif
 }
 
 const RwV2d steam_size = { 0.4f, 0.4f };
@@ -716,6 +722,7 @@ zParPTank* zParPTankAdd()
 // Equivalent: Scheduling
 void zParPTankInit()
 {
+#ifdef PC_TODO
     sNumPTanks = 0;
     sSparklePTank = zParPTankAdd();
     zParPTankSparkleCreate(sSparklePTank, 0x80, zParPTankSparkleUpdate);
@@ -729,13 +736,16 @@ void zParPTankInit()
 
     sSteamPTank = zParPTankAdd();
     zParPTankSteamCreate(sSteamPTank, 0x80, zParPTankSteamUpdate);
+#endif
 }
 
 // Equivalent: Scheduling
 void zParPTankSceneEnter()
 {
+#ifdef PC_TODO
     sSnowPTank = zParPTankAdd();
     zParPTankSnowCreate(sSnowPTank, 0x400, zParPTankSnowUpdate);
+#endif
 }
 
 void zParPTankSceneExit()
@@ -745,6 +755,7 @@ void zParPTankSceneExit()
 //Equivalent: Scheduling
 void zParPTankExit()
 {
+#ifdef PC_TODO
     zParPTank* zp = sPTank;
     for (S32 i = 0; i < sNumPTanks; i++, zp++)
     {
@@ -770,10 +781,12 @@ void zParPTankExit()
         xMemPopTemp(sMenuBubbleData);
     }
     sMenuBubbleData = NULL;
+#endif
 }
 
 void zParPTankUpdate(float dt)
 {
+#ifdef PC_TODO
     S32 paused = zGameIsPaused();
 
     zParPTank* zp = sPTank;
@@ -784,10 +797,12 @@ void zParPTankUpdate(float dt)
             zp->update(zp, dt);
         }
     }
+#endif
 }
 
 void zParPTankRender()
 {
+#ifdef PC_TODO
     zParPTank* zp = sPTank;
     for (S32 i = 0; i < sNumPTanks; i++, zp++)
     {
@@ -805,6 +820,7 @@ void zParPTankRender()
             }
         }
     }
+#endif
 }
 
 S32 zParPTankConvertEmitRate(xParEmitter* pe, float dt)

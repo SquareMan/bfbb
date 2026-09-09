@@ -16,9 +16,8 @@
 #define NOVEMBER 11
 #define DECEMBER 12
 
-typedef S64 iTime;
-
-// FIXME: Make this use SDL_Time
+// Same type as SDL_Time, however, iTime is usually measured relative to how long the process has been running,
+// rather than since the epoch
 typedef S64 iTime;
 #define ITIME_FROM_SECS(s) ((s) * (1'000'000'000))
 
@@ -36,7 +35,5 @@ S32 iGetMinute();
 S32 iGetHour();
 S32 iGetDay();
 S32 iGetMonth();
-U32 iGetCurrFormattedDate(char* input);
-U32 iGetCurrFormattedTime(char* input);
 
 #endif

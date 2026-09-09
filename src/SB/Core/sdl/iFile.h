@@ -13,16 +13,12 @@ enum IFILE_READSECTOR_STATUS
     IFILE_RDSTAT_EXPIRED
 };
 
-struct FileInfo
-{
-    uintptr_t startAddr;
-};
-
+struct SDL_IOStream;
 struct tag_iFile
 {
-    FileInfo fileInfo;
+    SDL_IOStream* io;
+    U32 size;
     S32 asynckey;
-    S32 offset;
 };
 
 #define IFILE_OPEN_READ 0x1
@@ -38,6 +34,7 @@ struct tag_xFile;
 void iFileInit();
 void iFileExit();
 U32* iFileLoad(const char* name, U32* buffer, U32* size);
+// Returns 0 on success
 U32 iFileOpen(const char* name, S32 flags, tag_xFile* file);
 S32 iFileSeek(tag_xFile* file, S32 offset, S32 whence);
 U32 iFileRead(tag_xFile* file, void* buf, U32 size);

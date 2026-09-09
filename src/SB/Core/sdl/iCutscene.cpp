@@ -161,8 +161,7 @@ U32 iCSFileOpen(xCutscene* csn)
 
     if (iFileOpen(filename, 0x1, &csn->File) == 0)
     {
-        iFileSeek(&csn->File, headerskip + ((ainfo.sector - csn->File.ps.fileInfo.startAddr) << 5),
-                  IFILE_SEEK_SET);
+        iFileSeek(&csn->File, headerskip + ainfo.sector, IFILE_SEEK_SET);
 
         csn->File.ps.asynckey = -1;
     }

@@ -1,7 +1,6 @@
 #ifndef LIBRWC_RWBASE
 #define LIBRWC_RWBASE
 
-#include "rw.h"
 #include "rwplcore.h"
 
 typedef rw::Line RwLine;
@@ -227,6 +226,13 @@ constexpr RwInt32 rwCAMERACLEARZ = rw::Camera::CLEARZ;
 constexpr RwInt32 rwCAMERACLEARSTENCIL = rw::Camera::CLEARSTENCIL;
 inline RwCamera* RwCameraClear(RwCamera* camera, RwRGBA* colour, RwInt32 clearMode)
 {
+    //librw doesn't allow colour to be null for CLEARZ mode, that should probably be fixed upstream
+    if(colour == NULL && clearMode == rwCAMERACLEARZ)
+    {
+        static RwRGBA black = {0, 0, 0, 255};
+        colour = &black;
+    }
+
     camera->clear(colour, clearMode);
     return camera;
 }
@@ -258,7 +264,7 @@ inline RwFrame* RwCameraGetFrame(RwCamera* camera)
     return camera->getFrame();
 }
 
-typedef struct BfbbRpWorld RpWorld;
+typedef struct rw::World RpWorld;
 inline RpWorld* RwCameraGetWorld(const RwCamera* camera)
 {
     return reinterpret_cast<RpWorld*>(camera->world);
@@ -346,11 +352,11 @@ inline RwUInt8* RwImageGetPixels(const RwImage* image)
     return image->pixels;
 }
 
-inline RwImage* RwImageSetFromRaster(RwImage* image, RwRaster* raster)
+inline RwImage* RwImageSetFromRaster(RwImage*& image, RwRaster* raster)
 {
     // Not sure is this is going to work. Take over the user provided image and give them the librw created one
     image->destroy();
-    memcpy(image, raster->toImage(), sizeof(RwImage));
+    image = raster->toImage();
     return image;
 }
 
@@ -379,7 +385,26 @@ inline RwTexture* RwTexDictionaryRemoveTexture(RwTexture* texture)
 
 inline RwTexDictionary* RwTexDictionaryStreamRead(RwStream* stream)
 {
-    return rw::TexDictionary::streamRead(stream);
+    RwTexDictionary* dict = rw::TexDictionary::streamRead(stream);
+
+    // We need to convert the textures from XBOX format to native
+    FORLIST(lnk, dict->textures)
+    {
+        RwTexture* tex = rw::Texture::fromDict(lnk);
+        RwRaster* raster = tex->raster;
+
+        if(raster->format & rw::Raster::C888)
+        {
+            // This is mostly stolen from Treedome and I'm not familiar enough with RW asset types right now to
+            // know for sure if this is a good idea. I think librw needs to be fixed to handle this case
+            raster->format &= ~rw::Raster::C888;
+            raster->format |= rw::Raster::C8888;
+        }
+
+        tex->raster = raster->convertTexToCurrentPlatform(raster);
+    }
+
+    return dict;
 }
 
 typedef RwTexture* (*RwTextureCallBack)(RwTexture* texture, void* pData);

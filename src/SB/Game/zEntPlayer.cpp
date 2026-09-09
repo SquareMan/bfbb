@@ -7868,7 +7868,7 @@ void zEntPlayer_Update(xEnt* ent, xScene* sc, F32 dt)
 
         if (!(bbc.flags & 0x11))
         {
-            zEntEvent(ent, 0x11);
+            zEntEvent(ent, eEventOutOfBounds);
         }
     }
 

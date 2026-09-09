@@ -8,21 +8,14 @@
 typedef rw::Material RpMaterial;
 typedef rw::MaterialList RpMaterialList;
 typedef rw::Triangle RpTriangle;
-// typedef rw::BuildMeshTriangle RpBuildMeshTriangle;
-// typedef rw::BuildMesh RpBuildMesh;
 typedef rw::Mesh RpMesh;
 typedef rw::MeshHeader RpMeshHeader;
 typedef rw::MorphTarget RpMorphTarget;
 typedef rw::Geometry RpGeometry;
 typedef rw::Clump RpClump;
-// typedef rw::Interpolator RpInterpolator;
 typedef rw::Atomic RpAtomic;
 typedef rw::Atomic::RenderCB RpAtomicCallBackRender;
-// typedef rw::VertexNormal RpVertexNormal;
-// typedef rw::Polygon RpPolygon;
-// typedef rw::WorldSector RpWorldSector;
-// typedef rw::Sector RpSector;
-typedef struct BfbbRpWorld RpWorld;
+typedef rw::World RpWorld;
 typedef rw::Light RpLight;
 
 // TODO: these types are not in librw
@@ -56,38 +49,43 @@ struct RpWorldSector
     RwUInt16 pad;
 };
 
-struct RpSector
-{
-    RwInt32 type;
-};
+// ----------------- RpWorld --------------------------
 
-//TODO
-typedef void* RpWorldRenderOrder;
 
-typedef RpWorldSector* (*RpWorldSectorCallBack)(RpWorldSector* worldSector, void* data);
-typedef RpWorldSector* (*RpWorldSectorCallBackRender)(RpWorldSector* worldSector);
-struct BfbbRpWorldExt
+struct RpWorldExt
 {
-    RwUInt32 flags;
-    RpWorldRenderOrder renderOrder;
     RpMaterialList matList;
-    RpSector* rootSector;
-    RwInt32 numTexCoordSets;
-    RwInt32 numClumpsInWorld;
-    RwLLLink* currentClumpLink;
-    RwV3d worldOrigin;
     RwBBox boundingBox;
-    RpWorldSectorCallBackRender renderCallBack;
-    RxPipeline* pipeline;
 };
-struct BfbbRpWorld : rw::World, BfbbRpWorldExt
+
+inline RwInt32 rpWorldPluginOffset = 0;
+
+inline void RpWorldPluginAttach()
 {
-};
+    rpWorldPluginOffset = rw::World::registerPlugin(sizeof(RpWorldExt), rw::ID_WORLD, NULL, NULL, NULL);
+}
 
 inline RpWorld* RpWorldCreate(RwBBox* boundingBox)
 {
-    // Note: RpWorld is actually our BfbbRpWorld
-    return reinterpret_cast<RpWorld*>(rw::World::create(boundingBox));
+    RwInt32 offset = rw::World::getPluginOffset(rw::ID_WORLD);
+    if (offset != rpWorldPluginOffset)
+    {
+        assert(false && "this is not good");
+        return NULL;
+    }
+    RpWorld* world = rw::World::create(boundingBox);
+
+    assert(rpWorldPluginOffset != 0 && "RpWorldPluginAttach not called!");
+    RpWorldExt* ext = PLUGINOFFSET(RpWorldExt, world, rpWorldPluginOffset);
+    if(boundingBox != NULL)
+    {
+        ext->boundingBox = *boundingBox;
+    }
+    // FIXME:
+    // set this up???
+    ext->matList.init();
+
+    return world;
 }
 inline RwBool RpWorldDestroy(RpWorld* world)
 {
@@ -126,12 +124,12 @@ inline RpWorld* RpWorldRemoveLight(RpWorld* world, RpLight* light)
 
 inline RwInt32 RpWorldGetNumMaterials(RpWorld* world)
 {
-    return world->matList.numMaterials;
+    return PLUGINOFFSET(RpWorldExt, world, rpWorldPluginOffset)->matList.numMaterials;
 }
 
 inline RpMaterial* RpWorldGetMaterial(RpWorld* world, RwInt32 num)
 {
-    return world->matList.materials[num];
+    return PLUGINOFFSET(RpWorldExt, world, rpWorldPluginOffset)->matList.materials[num];
 }
 
 inline RpWorld* RpWorldStreamRead(RwStream* stream)
@@ -169,7 +167,7 @@ inline const RwRGBA* RpMaterialGetColor(const RpMaterial* material)
 inline RpGeometry* RpGeometryForAllMaterials(RpGeometry* geometry, RpMaterialCallBack fpCallBack,
                                              void* pData)
 {
-    for (int32_t i; i < geometry->matList.numMaterials; i++)
+    for (int32_t i = 0; i < geometry->matList.numMaterials; i++)
     {
         if (fpCallBack(geometry->matList.materials[i], pData) == NULL)
         {

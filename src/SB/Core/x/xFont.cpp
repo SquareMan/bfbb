@@ -474,7 +474,8 @@ namespace
         font_asset& a = *fd.asset;
         S32 height;
         U8 i;
-        char c;
+        // Must be unsigned or we will negative index fd.char_index and be very sad
+        U8 c;
         U32 tail_index;
 
         fd.texture = (RwTexture*)xSTFindAsset(a.tex_id, NULL);

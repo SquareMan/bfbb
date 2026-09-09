@@ -9,7 +9,6 @@ typedef union RpIntersectData RpIntersectData;
 typedef struct RpIntersection RpIntersection;
 typedef struct RpCollisionTriangle RpCollisionTriangle;
 
-/* RpCollisionTriangle is typedef'd above */
 union RpIntersectData
 {
     RwLine line;
@@ -45,6 +44,9 @@ struct RpCollisionTriangle
     RwV3d* vertices[3];
 };
 
+typedef RpWorldSector* (*RpWorldSectorCallBack)(RpWorldSector* worldSector, void* data);
+typedef RpWorldSector* (*RpWorldSectorCallBackRender)(RpWorldSector* worldSector);
+
 typedef RpCollisionTriangle* (*RpIntersectionCallBackGeometryTriangle)(
     RpIntersection* intersection, RpCollisionTriangle* collTriangle, RwReal distance, void* data);
 
@@ -63,7 +65,7 @@ inline RpAtomic* RpAtomicForAllIntersections(RpAtomic* atomic, RpIntersection* i
                                              RpIntersectionCallBackGeometryTriangle callBack,
                                              void* data)
 {
-    assert(false && "TODO");
+    // assert(false && "TODO");
     return NULL;
 }
 
@@ -71,14 +73,8 @@ inline RpWorld* RpCollisionWorldForAllIntersections(RpWorld* world, RpIntersecti
                                                     RpIntersectionCallBackWorldTriangle callBack,
                                                     void* data)
 {
-    assert(false && "TODO");
+    // assert(false && "TODO");
     return NULL;
-}
-
-inline RwBool RpCollisionPluginAttach(void)
-{
-    assert(false && "TODO");
-    return 0;
 }
 
 #endif

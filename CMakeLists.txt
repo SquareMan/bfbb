@@ -48,10 +48,15 @@ target_sources(librwc
 
 # ----------------- Main Game Executable ------------------
 add_executable(bfbb)
-target_link_libraries(bfbb PUBLIC librwc)
+target_link_libraries(bfbb PUBLIC librwc SDL3::SDL3)
 # FIXME: This should be removable after getting the build fully linking and removing the dependency on gc headers
 # silence warning from RenderWare macros doing cursed enum stuff
 target_compile_options(bfbb PRIVATE -Wno-deprecated-enum-enum-conversion)
+# This is a workaround for what appears to be a lld-link issue. Including <immintrin.h> in multiple TUs causes:
+#       lld-link: error: duplicate symbol: __Avx2WmemEnabledWeakValue
+# lld-link seems to not be treating this symbol as something to be deduplicated.
+# For now we'll force it to allow this, but this is pretty cringe
+target_link_options(bfbb PRIVATE -Wl,/force:multiple)
 target_compile_definitions(bfbb PRIVATE _CRT_SECURE_NO_WARNINGS _CRT_NONSTDC_NO_WARNINGS)
 target_compile_definitions(bfbb PRIVATE WITH_LIBRW)
 

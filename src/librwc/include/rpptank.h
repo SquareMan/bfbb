@@ -3,6 +3,7 @@
 
 #include "rpworld.h"
 
+#include "rw.h"
 #include <cassert>
 
 struct RpPTankLockStruct
@@ -183,43 +184,67 @@ enum RpPTankDataLockFlags
     RPPTANKLOCKFLAGSFORCEENUMSIZEINT = RWFORCEENUMSIZEINT
 };
 
-inline static RwInt32 _rpPTankAtomicDataOffset = 0;
+inline RwInt32 _rpPTankAtomicDataOffset = 0;
 #define RPATOMICPTANKPLUGINDATA(atomic)                                                            \
     (*PLUGINOFFSET(RpPTankAtomicExtPrv*, (atomic), _rpPTankAtomicDataOffset))
 
-inline static RwInt32 _rpPTankGlobalsOffset = 0;
-#define GLOBALPTANKPLUGINDATA() (*PLUGINOFFSET(void*, rw::engine, _rpPTankGlobalsOffset))
+// inline RwInt32 _rpPTankGlobalsOffset = 0;
+// #define GLOBALPTANKPLUGINDATA() (*PLUGINOFFSET(void*, rw::engine, _rpPTankGlobalsOffset))
+
+inline void* RpPTankAtomicCtor(void* object, RwInt32 offset, RwInt32 size)
+{
+    *PLUGINOFFSET(RpPTankAtomicExtPrv*, object, offset) = NULL;
+    return object;
+}
+inline void* RpPTankAtomicDtor(void* object, RwInt32 offset, RwInt32 size)
+{
+    RpPTankAtomicExtPrv* ext = *PLUGINOFFSET(RpPTankAtomicExtPrv*, object, offset);
+    if (ext != NULL)
+    {
+        RwFree(ext->rawdata);
+        RwFree(ext);
+        *PLUGINOFFSET(RpPTankAtomicExtPrv*, object, offset) = NULL;
+    }
+    return object;
+}
+inline void* RpPTankAtomicCopy(void* dstObject, void* srcObject, RwInt32 offset, RwInt32 size)
+{
+    RpPTankAtomicCtor(dstObject, offset, size);
+    return dstObject;
+}
+
+inline RwBool RpPTankPluginAttach()
+{
+    const rw::uint32 pluginID = MAKEPLUGINID(rw::VEND_CRITERIONTK, 0x36);
+    _rpPTankAtomicDataOffset = rw::Atomic::registerPlugin(sizeof(RpPTankAtomicExtPrv), pluginID, RpPTankAtomicCtor, RpPTankAtomicDtor, RpPTankAtomicCopy);
+    return _rpPTankAtomicDataOffset > 0;
+}
 
 typedef enum RpPTankLockFlags RpPTankLockFlags;
-inline RwBool RpPTankPluginAttach(void)
-{
-    assert(false && "TODO");
-    return 0;
-}
 inline RpAtomic* RpPTankAtomicCreate(RwInt32 maxParticleNum, RwUInt32 dataFlags, RwUInt32 platFlags)
 {
-    assert(false && "TODO");
+    // assert(false && "TODO");
     return 0;
 }
 inline RpAtomic* _rpPTankAtomicCreateCustom(RwInt32 maxParticleNum, RwUInt32 dataFlags, RwUInt32 platFlags,
                                      RpPTankCallBacks* callbacks)
 {
-    assert(false && "TODO");
+    // assert(false && "TODO");
     return 0;
 }
 inline void RpPTankAtomicDestroy(RpAtomic* ptank)
 {
-    assert(false && "TODO");
+    // assert(false && "TODO");
 }
 inline RwBool RpPTankAtomicLock(RpAtomic* atomic, RpPTankLockStruct* dst, RwUInt32 dataFlags,
                                 RpPTankLockFlags lockFlag)
 {
-    assert(false && "TODO");
+    // assert(false && "TODO");
     return 0;
 }
 inline RpAtomic* RpPTankAtomicUnlock(RpAtomic* atomic)
 {
-    assert(false && "TODO");
+    // assert(false && "TODO");
     return 0;
 }
 

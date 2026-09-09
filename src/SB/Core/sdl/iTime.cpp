@@ -4,12 +4,16 @@
 #include <cassert>
 #include <types.h>
 
-static iTime sStartupTime;
-static F32 sGameTime;
+#include <immintrin.h>
+#include <SDL3/SDL_time.h>
+#include <SDL3/SDL_timer.h>
+
+static iTime sStartupTime = 0;
+static F32 sGameTime = 0;
 
 void iTimeInit()
 {
-    assert(false && "TODO");
+    SDL_GetCurrentTime(&sStartupTime);
 }
 
 void iTimeExit()
@@ -18,14 +22,14 @@ void iTimeExit()
 
 iTime iTimeGet()
 {
-    assert(false && "TODO");
-    return 0;
+    SDL_Time time;
+    SDL_GetCurrentTime(&time);
+    return time - sStartupTime;
 }
 
 F32 iTimeDiffSec(iTime time)
 {
-    assert(false && "TODO");
-    return 0;
+    return F32(time) / SDL_NS_PER_SECOND;
 }
 
 F32 iTimeDiffSec(iTime t0, iTime t1)
@@ -57,25 +61,33 @@ void iFuncProfileParse(const char* elfPath, S32 profile)
 
 S32 iGetMinute()
 {
-    return 0;
+    SDL_Time timeSinceEpoch;
+    SDL_GetCurrentTime(&timeSinceEpoch);
+    SDL_DateTime date;
+    SDL_TimeToDateTime(timeSinceEpoch, &date, true);
+    return date.minute;
 }
 S32 iGetHour()
 {
-    return 0;
+    SDL_Time timeSinceEpoch;
+    SDL_GetCurrentTime(&timeSinceEpoch);
+    SDL_DateTime date;
+    SDL_TimeToDateTime(timeSinceEpoch, &date, true);
+    return date.hour;
 }
 S32 iGetDay()
 {
-    return 0;
+    SDL_Time timeSinceEpoch;
+    SDL_GetCurrentTime(&timeSinceEpoch);
+    SDL_DateTime date;
+    SDL_TimeToDateTime(timeSinceEpoch, &date, true);
+    return date.day;
 }
 S32 iGetMonth()
 {
-    return 0;
-}
-U32 iGetCurrFormattedDate(char* input)
-{
-    return 0;
-}
-U32 iGetCurrFormattedTime(char* input)
-{
-    return 0;
+    SDL_Time timeSinceEpoch;
+    SDL_GetCurrentTime(&timeSinceEpoch);
+    SDL_DateTime date;
+    SDL_TimeToDateTime(timeSinceEpoch, &date, true);
+    return date.month;
 }

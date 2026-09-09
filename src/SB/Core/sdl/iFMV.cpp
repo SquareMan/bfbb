@@ -34,7 +34,7 @@ U32 iFMVPlay(char* filename, U32 buttons, F32 time, bool skippable, bool lockCon
         return 1;
     }
 
-    frame_num = 0;
+    frame_num = -1;
     while (frame_num >= 0)
     {
         PlayFMV(filename, buttons, time);
