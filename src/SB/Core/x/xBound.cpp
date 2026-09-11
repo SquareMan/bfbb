@@ -99,9 +99,6 @@ F32 xsqrt(F32 x)
 
 #ifdef GAMECUBE
     F32 guess = __frsqrte(x);
-#else
-    F32 guess = sqrtf(x);
-#endif
     guess = half * guess * (three - guess * guess * x);
 
     if (guess > 0.0000099999997f)
@@ -110,6 +107,9 @@ F32 xsqrt(F32 x)
     }
 
     return 100000.0f;
+#else
+    return sqrtf(x);
+#endif
 }
 
 U32 xBoundSphereHitsOBB(const xSphere* s, const xBox* b, const xMat4x3* m, xCollis* coll)
