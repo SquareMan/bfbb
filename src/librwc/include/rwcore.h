@@ -51,7 +51,7 @@ inline RxRenderStateVector* RxRenderStateVectorLoadDriverState(RxRenderStateVect
     rsvp->DestBlend = (RwBlendFunction)rw::GetRenderState(rw::DESTBLEND);
     rsvp->ShadeMode = (RwShadeMode)rw::GetRenderState(rw::SHADEMODE);
     rsvp->Flags &= (rw::GetRenderState(rw::ZWRITEENABLE) >> 2);
-    rsvp->Flags &= (rw::GetRenderState(rw::VERTEXALPHAENABLE) >> 3);
+    rsvp->Flags &= (rw::GetRenderState(rw::VERTEXALPHA) >> 3);
     return rsvp;
 }
 
