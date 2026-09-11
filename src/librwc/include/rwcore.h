@@ -558,6 +558,7 @@ inline void RwIm2DVertexSetPos(RwIm2DVertex* vert, RwReal x, RwReal y, RwReal z)
     vert->setScreenX(x);
     vert->setScreenY(y);
     vert->setScreenZ(z);
+    vert->setCameraZ(1);
 }
 
 inline void RwIm2DVertexSetRGBA(RwIm2DVertex* vert, RwUInt8 r, RwUInt8 g, RwUInt8 b, RwUInt8 a)
@@ -587,6 +588,7 @@ inline void RwIm2DVertexSetScreenY(RwIm2DVertex* vert, RwReal y)
 inline void RwIm2DVertexSetScreenZ(RwIm2DVertex* vert, RwReal z)
 {
     vert->setScreenZ(z);
+    vert->setCameraZ(1);
 }
 inline void RwIm2DVertexSetU(RwIm2DVertex* vert, RwReal u, RwReal recipz)
 {
