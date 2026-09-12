@@ -87,7 +87,11 @@ struct xFXRibbon
     void clear();
 
     void init(const char*, const char*);
-    void init(S32, const char*);
+    void init(S32, const char* name)
+    {
+        init(name, NULL);
+    }
+
     void set_texture(const char* name);
     void set_texture(U32);
     void set_texture(RwTexture* texture);

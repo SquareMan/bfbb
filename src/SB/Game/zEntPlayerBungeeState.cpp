@@ -39,17 +39,6 @@
 #include <types.h>
 
 
-// The declaration now lives in xMath3.h; the body has to stay here. Moving the
-// inline into the header makes zDiscoFloor.cpp expand it, and that emits weak
-// __apl__5xVec3Ff / __ami__5xVec3Ff copies into zDiscoFloor.o that retail's
-// zDiscoFloor.o does not contain. Measured, not assumed.
-inline void xBoxFromSphere(xBox& box, const xSphere& o)
-{
-    box.upper = box.lower = o.center;
-    box.upper += o.r;
-    box.lower -= o.r;
-}
-
 // These structs were used in deadstripped functions.
 // This function is here to force the symbols to be linked.
 void __deadstripped_zEntPlayerBungeeState()

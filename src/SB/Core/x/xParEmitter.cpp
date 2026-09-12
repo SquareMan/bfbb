@@ -813,8 +813,3 @@ inline void xParInterp::order()
         this->val[0] = f1;
     }
 }
-
-inline xPar* xParEmitterEmit(xParEmitter* pe, F32 dt)
-{
-    return xParEmitterEmit(pe, dt, dt);
-}

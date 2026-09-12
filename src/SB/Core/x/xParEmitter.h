@@ -36,7 +36,12 @@ struct xParInterp
     F32 oofreq;
 
     void set(F32, F32, F32, U32);
-    void set(F32); // Used in zNPCDutchman
+    void set(F32 value)
+    {
+        val[0] = val[1] = value;
+        interp = 0;
+        freq = oofreq = 1.0f;
+    }
     void order();
 };
 
@@ -167,8 +172,11 @@ U32 xParEmitterCull(xParEmitter* t, xPar* p);
 F32 xParInterpCompute(S32 interp_mode, xParInterp* r, F32 time, S32 time_has_elapsed, F32 lastVal);
 xPar* xParEmitterEmitSetTexIdxs(xPar* p, const xParSys* ps);
 xPar* xParEmitterEmit(xParEmitter* pe, F32 emit_dt, F32 par_dt);
+inline xPar* xParEmitterEmit(xParEmitter* pe, F32 dt)
+{
+    return xParEmitterEmit(pe, dt, dt);
+}
 void xParEmitterUpdate(xBase* to, xScene*, F32 dt);
 void xParEmitterDestroy();
-xPar* xParEmitterEmit(xParEmitter* pe, F32 dt);
 
 #endif

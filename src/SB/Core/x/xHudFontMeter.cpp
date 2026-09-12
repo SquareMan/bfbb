@@ -150,12 +150,3 @@ void xhud::font_meter_widget::render()
     }
     return;
 }
-
-// NOTE: this belongs in xFont.h. It is inline, so the compiler emits a weak
-// out-of-line copy into every translation unit that calls it.
-inline void xfont::render(const char* text, F32 x, F32 y) const
-{
-    start_render();
-    irender(text, x, y);
-    stop_render();
-}

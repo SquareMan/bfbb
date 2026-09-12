@@ -40,7 +40,12 @@ struct xfont
     void stop_render() const;
     void irender(const char* text, F32 x, F32 y) const;
     void irender(const char* text, size_t text_size, F32 x, F32 y) const;
-    void render(const char* text, F32 x, F32 y) const;
+    void render(const char* text, F32 x, F32 y) const
+    {
+        start_render();
+        irender(text, x, y);
+        stop_render();
+    }
 
     xfont& operator=(const xfont& rhs)
     {
@@ -243,8 +248,17 @@ struct xtextbox
         render(temp_layout(cache), 0, -1);
     }
     void render(layout& l, S32 begin_jot, S32 end_jot) const;
-    F32 yextent(bool cache) const;
-    F32 yextent(const layout& l, S32 begin_jot, S32 end_jot) const;
+    F32 yextent(bool cache) const
+    {
+        return yextent(temp_layout(cache), 0, -1);
+    }
+
+    F32 yextent(const layout& l, S32 begin_jot, S32 end_jot) const
+    {
+        S32 size;
+
+        return yextent(1e38f, size, l, begin_jot, end_jot);
+    }
     F32 yextent(F32 max, S32& size, bool cache) const;
     F32 yextent(F32 max, S32& size, const layout& l, S32 begin_jot, S32 end_jot) const;
 };

@@ -423,11 +423,6 @@ void xPadAnalogIsDigital(S32 idx, S32 enable)
     }
 }
 
-inline F32 xVec2::length() const
-{
-    return xsqrt(length2());
-}
-
 inline F32 normalize_analog(S32 v, S32 v_min, S32 v_max, S32 dead_center, S32 dead_min,
                             S32 dead_max)
 {

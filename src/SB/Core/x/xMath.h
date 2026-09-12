@@ -70,6 +70,19 @@ void xsqrtfast(F32& dst, F32 num);
 
 F32 xrmod(F32 ang);
 
-template <class T> T range_limit(T v, T minv, T maxv);
+template <class T> T range_limit(T v, T minv, T maxv)
+{
+    if (v <= minv)
+    {
+        return minv;
+    }
+
+    if (v >= maxv)
+    {
+        return maxv;
+    }
+
+    return v;
+}
 
 #endif

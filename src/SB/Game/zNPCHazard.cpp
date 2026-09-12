@@ -104,21 +104,6 @@ static zParEmitter* g_pemit_zapwarn;
 static zParEmitter* g_pemit_zapwave;
 static zParEmitter* g_pemit_zaprain;
 
-// These two are `inline` here rather than in a header: the target emits them
-// as weak per-TU copies (scope:weak in this object only), which is what an
-// out-of-line copy of an inline function looks like.
-inline xVec3* LERP(F32 t, xVec3* dst, const xVec3* a, const xVec3* b)
-{
-    dst->x = LERP(t, a->x, b->x);
-    dst->y = LERP(t, a->y, b->y);
-    dst->z = LERP(t, a->z, b->z);
-    return dst;
-}
-
-inline xVec3* SMOOTH(F32 t, xVec3* dst, const xVec3* a, const xVec3* b)
-{
-    return LERP(EASE(t), dst, a, b);
-}
 
 void zNPCHazard_Startup()
 {

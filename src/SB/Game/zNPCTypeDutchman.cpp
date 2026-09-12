@@ -5,6 +5,7 @@
 #include "xSnd.h"
 #include "zGlobals.h"
 #include "zNPCTypeDutchman.h"
+#include "xParEmitter.h"
 
 #include <types.h>
 
@@ -56,23 +57,6 @@ namespace auto_tweak
 // Defined here, not in a header: the retail object carries it as a common
 // symbol in this translation unit, and zEntPlayer.cpp declares it extern.
 xVec3 dutchman_reticle_center;
-
-// These two belong in xParEmitter.h and xFX.h respectively -- both are weak
-// (inline) in the retail object and this is the only translation unit that
-// uses either, so they are defined here until those shared headers can carry
-// them. Bodies recovered byte-exact from the target.
-inline void xParInterp::set(F32 value)
-{
-    val[0] = val[1] = value;
-    interp = 0;
-    freq = oofreq = 1.0f;
-}
-
-inline void xFXRibbon::init(S32, const char* name)
-{
-    init(name, NULL);
-}
-
 
 // xCollide.h declares neither of these; retail's header carried the xSphere overload inline.
 bool xSphereHitsCapsule(const xVec3& center, F32 radius, const xVec3& v1, const xVec3& v2,

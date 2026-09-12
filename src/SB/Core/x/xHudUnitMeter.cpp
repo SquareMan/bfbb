@@ -8,11 +8,6 @@
 #include <types.h>
 
 
-inline F32 xfmod(F32 a, F32 b)
-{
-    return std::fmodf(a, b);
-}
-
 namespace xhud
 {
     namespace {

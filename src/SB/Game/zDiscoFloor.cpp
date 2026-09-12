@@ -20,36 +20,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-// SLOP: put in header
-template <> size_t range_limit(size_t v, size_t minv, size_t maxv)
-{
-    if (v <= minv)
-    {
-        return minv;
-    }
-
-    if (v >= maxv)
-    {
-        return maxv;
-    }
-
-    return v;
-}
-
-template <> S32 range_limit(S32 v, S32 minv, S32 maxv)
-{
-    if (v <= minv)
-    {
-        return minv;
-    }
-
-    if (v >= maxv)
-    {
-        return maxv;
-    }
-
-    return v;
-}
 namespace
 {
     struct

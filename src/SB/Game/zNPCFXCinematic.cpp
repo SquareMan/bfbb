@@ -48,9 +48,6 @@ void clamp_bone_index(NCINEntry* fxrec, RpAtomic* model);
 // belongs in xDebug.h next to the other xDebugAddTweak overloads
 void xDebugAddTweak(const char*, xVec3*, const tweak_callback*, void*, U32);
 
-xVec3* LERP(F32 t, xVec3* dst, const xVec3* a, const xVec3* b);
-xVec3* SMOOTH(F32 t, xVec3* dst, const xVec3* a, const xVec3* b);
-
 void EmitFreezeBreath(xVec3* pos, xVec3* vel, F32 dt, F32 elapsed, F32 total);
 void NPAR_EmitTubeSpiralCin(const xVec3* pos, const xVec3* vel, F32 dt);
 

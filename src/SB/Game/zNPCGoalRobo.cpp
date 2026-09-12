@@ -8730,18 +8730,6 @@ xVec3& xVec3::assign(float dt)
     return assign(dt, dt, dt);
 }
 
-// .text (18)
-
-inline void NPCHazard::SetNPCOwner(zNPCCommon* owner)
-{
-    this->npc_owner = owner;
-}
-
-inline void NPCHazard::NotifyCBSet(HAZNotify* noter)
-{
-    this->cb_notify = noter;
-}
-
 inline S32 HAZNotify::Notify(en_haznote note, NPCHazard* haz)
 {
     return 0;
