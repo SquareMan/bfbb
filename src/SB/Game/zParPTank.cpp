@@ -498,7 +498,11 @@ void zParPTankSpawnBubbles(xVec3* pos, xVec3* vel, U32 count, float scale)
 
 S32 zParPTankBubblesAvailable()
 {
+#ifdef PC_TODO
     return sBubblePTank->max_particles - sBubblePTank->num_particles;
+#else
+    return 0;
+#endif
 }
 
 void zParPTankSpawnMenuBubbles(xVec3* pos, xVec3* vel, U32 count)
