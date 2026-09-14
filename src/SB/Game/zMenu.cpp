@@ -158,6 +158,7 @@ U32 zMenuLoop()
             }
         }
 
+        iSystemPaceFrame();
         time_current = 1.0f / float(ITIME_FROM_SECS(1)) * iTimeGet();
 
         F32 current = time_current;

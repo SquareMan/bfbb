@@ -415,6 +415,7 @@ void zGameLoop()
     {
         gGameWhereAmI = eGameWhere_LoopCalcTime;
 
+        iSystemPaceFrame();
         sTimeCurrent = iTimeGet();
         sTimeElapsed = iTimeDiffSec(sTimeLast, sTimeCurrent);
 

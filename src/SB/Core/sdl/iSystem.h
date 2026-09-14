@@ -4,6 +4,8 @@
 #include "rwplcore.h"
 #include <types.h>
 
+#define iSystemPaceFrame() iVSync()
+
 struct RwMemoryFunctions* psGetMemoryFunctions();
 
 void iVSync();
