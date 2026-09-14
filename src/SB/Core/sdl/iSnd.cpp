@@ -505,6 +505,7 @@ void iSndStereo(U32 i)
 
 void iSndWaitForDeadSounds()
 {
+#ifdef PC_TODO
     fc = 0;
     for (int i = 0x8c; fc < i;)
     {
@@ -516,6 +517,7 @@ void iSndWaitForDeadSounds()
         i = 0x8c;
         iSndUpdate();
     }
+#endif
 }
 
 void iSndSuspendCD(U32)

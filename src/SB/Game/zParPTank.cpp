@@ -160,6 +160,7 @@ static void zParPTankSparkleUpdate(zParPTank* zp, float dt)
 // Equivalent: regswaps
 void zParPTankSpawnSparkles(xVec3* pos, U32 count)
 {
+#ifdef PC_TODO
     if (zGameIsPaused())
     {
         return;
@@ -221,6 +222,7 @@ void zParPTankSpawnSparkles(xVec3* pos, U32 count)
     RpPTankAtomicUnlock(zp->ptank);
     RPATOMICPTANKPLUGINDATA(zp->ptank)->instFlags |= rpPTANKIFLAGACTNUMCHG;
     RPATOMICPTANKPLUGINDATA(zp->ptank)->actPCount = zp->num_particles;
+#endif
 }
 
 const RwRGBA bubble_color = { 0x80, 0x80, 0x80, 0xFF };
