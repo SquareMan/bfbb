@@ -245,6 +245,12 @@ inline RwCamera* RwCameraBeginUpdate(RwCamera* camera)
 inline RwCamera* RwCameraEndUpdate(RwCamera* camera)
 {
     camera->endUpdate();
+
+    // librw does not unset these globals in endUpdate, leading to use-after-free issues
+    // when accessing RwCameraGetCurrentCamera 
+    rw::engine->currentCamera = NULL;
+    rw::engine->currentWorld = NULL;
+
     return camera;
 }
 

@@ -101,12 +101,22 @@ inline RpWorld* RpWorldRender(RpWorld* world)
 
 inline RpWorld* RpWorldAddCamera(RpWorld* world, RwCamera* camera)
 {
+    // seems like xShadow calls this with the same camera without ever removing it from the previous world
+    // Once again librw asserts that the provided camera is not already in a world
+    if(camera->world != NULL)
+    {
+        camera->world->removeCamera(camera);
+    }
+
     world->addCamera(camera);
     return world;
 }
 inline RpWorld* RpWorldRemoveCamera(RpWorld* world, RwCamera* camera)
 {
-    world->removeCamera(camera);
+    // Implement this one manually
+    // There are some places in the game that remove the camera from the world twice
+    // unfortunately librw actually asserts that the camera is in the world before removing it
+    camera->world = NULL;
     return world;
 }
 
