@@ -19,8 +19,25 @@
 #include <SDL3/SDL_filesystem.h>
 #include <SDL3/SDL_iostream.h>
 
+struct file_queue_entry
+{
+    tag_xFile* file;
+    U32 bytesRead;
+    IFILE_READSECTOR_STATUS stat;
+    void (*callback)(tag_xFile* file);
+    U32 asynckey;
+};
+
+file_queue_entry file_queue[4];
+
+
 void iFileInit()
 {
+    memset(file_queue, 0, sizeof(file_queue));
+    for (S32 i = 0; i < 4; i++)
+    {
+        file_queue[i].stat = IFILE_RDSTAT_NOOP;
+    }
 }
 
 void iFileExit()
@@ -123,16 +140,75 @@ U32 iFileRead(tag_xFile* file, void* buf, U32 size)
 S32 iFileReadAsync(tag_xFile* file, void* buf, U32 aSize, void (*callback)(tag_xFile*),
                    S32 priority)
 {
-    // assert(false && "TODO");
-    iFileRead(file, buf, aSize);
-    callback(file);
-    return 1;
+    static S32 fopcount = 1;
+    tag_iFile* ps = &file->ps;
+    S32 i;
+
+    for (i = 0; i < 4; i++)
+    {
+        if (file_queue[i].stat != IFILE_RDSTAT_QUEUED && file_queue[i].stat != IFILE_RDSTAT_INPROG)
+        {
+            S32 asynckey;
+            S32 id = fopcount++ << 2;
+
+            asynckey = id + i;
+
+            // This API is not supposed to move the file cursor
+            Sint64 cursor = SDL_TellIO(file->ps.io);
+            iFileRead(file, buf, aSize);
+            Sint64 bytesRead = SDL_TellIO(file->ps.io) - cursor;
+            SDL_SeekIO(file->ps.io, cursor, SDL_IO_SEEK_SET);
+
+            file_queue[i].file = file;
+            file_queue[i].bytesRead = bytesRead;
+            file_queue[i].stat = IFILE_RDSTAT_QUEUED;
+            file_queue[i].callback = callback;
+            file_queue[i].asynckey = asynckey;
+
+            ps->asynckey = asynckey;
+
+            return i + id;
+        }
+    }
+
+    return -1;
 }
 
 IFILE_READSECTOR_STATUS iFileReadAsyncStatus(S32 key, S32* amtToFar)
 {
-    // assert(false && "TODO");
-    return IFILE_RDSTAT_DONE;
+    if (key != file_queue[key & 0x3].asynckey)
+    {
+        return IFILE_RDSTAT_EXPIRED;
+    }
+
+    if (amtToFar)
+    {
+        *amtToFar = file_queue[key & 0x3].bytesRead;
+    }
+
+    return file_queue[key & 0x3].stat;
+}
+
+void iFileAsyncService()
+{
+    for(int i = 0; i < 4; i++)
+    {
+        file_queue_entry* entry = &file_queue[i];
+        if(entry->stat != IFILE_RDSTAT_QUEUED)
+        {
+            continue;
+        }
+        // We loaded everything in the intial call to iFileReadAsync
+        tag_xFile* file = entry->file;
+        entry->stat = IFILE_RDSTAT_DONE;
+
+        if(entry->callback)
+        {
+            entry->callback(file);
+        }
+
+        file->ps.asynckey = -1;
+    }
 }
 
 U32 iFileClose(tag_xFile* file)
@@ -152,7 +228,7 @@ U32 iFileGetSize(tag_xFile* file)
 
 void iFileReadStop()
 {
-    assert(false && "TODO");
+    // no-op unless we implement actual async io
 }
 
 void iFileFullPath(const char* relname, char* fullname)

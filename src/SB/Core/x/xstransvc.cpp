@@ -578,7 +578,3 @@ static st_STRAN_SCENE* XST_find_bySID(U32 sid, S32 findTheHOP)
     }
     return da_sdata;
 }
-
-WEAK void iFileAsyncService()
-{
-}

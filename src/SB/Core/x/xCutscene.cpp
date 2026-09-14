@@ -325,10 +325,12 @@ F32 xlog(F32 x)
 
 // A camera chunk's payload sits directly after its xCutsceneData header: the
 // number of fly keys, then the keys themselves.
+//
+// DST, length of Keys is determined by NumKeys
 struct xCutsceneCameraData
 {
     U32 NumKeys;
-    zFlyKey Keys[1];
+    zFlyKey Keys[];
 };
 
 void xCutscene_SetCamera(xCutscene* csn, xCamera* cam)
@@ -401,7 +403,7 @@ void xCutscene_SetCamera(xCutscene* csn, xCamera* cam)
             xCameraSetFOV(&xglobals->camera, camFOV);
         }
 
-        data = (xCutsceneData*)((U8*)data + 0x10 + ((data->ChunkSize + 0xf) & 0xfffffff0));
+        data = (xCutsceneData*)((U8*)data + sizeof(xCutsceneData) + ALIGN_NEXT(data->ChunkSize, 0x10));
     }
 }
 
@@ -487,6 +489,11 @@ static void xcsCalcAnimMatrices(RwMatrix* animMat, RpAtomic* model, xCutsceneAni
 
 static void JDeltaEval(RpAtomic* model, void* deltaModel, void* deltaAnim, F32 time)
 {
+#ifdef PC_TODO
+    // FIXME:
+    // This function is doing an oob write to model->geometry->morphTarget->verts
+    // Likely the root cause is something upstream with model loading
+
     F32 outweight[128];
     S32 i;
     S32 numFrames;
@@ -631,6 +638,7 @@ static void JDeltaEval(RpAtomic* model, void* deltaModel, void* deltaAnim, F32 t
     }
 
     RpGeometryUnlock(model->geometry);
+#endif
 }
 
 void xVec3Lerp(xVec3* out, const xVec3* a, const xVec3* b, float alpha)
@@ -952,8 +960,8 @@ void xCutscene_Render(xCutscene* csn, xEnt**, S32*, F32*)
                                 goto nextmodel;
                             }
 
-                            mphdata = (xCutsceneData*)((U8*)mphdata + 0x10 +
-                                                       ((mphdata->ChunkSize + 0xf) & 0xfffffff0));
+                            mphdata = (xCutsceneData*)((U8*)mphdata + sizeof(xCutsceneData) +
+                                                       ALIGN_NEXT(mphdata->ChunkSize, 0x10));
                         }
 
                         if (hasAlpha)
@@ -1015,7 +1023,7 @@ void xCutscene_Render(xCutscene* csn, xEnt**, S32*, F32*)
             animIndex++;
         }
 
-        data = (xCutsceneData*)((U8*)data + 0x10 + ((data->ChunkSize + 0xf) & 0xfffffff0));
+        data = (xCutsceneData*)((U8*)data + sizeof(xCutsceneData) + ALIGN_NEXT(data->ChunkSize, 0x10));
     }
 
     if (nosey != NULL && (nosey->flg_nosey & 1))

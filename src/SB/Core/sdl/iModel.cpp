@@ -140,7 +140,7 @@ static RpAtomic* iModelStreamRead(RwStream* stream)
         return NULL;
     }
 
-    if (RwStreamFindChunk(stream, 0x10, 0, 0) == 0)
+    if (RwStreamFindChunk(stream, rwID_CLUMP, 0, 0) == 0)
     {
         RwStreamClose(stream, 0);
         return NULL;
