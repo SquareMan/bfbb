@@ -24,6 +24,7 @@
 #include <synchapi.h>
 #define SDL_MAIN_HANDLED 1
 #include "SDL3/SDL_events.h"
+#include "SDL3/SDL_init.h"
 #include <SDL3/SDL_main.h>
 #include <SDL3/SDL_time.h>
 #include <SDL3/SDL_timer.h>
@@ -35,8 +36,9 @@ void iVSync()
 {
     // FIXME: Proper frame pacing. This function is only called in certain places though...
     SDL_Event event;
-    while(SDL_PollEvent(&event))
-    {}
+    while (SDL_PollEvent(&event))
+    {
+    }
     SDL_DelayNS(SDL_NS_PER_SECOND / 60);
 }
 
@@ -93,12 +95,15 @@ static void RenderWareExit()
     rw::Engine::close();
     rw::Engine::term();
 }
+
 void iSystemInit(U32 options)
 {
     //FIXME: This absolutely can NOT be hardcoded!!!!
     SetCurrentDirectory(
         R"(E:\Games\Xbox\Nickelodeon SpongeBob SquarePants - Battle for Bikini Bottom (USA).xiso\)");
 
+    SDL_SetAppMetadata("SpongeBob SquarePants: Battle for Bikini Bottom", "PC Port", "");
+    SDL_Init(SDL_INIT_GAMEPAD);
     // Note: SDL_RunApp seems to do some necessary setup on some platforms
     // It doesn't seem like win32 is one of those platforms, but not calling it here
     // might give us issues int the future.
@@ -132,6 +137,7 @@ void iSystemExit()
     iFileExit();
     iTimeExit();
     xMemExit();
+    SDL_Quit();
 }
 
 const char* months[] = {
