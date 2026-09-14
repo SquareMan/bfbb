@@ -38,6 +38,13 @@ void iVSync()
     SDL_Event event;
     while (SDL_PollEvent(&event))
     {
+        switch(event.type)
+        {
+        case SDL_EVENT_WINDOW_CLOSE_REQUESTED:
+            // TODO: Graceful shutdown
+            iSystemExit();
+            exit(0);
+        }
     }
     SDL_DelayNS(SDL_NS_PER_SECOND / 60);
 }
