@@ -143,19 +143,19 @@ S32 xPadUpdate(S32 idx, F32 time_passed)
             U32 fake_dpad = 0;
             if (p->analog1.x >= 50)
             {
-                fake_dpad |= 0x20;
+                fake_dpad |= XPAD_BUTTON_RIGHT;
             }
             else if (p->analog1.x <= -50)
             {
-                fake_dpad |= 0x80;
+                fake_dpad |= XPAD_BUTTON_LEFT;
             }
             if (p->analog1.y >= 50)
             {
-                fake_dpad |= 0x40;
+                fake_dpad |= XPAD_BUTTON_DOWN;
             }
             else if (p->analog1.y <= -50)
             {
-                fake_dpad |= 0x10;
+                fake_dpad |= XPAD_BUTTON_UP;
             }
             if (fake_dpad == 0)
             {
@@ -187,19 +187,19 @@ S32 xPadUpdate(S32 idx, F32 time_passed)
                     p->ar2d_timer = 0.35f;
                     if (p->analog2.x >= 50)
                     {
-                        new_on |= 0x20;
+                        new_on |= XPAD_BUTTON_RIGHT;
                     }
                     else if (p->analog2.x <= -50)
                     {
-                        new_on |= 0x80;
+                        new_on |= XPAD_BUTTON_LEFT;
                     }
                     if (p->analog2.y >= 50)
                     {
-                        new_on |= 0x40;
+                        new_on |= XPAD_BUTTON_DOWN;
                     }
                     else if (p->analog2.y <= -50)
                     {
-                        new_on |= 0x10;
+                        new_on |= XPAD_BUTTON_UP;
                     }
                 }
             }

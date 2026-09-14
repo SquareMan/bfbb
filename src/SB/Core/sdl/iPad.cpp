@@ -92,10 +92,10 @@ S32 iPadUpdate(_tagxPad* pad, U32* on)
     *on |= SDL_GetGamepadButton(sActivePad, SDL_GAMEPAD_BUTTON_DPAD_RIGHT) ? XPAD_BUTTON_RIGHT : 0;
     *on |= SDL_GetGamepadButton(sActivePad, SDL_GAMEPAD_BUTTON_DPAD_DOWN) ? XPAD_BUTTON_DOWN : 0;
     *on |= SDL_GetGamepadButton(sActivePad, SDL_GAMEPAD_BUTTON_DPAD_LEFT) ? XPAD_BUTTON_LEFT : 0;
-    *on |= SDL_GetGamepadButton(sActivePad, SDL_GAMEPAD_BUTTON_LEFT_SHOULDER) ? XPAD_BUTTON_L1 : 0;
-    *on |= SDL_GetGamepadAxis(sActivePad, SDL_GAMEPAD_AXIS_LEFT_TRIGGER) > 30000 ? XPAD_BUTTON_L2 : 0;
-    *on |= SDL_GetGamepadButton(sActivePad, SDL_GAMEPAD_BUTTON_RIGHT_SHOULDER) ? XPAD_BUTTON_R1 : 0;
-    *on |= SDL_GetGamepadAxis(sActivePad, SDL_GAMEPAD_AXIS_RIGHT_TRIGGER) > 30000 ? XPAD_BUTTON_R2 : 0;
+    // *on |= SDL_GetGamepadButton(sActivePad, SDL_GAMEPAD_BUTTON_LEFT_SHOULDER) ? XPAD_BUTTON_L1 : 0;
+    *on |= SDL_GetGamepadAxis(sActivePad, SDL_GAMEPAD_AXIS_LEFT_TRIGGER) > 30000 ? XPAD_BUTTON_L1 : 0;
+    *on |= SDL_GetGamepadButton(sActivePad, SDL_GAMEPAD_BUTTON_RIGHT_SHOULDER) ? XPAD_BUTTON_Z : 0;
+    *on |= SDL_GetGamepadAxis(sActivePad, SDL_GAMEPAD_AXIS_RIGHT_TRIGGER) > 30000 ? XPAD_BUTTON_R1 : 0;
     *on |= SDL_GetGamepadButton(sActivePad, SDL_GAMEPAD_BUTTON_SOUTH) ? XPAD_BUTTON_X: 0;
     *on |= SDL_GetGamepadButton(sActivePad, SDL_GAMEPAD_BUTTON_EAST) ? XPAD_BUTTON_O: 0;
     *on |= SDL_GetGamepadButton(sActivePad, SDL_GAMEPAD_BUTTON_WEST) ? XPAD_BUTTON_TRIANGLE: 0;
