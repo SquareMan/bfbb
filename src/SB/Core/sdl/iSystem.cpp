@@ -44,6 +44,10 @@ void iVSync()
             // TODO: Graceful shutdown
             iSystemExit();
             exit(0);
+        case SDL_EVENT_GAMEPAD_ADDED:
+        case SDL_EVENT_GAMEPAD_REMOVED:
+            // TODO: Respond to inputs from inactive gamepads and switching the active gamepad to that one.
+            iPadInit();
         }
     }
     SDL_DelayNS(SDL_NS_PER_SECOND / 60);

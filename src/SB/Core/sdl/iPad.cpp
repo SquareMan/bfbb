@@ -14,6 +14,7 @@ static SDL_Gamepad* sActivePad = NULL;
 
 S32 iPadInit()
 {
+    sActivePad = NULL;
     int count;
     SDL_JoystickID* gamepads = SDL_GetGamepads(&count);
 
@@ -80,12 +81,14 @@ S32 iPadConvStick(F32 value)
 S32 iPadUpdate(_tagxPad* pad, U32* on)
 {
     SDL_UpdateGamepads();
+    *on = 0;
+    pad->analog1 = {0, 0};
+    pad->analog2 = {0, 0};
     if(sActivePad == NULL)
     {
         return 1;
     }
 
-    *on = 0;
     *on |= SDL_GetGamepadButton(sActivePad, SDL_GAMEPAD_BUTTON_START) ? XPAD_BUTTON_START : 0;
     *on |= SDL_GetGamepadButton(sActivePad, SDL_GAMEPAD_BUTTON_BACK) ? XPAD_BUTTON_SELECT : 0;
     *on |= SDL_GetGamepadButton(sActivePad, SDL_GAMEPAD_BUTTON_DPAD_UP) ? XPAD_BUTTON_UP : 0;
