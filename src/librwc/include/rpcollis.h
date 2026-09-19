@@ -2,7 +2,6 @@
 #define LIBRWC_RPCOLLIS
 
 #include "rpworld.h"
-
 #include <cassert>
 
 typedef union RpIntersectData RpIntersectData;
@@ -28,7 +27,6 @@ enum RpIntersectType
     rpINTERSECTATOMIC,
     rpINTERSECTTYPEFORCEENUMSIZEINT = 2147483647,
 };
-typedef enum RpIntersectType RpIntersectType;
 
 struct RpIntersection
 {
@@ -61,20 +59,12 @@ typedef RpAtomic* (*RpIntersectionCallBackAtomic)(RpIntersection* intersection,
 typedef RpWorldSector* (*RpIntersectionCallBackWorldSector)(RpIntersection* intersection,
                                                             RpWorldSector* worldSector, void* data);
 
-inline RpAtomic* RpAtomicForAllIntersections(RpAtomic* atomic, RpIntersection* intersection,
+RpAtomic* RpAtomicForAllIntersections(RpAtomic* atomic, RpIntersection* intersection,
                                              RpIntersectionCallBackGeometryTriangle callBack,
-                                             void* data)
-{
-    // assert(false && "TODO");
-    return NULL;
-}
+                                             void* data);
 
-inline RpWorld* RpCollisionWorldForAllIntersections(RpWorld* world, RpIntersection* intersection,
-                                                    RpIntersectionCallBackWorldTriangle callBack,
-                                                    void* data)
-{
-    // assert(false && "TODO");
-    return NULL;
-}
+RpWorld* RpCollisionWorldForAllIntersections(RpWorld* world, RpIntersection* intersection,
+                                             RpIntersectionCallBackWorldTriangle callBack,
+                                             void* data);
 
 #endif

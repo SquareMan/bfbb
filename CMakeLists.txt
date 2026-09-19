@@ -27,6 +27,7 @@ add_subdirectory(third_party/sdl)
 # ----------------- librw c-style wrapper ------------------
 add_library(librwc STATIC)
 target_link_libraries(librwc PUBLIC librw)
+target_include_directories(librwc PUBLIC include/)
 target_sources(librwc
     PUBLIC
     FILE_SET headers TYPE HEADERS
@@ -44,6 +45,10 @@ target_sources(librwc
     src/librwc/include/rpptank.h
     src/librwc/include/rtquat.h
     src/librwc/include/rtslerp.h
+
+    PRIVATE
+    src/librwc/src/rintsec.cpp
+    src/librwc/src/rpcollis.cpp
 )
 
 # ----------------- Main Game Executable ------------------
@@ -550,3 +555,14 @@ target_sources(bfbb
 
     ${PLATFORM_SOURCES}
 )
+
+# ------ collision test -------------------
+add_executable(test_collision)
+target_link_libraries(test_collision PRIVATE librwc)
+target_sources(test_collision
+    PRIVATE
+    src/librwc/test/collision.cpp
+)
+
+enable_testing()
+add_test(NAME test_collision COMMAND test_collision)
