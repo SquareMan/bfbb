@@ -489,11 +489,6 @@ static void xcsCalcAnimMatrices(RwMatrix* animMat, RpAtomic* model, xCutsceneAni
 
 static void JDeltaEval(RpAtomic* model, void* deltaModel, void* deltaAnim, F32 time)
 {
-#ifdef PC_TODO
-    // FIXME:
-    // This function is doing an oob write to model->geometry->morphTarget->verts
-    // Likely the root cause is something upstream with model loading
-
     F32 outweight[128];
     S32 i;
     S32 numFrames;
@@ -638,7 +633,6 @@ static void JDeltaEval(RpAtomic* model, void* deltaModel, void* deltaAnim, F32 t
     }
 
     RpGeometryUnlock(model->geometry);
-#endif
 }
 
 void xVec3Lerp(xVec3* out, const xVec3* a, const xVec3* b, float alpha)
