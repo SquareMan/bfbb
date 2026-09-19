@@ -292,7 +292,7 @@ static S32 zCameraFlyUpdate(xCamera* cam, F32 dt)
     xQuat quats[2];
     xQuat qresult;
 
-    if ((globals.pad0->pressed & 0x50000) && zcam_flytime > gSkipTimeFlythrough)
+    if ((globals.pad0->pressed & (XPAD_BUTTON_X | XPAD_BUTTON_SQUARE)) && zcam_flytime > gSkipTimeFlythrough)
     {
         zcam_flytime = 0.033333335f * zcam_flysize;
     }
@@ -315,6 +315,7 @@ static S32 zCameraFlyUpdate(xCamera* cam, F32 dt)
     flyIdx = numKeys + 2 < flySize ? numKeys + 2 : numKeys + 1;
     keys[3] = *((zFlyKey*)zcam_flydata + flyIdx);
 
+#ifdef __ORDER_BIG_ENDIAN__
     // Reverses the byte order (endianness) of 64 4-byte blocks
     S8* framePtr = (S8*)&keys[0].frame;
     for (i = 64; i > 0; i--)
@@ -328,6 +329,7 @@ static S32 zCameraFlyUpdate(xCamera* cam, F32 dt)
 
         framePtr += 4;
     }
+#endif
 
     if (0 < numKeys)
     {

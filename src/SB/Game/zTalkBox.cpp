@@ -62,61 +62,61 @@ namespace
 
     void trigger_pads(U32 pressed)
     {
-        if ((pressed & 0x10) != 0)
+        if ((pressed & XPAD_BUTTON_UP) != 0)
         {
-            trigger(73);
+            trigger(eEventPadPressUp);
         }
-        if ((pressed & 0x40) != 0)
+        if ((pressed & XPAD_BUTTON_DOWN) != 0)
         {
-            trigger(74);
+            trigger(eEventPadPressDown);
         }
-        if ((pressed & 0x80) != 0)
+        if ((pressed & XPAD_BUTTON_LEFT) != 0)
         {
-            trigger(76);
+            trigger(eEventPadPressLeft);
         }
-        if ((pressed & 0x20) != 0)
+        if ((pressed & XPAD_BUTTON_RIGHT) != 0)
         {
-            trigger(75);
+            trigger(eEventPadPressRight);
         }
-        if ((pressed & 1) != 0)
+        if ((pressed & XPAD_BUTTON_START) != 0)
         {
-            trigger(71);
+            trigger(eEventPadPressStart);
         }
-        if ((pressed & 2) != 0)
+        if ((pressed & XPAD_BUTTON_SELECT) != 0)
         {
-            trigger(72);
+            trigger(eEventPadPressSelect);
         }
-        if ((pressed & 0x1000) != 0)
+        if ((pressed & XPAD_BUTTON_R1) != 0)
         {
-            trigger(69);
+            trigger(eEventPadPressR1);
         }
-        if ((pressed & 0x2000) != 0)
+        if ((pressed & XPAD_BUTTON_R2) != 0)
         {
-            trigger(70);
+            trigger(eEventPadPressR2);
         }
-        if ((pressed & 0x100) != 0)
+        if ((pressed & XPAD_BUTTON_L1) != 0)
         {
-            trigger(67);
+            trigger(eEventPadPressL1);
         }
-        if ((pressed & 0x200) != 0)
+        if ((pressed & XPAD_BUTTON_L2) != 0)
         {
-            trigger(68);
+            trigger(eEventPadPressL2);
         }
-        if ((pressed & 0x10000) != 0)
+        if ((pressed & XPAD_BUTTON_X) != 0)
         {
-            trigger(63);
+            trigger(eEventPadPressX);
         }
-        if ((pressed & 0x20000) != 0)
+        if ((pressed & XPAD_BUTTON_O) != 0)
         {
-            trigger(65);
+            trigger(eEventPadPressO);
         }
-        if ((pressed & 0x40000) != 0)
+        if ((pressed & XPAD_BUTTON_SQUARE) != 0)
         {
-            trigger(66);
+            trigger(eEventPadPressSquare);
         }
-        if ((pressed & 0x80000) != 0)
+        if ((pressed & XPAD_BUTTON_TRIANGLE) != 0)
         {
-            trigger(64);
+            trigger(eEventPadPressTriangle);
         }
     }
 
@@ -1849,33 +1849,33 @@ namespace
             switch (shared.wait.query)
             {
             case Q_YESNO:
-                if (*pressed & 0x10000)
+                if (*pressed & XPAD_BUTTON_X)
                 {
-                    *pressed &= ~0x10000;
+                    *pressed &= ~XPAD_BUTTON_X;
                     this->answer_yes = true;
                     return (state_enum)2;
                 }
-                if (*pressed & 0x40000)
+                if (*pressed & XPAD_BUTTON_SQUARE)
                 {
-                    *pressed &= ~0x40000;
+                    *pressed &= ~XPAD_BUTTON_SQUARE;
                     return (state_enum)2;
                 }
                 break;
             case Q_SKIP:
             default:
-                if (*pressed & 0x10000)
+                if (*pressed & XPAD_BUTTON_X)
                 {
-                    *pressed &= ~0x10000;
+                    *pressed &= ~XPAD_BUTTON_X;
                     return (state_enum)2;
                 }
                 break;
             }
         }
 
-        if (shared.allow_quit && (*pressed & 0x80000) && shared.quit_ready && (*pressed & 0x80000))
+        if (shared.allow_quit && (*pressed & XPAD_BUTTON_TRIANGLE) && shared.quit_ready && (*pressed & XPAD_BUTTON_TRIANGLE))
         {
             shared.quitting = true;
-            *pressed &= ~0x80000;
+            *pressed &= ~XPAD_BUTTON_TRIANGLE;
             return (state_enum)2;
         }
 

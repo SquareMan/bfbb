@@ -566,7 +566,7 @@ void zUI_PreUpdate(_zUI* ent, xScene*, F32)
             }
             else if (globals.firstStartPressed)
             {
-                if (pad->pressed & 0x1)
+                if (pad->pressed & XPAD_BUTTON_START)
                 {
                     pad->pressed &= ~XPAD_BUTTON_START;
                     gTrcPad[0].state = TRC_PadInserted;
@@ -574,7 +574,7 @@ void zUI_PreUpdate(_zUI* ent, xScene*, F32)
                     xTRCReset();
                 }
             }
-            else if (pad->pressed & 0x1 && (ui->asset->id == xStrHash("MNU3 PRESS START UIF") ||
+            else if (pad->pressed & XPAD_BUTTON_START && (ui->asset->id == xStrHash("MNU3 PRESS START UIF") ||
                                             ui->asset->id == xStrHash("MNU3 PRESS START 02 UIF")))
             {
                 globals.currentActivePad = i;

@@ -1343,7 +1343,7 @@ const char* xbtoa(U32 param)
 
 static void xEntMotionDebugIPad(xEntMotion* xem)
 {
-    if (gDebugPad->pressed & 0x20)
+    if (gDebugPad->pressed & XPAD_BUTTON_RIGHT)
     {
         *(volatile S16*)(&dbg_idx) = *(volatile S16*)(&dbg_idx) + 1;
         if (*(volatile S16*)(&dbg_idx) >= *(volatile U16*)(&dbg_num))
@@ -1351,7 +1351,7 @@ static void xEntMotionDebugIPad(xEntMotion* xem)
             *(volatile S16*)(&dbg_idx) = 0;
         }
     }
-    if (gDebugPad->pressed & 0x80)
+    if (gDebugPad->pressed & XPAD_BUTTON_LEFT)
     {
         *(volatile S16*)(&dbg_idx) = *(volatile S16*)(&dbg_idx) - 1;
         if (*(volatile S16*)(&dbg_idx) < 0)
@@ -1359,7 +1359,7 @@ static void xEntMotionDebugIPad(xEntMotion* xem)
             *(volatile S16*)(&dbg_idx) = *(volatile U16*)(&dbg_num) - 1;
         }
     }
-    if (gDebugPad->pressed & 0x10000)
+    if (gDebugPad->pressed & XPAD_BUTTON_X)
     {
         if (xem->owner != NULL)
         {
@@ -1367,7 +1367,7 @@ static void xEntMotionDebugIPad(xEntMotion* xem)
         }
         xEntMotionReset(xem, g_xSceneCur);
     }
-    if (gDebugPad->pressed & 0x20000)
+    if (gDebugPad->pressed & XPAD_BUTTON_SQUARE)
     {
         if (xEntMotionIsStopped(xem))
         {

@@ -239,7 +239,7 @@ S32 xPadUpdate(S32 idx, F32 time_passed)
 
     if (p->flags & 0x10)
     {
-        if (!(p->on & 0x10) && !(p->on & 0x40) && !(p->on & 0x80) && !(p->on & 0x20))
+        if (!(p->on & XPAD_BUTTON_UP) && !(p->on & XPAD_BUTTON_DOWN) && !(p->on & XPAD_BUTTON_LEFT) && !(p->on & XPAD_BUTTON_RIGHT))
         {
             p->d_timer = 0.0f;
         }
@@ -249,21 +249,21 @@ S32 xPadUpdate(S32 idx, F32 time_passed)
             if (p->d_timer <= 0.0f)
             {
                 p->d_timer = 0.35f;
-                if (p->on & 0x10)
+                if (p->on & XPAD_BUTTON_UP)
                 {
-                    p->pressed |= 0x10;
+                    p->pressed |= XPAD_BUTTON_UP;
                 }
-                else if (p->on & 0x40)
+                else if (p->on & XPAD_BUTTON_DOWN)
                 {
-                    p->pressed |= 0x40;
+                    p->pressed |= XPAD_BUTTON_DOWN;
                 }
-                if (p->on & 0x80)
+                if (p->on & XPAD_BUTTON_LEFT)
                 {
-                    p->pressed |= 0x80;
+                    p->pressed |= XPAD_BUTTON_LEFT;
                 }
-                else if (p->on & 0x20)
+                else if (p->on & XPAD_BUTTON_RIGHT)
                 {
-                    p->pressed |= 0x20;
+                    p->pressed |= XPAD_BUTTON_RIGHT;
                 }
             }
         }

@@ -900,7 +900,7 @@ static void zGameUpdateMode()
     if (gGameState == eGameState_Play)
     {
         iTimeGameAdvance(sTimeElapsed);
-        if (globals.pad0->pressed & 1)
+        if (globals.pad0->pressed & XPAD_BUTTON_START)
         {
             switch (zGameOkToPause())
             {

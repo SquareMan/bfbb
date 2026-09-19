@@ -408,7 +408,7 @@ void zGameCheats(float dt)
         return;
     }
 
-    AddToCheatPressed(globals.pad0->pressed & 0x60000);
+    AddToCheatPressed(globals.pad0->pressed & (XPAD_BUTTON_SQUARE | XPAD_BUTTON_O));
 
     S32 match = 0;
     sCheatTimer = 0.3f;

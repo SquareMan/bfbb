@@ -6386,22 +6386,22 @@ static void zEntPlayer_BoulderVehicleUpdate(xEnt* ent, xScene* sc, F32 dt)
 
         getPadDefl(&globals.pad0->analog1, &inputDefl);
 
-        if (globals.pad0->on & 0x20)
+        if (globals.pad0->on & XPAD_BUTTON_RIGHT)
         {
             inputDefl.x = 1.0f;
         }
 
-        if (globals.pad0->on & 0x80)
+        if (globals.pad0->on & XPAD_BUTTON_LEFT)
         {
             inputDefl.x = -1.0f;
         }
 
-        if (globals.pad0->on & 0x40)
+        if (globals.pad0->on & XPAD_BUTTON_DOWN)
         {
             inputDefl.y = 1.0f;
         }
 
-        if (globals.pad0->on & 0x10)
+        if (globals.pad0->on & XPAD_BUTTON_UP)
         {
             inputDefl.y = -1.0f;
         }

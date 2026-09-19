@@ -468,7 +468,7 @@ void zCutsceneMgrUpdate(xBase* to, xScene* sc, F32 dt)
             else
             {
                 if (gCutsceneSkipOK && t->csn->Time > gSkipTimeCutscene &&
-                    globals.pad0->pressed & 0x50000)
+                    globals.pad0->pressed & (XPAD_BUTTON_X | XPAD_BUTTON_SQUARE))
                 {
                     zEntEvent(to, to, 0x13);
                 }

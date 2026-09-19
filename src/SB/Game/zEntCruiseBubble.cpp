@@ -706,7 +706,7 @@ namespace cruise_bubble
             bool can_cruise_bubble =
                 (!(globals.player.ControlOff || globals.player.cheat_mode) &&
                  globals.player.g.PowerUp[1] && (globals.player.s->pcType == ePlayer_SB) &&
-                 (globals.pad0->pressed & 0x100));
+                 (globals.pad0->pressed & XPAD_BUTTON_L1));
 
             if (!can_cruise_bubble)
             {
@@ -2923,7 +2923,7 @@ namespace cruise_bubble
             this->apply_yaw();
             this->update_animation(dt);
 
-            if (!(globals.pad0->on & 0x100))
+            if (!(globals.pad0->on & XPAD_BUTTON_L1))
             {
                 return STATE_PLAYER_FIRE;
             }
@@ -3165,7 +3165,7 @@ namespace cruise_bubble
         cruise_bubble::state_enum cruise_bubble::state_missle_fly::update(F32 dt)
         {
             this->life -= dt;
-            if (this->life <= 0.0f || (globals.pad0->pressed & 0x100))
+            if (this->life <= 0.0f || (globals.pad0->pressed & XPAD_BUTTON_L1))
             {
                 shared.hit_loc = get_missle_mat()->pos;
                 shared.hit_norm = get_missle_mat()->at;
@@ -4161,7 +4161,7 @@ namespace cruise_bubble
             }
 
             if (this->time >= current_tweak->camera.survey.min_duration &&
-                ((globals.pad0->pressed & 0x100) || this->control_jerked()))
+                ((globals.pad0->pressed & XPAD_BUTTON_L1) || this->control_jerked()))
             {
                 return STATE_CAMERA_RESTORE;
             }
