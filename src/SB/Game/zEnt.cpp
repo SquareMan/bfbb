@@ -411,8 +411,8 @@ void zEntAnimEvent(zEnt* ent, U32 animEvent, const F32* animParam)
     {
         switch (animEvent)
         {
-        case 0xc3:
-        case 0xc4:
+        case eEventAnimPlay:
+        case eEventAnimPlayLoop:
         {
             if (animParam == NULL)
             {
@@ -426,7 +426,7 @@ void zEntAnimEvent(zEnt* ent, U32 animEvent, const F32* animParam)
             }
 
             char name[12];
-            if (animEvent == 0xc4)
+            if (animEvent == eEventAnimPlayLoop)
             {
                 sprintf(name, "loop%d", anum);
             }
@@ -457,7 +457,7 @@ void zEntAnimEvent(zEnt* ent, U32 animEvent, const F32* animParam)
 
             break;
         }
-        case 0xc5:
+        case eEventAnimStop:
             if (strcmp(single->State->Name, "idle") == 0)
             {
                 break;
@@ -469,13 +469,13 @@ void zEntAnimEvent(zEnt* ent, U32 animEvent, const F32* animParam)
 
             single->State = xAnimTableGetState(ent->atbl, name2);
             break;
-        case 0xc6:
+        case eEventAnimPause:
             single->CurrentSpeed = 0.0f;
             break;
-        case 199:
+        case eEventAnimResume:
             single->CurrentSpeed = 1.0f;
             break;
-        case 200:
+        case eEventAnimTogglePause:
             if (single->CurrentSpeed)
             {
                 single->CurrentSpeed = 0.0f;
@@ -485,7 +485,7 @@ void zEntAnimEvent(zEnt* ent, U32 animEvent, const F32* animParam)
                 single->CurrentSpeed = 1.0f;
             }
             break;
-        case 0xc9:
+        case eEventAnimPlayRandom:
         {
             if (animParam == NULL)
             {
@@ -518,7 +518,7 @@ void zEntAnimEvent(zEnt* ent, U32 animEvent, const F32* animParam)
             xAnimPlayEval(play);
             break;
         }
-        case 0xca:
+        case eEventAnimPlayMaybe:
         {
             if (animParam == NULL)
             {
