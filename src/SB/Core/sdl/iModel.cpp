@@ -391,12 +391,12 @@ void iModelRender(RpAtomic* model, RwMatrix* mat)
     RwMatrixUpdate(&frame->ltm);
     if (iModelHack_DisablePrelight != 0)
     {
-        model->geometry->flags &= 0xfffffff7;
+        model->geometry->flags &= ~rpGEOMETRYPRELIT;
     }
     iModelCacheAtomic(model)->renderCallBack(iModelCacheAtomic(model));
     if ((iModelHack_DisablePrelight != 0) && (model->geometry->preLitLum != NULL))
     {
-        model->geometry->flags |= 8;
+        model->geometry->flags |= rpGEOMETRYPRELIT;
     }
     if (hierarchy != NULL)
     {
