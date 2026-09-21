@@ -76,7 +76,6 @@ static void RenderWareInit()
     rw::registerMeshPlugin();
     RpCollisionPluginAttach();
     RpWorldPluginAttach();
-    RpCollisionPluginAttach();
     rw::registerSkinPlugin();
     rw::registerHAnimPlugin();
     rw::registerMatFXPlugin();
