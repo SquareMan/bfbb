@@ -1,27 +1,9 @@
 #include "rtintsec.h"
 
+#include "collision_support.h"
 #include "macros.h"
 #include "rw.h"
 
-static bool PointInTriangle(RwV3d& test, RwV3d& a, RwV3d& b, RwV3d& c)
-{
-    RwV3d ab = rw::normalize(rw::sub(b, a));
-    RwV3d ac = rw::normalize(rw::sub(c, a));
-
-    RwV3d ba = rw::neg(ab);
-    RwV3d bc = rw::normalize(rw::sub(c, b));
-
-    RwV3d ca = rw::neg(ac);
-    RwV3d cb = rw::neg(bc);
-
-    if (rw::dot(ab, ac) > rw::dot(ab, rw::normalize(rw::sub(test, a))))
-        return false;
-    if (rw::dot(ba, bc) > rw::dot(ba, rw::normalize(rw::sub(test, b))))
-        return false;
-    if (rw::dot(ca, cb) > rw::dot(ca, rw::normalize(rw::sub(test, c))))
-        return false;
-    return true;
-}
 
 static RwV3d ClosestPointOnLine(RwV3d& test, RwV3d& a, RwV3d& b)
 {

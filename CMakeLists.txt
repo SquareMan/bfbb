@@ -47,6 +47,14 @@ target_sources(librwc
     src/librwc/include/rtslerp.h
 
     PRIVATE
+    FILE_SET private_headers TYPE HEADERS
+    BASE_DIRS src/librwc/src/
+    FILES
+    src/librwc/src/collision_support.h
+
+    FILES
+    PRIVATE
+    src/librwc/src/collision_support.cpp
     src/librwc/src/rintsec.cpp
     src/librwc/src/rpcollis.cpp
 )

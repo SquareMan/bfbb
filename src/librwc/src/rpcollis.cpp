@@ -1,9 +1,13 @@
 #include "rpcollis.h"
 
+#include "collision_support.h"
 #include "rtintsec.h"
 #include "rw.h"
 #include "rwcore.h"
 #include "rwplcore.h"
+
+#include <cassert>
+
 
 RpAtomic* RpAtomicForAllIntersections(RpAtomic* atomic, RpIntersection* intersection,
                                       RpIntersectionCallBackGeometryTriangle callBack, void* data)
@@ -11,37 +15,49 @@ RpAtomic* RpAtomicForAllIntersections(RpAtomic* atomic, RpIntersection* intersec
     RpGeometry* geo = atomic->geometry;
     RpMorphTarget* morph = atomic->geometry->morphTarget;
 
-    RwMatrix inverse;
-    RwMatrixInvert(&inverse, &atomic->getFrame()->modelling);
+    RwMatrix worldToFrame;
+    RwMatrixInvert(&worldToFrame, &atomic->getFrame()->modelling);
 
     switch (intersection->type)
     {
-    case rpINTERSECTPOINT: {
-        RwV3d modelSpacePoint = intersection->t.point;
-        RwV3dTransformPoints(&modelSpacePoint, &modelSpacePoint, 2, &inverse);
-
-        for (int i = 0; i < geo->numTriangles; i++)
-        {
-            RpTriangle* tri = &geo->triangles[i];
-        }
-        // TODO:
-        break;        
-    }
-    case rpINTERSECTLINE: {
+    case rpINTERSECTPOINT:
+    case rpINTERSECTATOMIC:
+        assert(false && "unsupported");
+        return atomic;
+    case rpINTERSECTLINE:
+    {
         RwLine modelSpaceLine = intersection->t.line;
-        RwV3dTransformPoints(&modelSpaceLine.start, &modelSpaceLine.end, 2, &inverse);
+        RwV3dTransformPoints(&modelSpaceLine.start, &modelSpaceLine.start, 2, &worldToFrame);
 
         for (int i = 0; i < geo->numTriangles; i++)
         {
             RpTriangle* tri = &geo->triangles[i];
+            RwReal t = 0;
+            if (IntersectionLineTriangle(modelSpaceLine, morph->verts[tri->vertIndex[0]],
+                                         morph->verts[tri->vertIndex[1]],
+                                         morph->verts[tri->vertIndex[2]], t))
+            {
+                RpCollisionTriangle coll;
+                coll.index = i;
+                coll.point = morph->verts[tri->vertIndex[0]];
+                coll.vertices[0] = &morph->verts[tri->vertIndex[0]];
+                coll.vertices[1] = &morph->verts[tri->vertIndex[1]];
+                coll.vertices[2] = &morph->verts[tri->vertIndex[2]];
+                coll.normal =
+                    rw::normalize(rw::cross(rw::sub(*coll.vertices[1], *coll.vertices[0]),
+                                            rw::sub(*coll.vertices[2], *coll.vertices[0])));
+                if (callBack(intersection, &coll, t, data) == NULL)
+                {
+                    return atomic;
+                }
+            }
         }
-        // TODO:
         break;
     }
     case rpINTERSECTBOX:
     {
         RwBBox modelSpaceBBox = intersection->t.box;
-        RwV3dTransformPoints(&modelSpaceBBox.sup, &modelSpaceBBox.sup, 2, &inverse);
+        RwV3dTransformPoints(&modelSpaceBBox.sup, &modelSpaceBBox.sup, 2, &worldToFrame);
 
         for (int i = 0; i < geo->numTriangles; i++)
         {
@@ -59,7 +75,7 @@ RpAtomic* RpAtomicForAllIntersections(RpAtomic* atomic, RpIntersection* intersec
                 coll.normal =
                     rw::normalize(rw::cross(rw::sub(*coll.vertices[1], *coll.vertices[0]),
                                             rw::sub(*coll.vertices[2], *coll.vertices[0])));
-                if (callBack(intersection, &coll, 0.0f, data) == NULL) 
+                if (callBack(intersection, &coll, 0.0f, data) == NULL)
                 {
                     return atomic;
                 }
@@ -71,7 +87,7 @@ RpAtomic* RpAtomicForAllIntersections(RpAtomic* atomic, RpIntersection* intersec
     case rpINTERSECTSPHERE:
     {
         RwSphere modelSpaceSphere = intersection->t.sphere;
-        RwV3dTransformPoints(&modelSpaceSphere.center, &modelSpaceSphere.center, 1, &inverse);
+        RwV3dTransformPoints(&modelSpaceSphere.center, &modelSpaceSphere.center, 1, &worldToFrame);
 
         for (int i = 0; i < geo->numTriangles; i++)
         {
@@ -98,6 +114,8 @@ RpAtomic* RpAtomicForAllIntersections(RpAtomic* atomic, RpIntersection* intersec
         }
         break;
     }
+    default:
+        return atomic;
     }
     return atomic;
 }
