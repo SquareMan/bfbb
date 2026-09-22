@@ -108,7 +108,7 @@ static bool SatTest(const RwV3d& halfBoxExtent, const RwV3d& axis, const RwV3d& 
 RwBool RtIntersectionBBoxTriangle(RwBBox* bbox, RwV3d* v0, RwV3d* v1, RwV3d* v2)
 {
     RwV3d center = rw::scale(rw::add(bbox->sup, bbox->inf), 0.5f);
-    RwV3d half = rw::sub(bbox->inf, center);
+    RwV3d half = rw::sub(bbox->sup, center);
 
     // put triangle in bbox-space
     RwV3d a = rw::sub(*v0, center);

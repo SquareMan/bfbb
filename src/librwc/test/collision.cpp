@@ -86,32 +86,32 @@ static void test_sphere_bbox()
     RwV3d c = { 0.0f, 1.0f, 0.0f };
     
     // box in front
-    RwBBox box1 = {{-0.5f, 0.0f, -1.0f}, {0.5f, 2.0f, -0.5f}};
+    RwBBox box1 = {{0.5f, 2.0f, -0.5f}, {-0.5f, 0.0f, -1.0f}};
     RwBool result = RtIntersectionBBoxTriangle(&box1, &a, &b, &c);
     EXPECT_FALSE(result, "No Collision expected");
 
     // box above
-    RwBBox box2 = {{-0.5f, 2.0f, -1.0f}, {0.5f, 4.0f, 1.0f}};
+    RwBBox box2 = {{0.5f, 4.0f, 1.0f}, {-0.5f, 2.0f, -1.0f}};
     result = RtIntersectionBBoxTriangle(&box2, &a, &b, &c);
     EXPECT_FALSE(result, "No Collision expected");
 
     // box beside
-    RwBBox box3 = {{1.5f, 0.0f, -1.0f}, {2.0f, 2.0f, 1.0f}};
+    RwBBox box3 = {{2.0f, 2.0f, 1.0f}, {1.5f, 0.0f, -1.0f}};
     result = RtIntersectionBBoxTriangle(&box3, &a, &b, &c);
     EXPECT_FALSE(result, "No Collision expected");
 
     // box clipping edge
-    RwBBox box4 = {{0.5f, 0.0f, -1.0f}, {2.0f, 2.0f, 1.0f}};
+    RwBBox box4 = {{2.0f, 2.0f, 1.0f}, {0.5f, 0.0f, -1.0f}};
     result = RtIntersectionBBoxTriangle(&box4, &a, &b, &c);
     EXPECT(result, "Collision expected");
     
     // box touching edge
-    RwBBox box5 = {{1.0f, 0.0f, -1.0f}, {2.0f, 2.0f, 1.0f}};
+    RwBBox box5 = {{2.0f, 2.0f, 1.0f}, {1.0f, 0.0f, -1.0f}};
     result = RtIntersectionBBoxTriangle(&box5, &a, &b, &c);
     EXPECT(result, "Collision expected");
 
     // box barely seperated
-    RwBBox box6 = {{1.01f, 0.0f, -1.0f}, {2.0f, 2.0f, 1.0f}};
+    RwBBox box6 = {{2.0f, 2.0f, 1.0f}, {1.01f, 0.0f, -1.0f}};
     result = RtIntersectionBBoxTriangle(&box6, &a, &b, &c);
     EXPECT_FALSE(result, "No collision expected");
 }
