@@ -365,11 +365,14 @@ inline RwV3d* RwV3dTransformPoints(RwV3d* pointsOut, const RwV3d* pointsIn, RwIn
 // -------------------- RwMatrix ------------------------
 
 typedef rw::Matrix::Type RwMatrixType;
+typedef rw::Matrix::Flags RwMatrixFlags;
 
 constexpr RwMatrixType rwMATRIXTYPENORMAL = rw::Matrix::TYPENORMAL;
 constexpr RwMatrixType rwMATRIXTYPEORTHOGONAL = rw::Matrix::TYPEORTHOGONAL;
 constexpr RwMatrixType rwMATRIXTYPEORTHONORMAL = rw::Matrix::TYPEORTHONORMAL;
 constexpr RwMatrixType rwMATRIXTYPEMASK = rw::Matrix::TYPEMASK;
+
+constexpr RwMatrixFlags rwMATRIXINTERNALINDENTITY = rw::Matrix::IDENTITY;
 
 inline void RwMatrixCopy(RwMatrix* dst, RwMatrix* src)
 {
