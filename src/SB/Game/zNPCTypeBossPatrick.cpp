@@ -1471,7 +1471,7 @@ void zNPCBPatrick::Process(xScene* xscn, F32 dt)
                     {
                         this->glob[0].flags |= 8;
                         xVec3Init(&this->glob[0].norm, 0.0f, 1.0f, 0.0f);
-                        this->glob[0].conv = (zPlatform*)colls.optr;
+                        this->glob[0].conv = XCOLLIDE_DOWNCAST_OPTR(zPlatform*, colls.optr);
                         xVec3SMul(&this->glob[0].convVel,
                                   &this->glob[0].conv->bound.mat->right,
                                   this->glob[0].conv->passet->cb.speed);
@@ -2994,7 +2994,7 @@ S32 zNPCGoalBossPatSpit::Process(en_trantype* trantype, F32 dt, void* updCtxt, x
             {
                 glob->flags |= 8;
                 xVec3Init(&glob->norm, 0.0f, 1.0f, 0.0f);
-                glob->conv = (zPlatform*)colls.optr;
+                glob->conv = XCOLLIDE_DOWNCAST_OPTR(zPlatform*, colls.optr);
                 xVec3SMul(&glob->convVel, &glob->conv->bound.mat->right,
                           glob->conv->passet->cb.speed);
             }
@@ -3143,7 +3143,7 @@ S32 zNPCGoalBossPatSmack::Process(en_trantype* trantype, F32 dt, void* updCtxt, 
                 {
                     glob->flags |= 8;
                     xVec3Init(&glob->norm, 0.0f, 1.0f, 0.0f);
-                    glob->conv = (zPlatform*)colls.optr;
+                    glob->conv = XCOLLIDE_DOWNCAST_OPTR(zPlatform*, colls.optr);
 
                     xVec3SMul(&glob->convVel, (xVec3*)&glob->conv->bound.mat->right,
                               glob->conv->passet->cb.speed);
@@ -3581,7 +3581,7 @@ S32 zNPCGoalBossPatSpin::Process(en_trantype* trantype, F32 dt, void* ctxt, xSce
                     {
                         glob->flags |= 8;
                         xVec3Init(&glob->norm, 0.0f, 1.0f, 0.0f);
-                        glob->conv = (zPlatform*)colls.optr;
+                        glob->conv = XCOLLIDE_DOWNCAST_OPTR(zPlatform*, colls.optr);
                         xVec3SMul(&glob->convVel, &glob->conv->bound.mat->right,
                                   glob->conv->passet->cb.speed);
                     }
@@ -4168,7 +4168,7 @@ S32 zNPCGoalBossPatFudge::Process(en_trantype* trantype, F32 dt, void* ctxt, xSc
                 {
                     glob->flags |= 8;
                     xVec3Init(&glob->norm, 0.0f, 1.0f, 0.0f);
-                    glob->conv = (zPlatform*)colls.optr;
+                    glob->conv = XCOLLIDE_DOWNCAST_OPTR(zPlatform*, colls.optr);
 
                     xVec3SMul(&glob->convVel, (xVec3*)&glob->conv->bound.mat->right,
                               glob->conv->passet->cb.speed);

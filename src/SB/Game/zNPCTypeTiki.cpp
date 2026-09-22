@@ -221,7 +221,7 @@ static void zNPCTiki_PickTikisToAnimate()
     {
         if ((coll->flags & 1) != 0 && coll->optr != NULL)
         {
-            npc = (xNPCBasic*)coll->optr;
+            npc = XCOLLIDE_DOWNCAST_OPTR(xNPCBasic*, coll->optr);
             if (npc->baseType == '+' && (npc->SelfType() & ~0xFF) == 'NTT\0')
             {
                 ((zNPCTiki*)npc)->tikiFlag &= ~0xC0;

@@ -2983,7 +2983,7 @@ static xEnt* GetPatrickTarget(xEnt* ent)
 {
     xEnt* result = NULL;
     zPlatform* plat =
-        ent->collis->colls[0].flags & 1 ? (zPlatform*)ent->collis->colls[0].optr : NULL;
+        ent->collis->colls[0].flags & 1 ? XCOLLIDE_DOWNCAST_OPTR(zPlatform*, ent->collis->colls[0].optr) : NULL;
 
     if (plat && plat->baseType == eBaseTypePlatform && plat->plat_flags & 2)
     {
@@ -6450,10 +6450,10 @@ static void zEntPlayer_BoulderVehicleUpdate(xEnt* ent, xScene* sc, F32 dt)
         for (i = collis.dyn_sidx; i < collis.dyn_eidx; i++)
         {
             if ((collis.colls[i].flags & 0x1) && collis.colls[i].optr &&
-                ((xEntBoulder*)collis.colls[i].optr)->baseType == eBaseTypeBoulder &&
-                (((xEntBoulder*)collis.colls[i].optr)->basset->flags & 0x2))
+                XCOLLIDE_DOWNCAST_OPTR(xEntBoulder*, collis.colls[i].optr)->baseType == eBaseTypeBoulder &&
+                (XCOLLIDE_DOWNCAST_OPTR(xEntBoulder*, collis.colls[i].optr)->basset->flags & 0x2))
             {
-                shouldDamagePlayer = (xEntBoulder*)collis.colls[i].optr;
+                shouldDamagePlayer = XCOLLIDE_DOWNCAST_OPTR(xEntBoulder*, collis.colls[i].optr);
             }
         }
 
@@ -9219,7 +9219,7 @@ void zEntPlayer_CheckCritterContact(xEnt* player, F32 dt)
             continue;
         }
 
-        zNPCCommon* npc = (zNPCCommon*)colrec->optr;
+        zNPCCommon* npc = XCOLLIDE_DOWNCAST_OPTR(zNPCCommon*, colrec->optr);
 
         if (npc->baseType != eBaseTypeNPC)
         {
@@ -12054,7 +12054,7 @@ static void zEntPlayerDriveUpdate(xEnt* ent, xScene* sc, F32 dt)
 
     if (coll->flags & 0x1)
     {
-        plat = (zPlatform*)coll->optr;
+        plat = XCOLLIDE_DOWNCAST_OPTR(zPlatform*, coll->optr);
     }
     else
     {

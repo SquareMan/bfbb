@@ -2808,7 +2808,7 @@ S32 zNPCGoalAlertGlove::CollReview(void*)
 
         xVec3AddTo(&vec_depen, &colrec->depen);
         hitstuff++;
-        zNPCCommon* tgt = (zNPCCommon*)colrec->optr;
+        zNPCCommon* tgt = XCOLLIDE_DOWNCAST_OPTR(zNPCCommon*, colrec->optr);
 
         xVec3Normalize(&pump, &colrec->tohit);
         xVec3SMulBy(&pump, spd);
@@ -6342,7 +6342,7 @@ S32 zNPCGoalLassoThrow::CollReview(void*)
         colrec = &npccol->colls[i];
 
         xVec3AddTo(&vec_depen, &colrec->depen);
-        zNPCCommon* tgt = (zNPCCommon*)colrec->optr;
+        zNPCCommon* tgt = XCOLLIDE_DOWNCAST_OPTR(zNPCCommon*, colrec->optr);
         hitstuff++;
 
         if (tgt != NULL)
@@ -6710,7 +6710,7 @@ S32 zNPCGoalWound::CollReview(void*)
 
         xVec3AddTo(&vec_depen, &colrec->depen);
         hitstuff++;
-        zNPCCommon* tgt = (zNPCCommon*)colrec->optr;
+        zNPCCommon* tgt = XCOLLIDE_DOWNCAST_OPTR(zNPCCommon*, colrec->optr);
 
         xVec3Normalize(&pump, &colrec->tohit);
         xVec3SMulBy(&pump, spd);
@@ -6956,7 +6956,7 @@ S32 zNPCGoalKnock::CollReview(void*)
         colrec = &npccol->colls[i];
 
         xVec3AddTo(&vec_depen, &colrec->depen);
-        zNPCCommon* tgt = (zNPCCommon*)colrec->optr;
+        zNPCCommon* tgt = XCOLLIDE_DOWNCAST_OPTR(zNPCCommon*, colrec->optr);
         hitstuff++;
 
         if (tgt != NULL)

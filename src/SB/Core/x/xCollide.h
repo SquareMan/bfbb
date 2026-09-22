@@ -22,6 +22,11 @@
 
 struct xModelInstance;
 
+// It is important that we always cast the optr field to the actual type that was stored to it for ABI compatibility.
+// If you attempt to cast directly from void* to the actual type stored there you may end up treating the vtable
+// as data if the actual type has virtual functions.
+#define XCOLLIDE_DOWNCAST_OPTR(_enttype, _optr) ((_enttype)(xEnt*)(_optr))
+
 struct xCollis
 {
     struct tri_data

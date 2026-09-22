@@ -180,7 +180,7 @@ void xEntBoulder_ApplyForces(xEntCollis* collis)
         xBase* obj = (xBase*)(coll->optr);
         if ((obj != NULL) && (obj->baseType == eBaseTypeBoulder))
         {
-            xEntBoulder* boul = ((xEntBoulder*)(coll->optr));
+            xEntBoulder* boul = XCOLLIDE_DOWNCAST_OPTR(xEntBoulder*, coll->optr);
             xVec3 vec;
             xVec3SMul(&vec, &collis->colls[i].norm, -5.0f);
             if ((boul == globals.player.drv.odriver) || (boul == globals.player.drv.driver))
@@ -416,7 +416,7 @@ void xEntBoulder_Update(xEntBoulder* ent, xScene* sc, F32 dt)
                                xVec3Dot(&ent->collis->colls[i].norm, &ent->collis->colls[i].depen));
             }
 
-            xEntBoulder* boul = ((xEntBoulder*)(ent->collis->colls[i].optr));
+            xEntBoulder* boul = XCOLLIDE_DOWNCAST_OPTR(xEntBoulder*, ent->collis->colls[i].optr);
             if (boul->baseType == eBaseTypeBoulder)
             {
                 xVec3Normalize(&depenNorm0, (xVec3*)(&ent->collis->colls[i].depen));
@@ -475,7 +475,7 @@ void xEntBoulder_Update(xEntBoulder* ent, xScene* sc, F32 dt)
                 xVec3AddScaled(&depen, &ent->collis->colls[i].norm, fn);
             }
 
-            xEntBoulder* boul = (xEntBoulder*)(ent->collis->colls[i].optr);
+            xEntBoulder* boul = XCOLLIDE_DOWNCAST_OPTR(xEntBoulder*, ent->collis->colls[i].optr);
             if ((ent->basset->flags & 4) && (boul->baseType == eBaseTypeDestructObj))
             {
                 if ((zEntDestructObj_GetHit((zEntDestructObj*)boul, 0x8000)) &&
@@ -502,7 +502,7 @@ void xEntBoulder_Update(xEntBoulder* ent, xScene* sc, F32 dt)
         // NPC
         for (iter_npc = ent->collis->npc_sidx; iter_npc < ent->collis->npc_eidx; iter_npc++)
         {
-            zNPCCommon* npc = (zNPCCommon*)(ent->collis->colls[iter_npc].optr);
+            zNPCCommon* npc = XCOLLIDE_DOWNCAST_OPTR(zNPCCommon*, ent->collis->colls[iter_npc].optr);
 
             if (ent->basset->flags & 1)
             {
