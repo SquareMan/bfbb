@@ -4,7 +4,10 @@
 #define MAX(x, y) ((x) > (y) ? (x) : (y))
 #define MIN(x, y) ((x) < (y) ? (x) : (y))
 
-#define CLAMP(low, high, x) \
+// FIXME: I am editing this to move `x` to the beginning to be compatible with the clamp definition that used to be in
+// xMath.h. This header is included in a several non-bfbb files for some reason though so this may break something for GC
+// This needs to be cleaned up at some point.
+#define CLAMP(x, low, high) \
     ((x) > (high) ? (high) : ((x) < (low) ? (low) : (x)))
 
 #define ROUND_UP(x, align) (((x) + (align)-1) & (-(align)))

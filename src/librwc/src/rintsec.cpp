@@ -29,7 +29,7 @@ static RwV3d ClosestPointOnLine(RwV3d& test, RwV3d& a, RwV3d& b)
     RwV3d at = rw::sub(test, a);
 
     RwReal t = rw::dot(at, ab) / rw::dot(ab, ab);
-    t = CLAMP(0.0f, 1.0f, t);
+    t = CLAMP(t, 0.0f, 1.0f);
     return rw::add(a, rw::scale(ab, t));
 }
 
