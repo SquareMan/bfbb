@@ -99,7 +99,7 @@ U32 iFileOpen(const char* name, S32 flags, tag_xFile* file)
 
     if(!fileExists)
     {
-        printf("Cannot open file \"%s\": Does not exist", name);
+        printf("Cannot open file \"%s\": Does not exist\n", name);
         return 1;
     }
 
