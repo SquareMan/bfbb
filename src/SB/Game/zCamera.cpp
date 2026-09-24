@@ -315,7 +315,7 @@ static S32 zCameraFlyUpdate(xCamera* cam, F32 dt)
     flyIdx = numKeys + 2 < flySize ? numKeys + 2 : numKeys + 1;
     keys[3] = *((zFlyKey*)zcam_flydata + flyIdx);
 
-#ifdef __ORDER_BIG_ENDIAN__
+#ifdef BFBB_BIG_ENDIAN
     // Reverses the byte order (endianness) of 64 4-byte blocks
     S8* framePtr = (S8*)&keys[0].frame;
     for (i = 64; i > 0; i--)

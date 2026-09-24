@@ -1,6 +1,12 @@
 #ifndef MACROS_H
 #define MACROS_H
 
+#if defined(__BYTE_ORDER__) && __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+#define BFBB_BIG_ENDIAN
+#elif defined(GAMECUBE)
+#define BFBB_BIG_ENDIAN
+#endif
+
 #define MAX(x, y) ((x) > (y) ? (x) : (y))
 #define MIN(x, y) ((x) < (y) ? (x) : (y))
 
