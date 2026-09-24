@@ -32,9 +32,21 @@
 
 static SDL_Window* sWindow = NULL;
 
+static iTime sLastFrameStartTime = 0;
+static iTime targetFrameTime = SDL_NS_PER_SECOND / 60;
+
 void iVSync()
 {
-    // FIXME: Proper frame pacing. This function is only called in certain places though...
+    iTime elapsedTime = iTimeGet() - sLastFrameStartTime;
+    iTime remainingTime = targetFrameTime - elapsedTime;
+    if(remainingTime > 0)
+    {
+        SDL_DelayPrecise(remainingTime);
+    }
+    sLastFrameStartTime = iTimeGet();
+
+    // Pump the event queue. Maybe we this should be done somewhere else but this seems to be our only
+    // entry point from the game code
     SDL_Event event;
     while (SDL_PollEvent(&event))
     {
@@ -50,7 +62,6 @@ void iVSync()
             iPadInit();
         }
     }
-    SDL_DelayNS(SDL_NS_PER_SECOND / 60);
 }
 
 static RwTexture* TextureRead(const RwChar* name, const RwChar* maskName)
