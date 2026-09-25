@@ -1,3 +1,5 @@
+#include "iPad.h"
+
 #include <types.h>
 #include <dolphin.h>
 
@@ -58,6 +60,7 @@ S32 iPadConvStick(F32 value)
     return convertedValue;
 }
 
+static S32 iPadConvFromGCN(U32 gcnButtons, U32 gcnMask, U32 xpadButton);
 S32 iPadUpdate(_tagxPad* pad, U32* on)
 {
     U16 buttons;

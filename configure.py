@@ -262,6 +262,9 @@ cflags_dolphin = [
     "-str reuse",
     "-common off",
     "-O4,p",
+    "-i src/PowerPC_EABI_Support/include",
+    "-i src/PowerPC_EABI_Support/include/PowerPC_EABI_Support/MSL_C/MSL_Common",
+    "-i src/PowerPC_EABI_Support/include/PowerPC_EABI_Support/MSL_C++/MSL_Common/Include",
     #"-requireprotos"
 ]
 
@@ -289,6 +292,8 @@ cflags_bink = [
     "-D__GEKKO__",
     "-I src/bink/include",
     "-I src/PowerPC_EABI_Support/include",
+    "-I src/PowerPC_EABI_Support/include/PowerPC_EABI_Support/MSL_C/MSL_Common",
+    "-I src/PowerPC_EABI_Support/include/PowerPC_EABI_Support/MSL_C++/MSL_Common/Include",
     "-G4",
 ]
 
@@ -323,6 +328,9 @@ cflags_bfbb = [
     '-pragma "cpp_extensions on"',
     "-inline off",
     "-gccinc",
+    "-i src/PowerPC_EABI_Support/include",
+    "-i src/PowerPC_EABI_Support/include/PowerPC_EABI_Support/MSL_C/MSL_Common",
+    "-i src/PowerPC_EABI_Support/include/PowerPC_EABI_Support/MSL_C++/MSL_Common/Include",
     "-i include/inline",
     "-i include/rwsdk",
     "-i src/SB/Core/gc",
@@ -497,7 +505,7 @@ config.libs = [
             Object(NonMatching, "SB/Game/zCutsceneMgr.cpp"),
             Object(Matching, "SB/Game/zDispatcher.cpp"),
             Object(NonMatching, "SB/Game/zEGenerator.cpp"),
-            Object(Matching, "SB/Game/zEnt.cpp"),
+            Object(Matching, "SB/Game/zEnt.cpp", extra_cflags=["-sym on"]),
             Object(Equivalent, "SB/Game/zEntButton.cpp"),
             Object(NonMatching, "SB/Game/zEntCruiseBubble.cpp"),
             Object(Matching, "SB/Game/zEntDestructObj.cpp"),

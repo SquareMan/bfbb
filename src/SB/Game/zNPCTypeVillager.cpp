@@ -68,7 +68,7 @@ U32 g_hash_folkanim[26] = {};
 zParEmitter* g_pemit_aqualeak;
 static xParEmitterCustomSettings g_parf_aqualeak;
 
-const char* g_strz_folkanim[26] = {
+CChar* g_strz_folkanim[26] = {
     "Unknown", "Idle01",    "Move01", "Hurt01", "Yawn01", "Talk01", "Flee01", "Fear01", "Pray01",
     "Clap01",  "Special01", "Ride01", "Bump01", "Fall01", "Land01", "Weep01", "Swim01", "Idle02",
     "Idle03",  "Idle04",    "Yawn02", "Yawn03", "Yawn04", "Talk02", "Talk03", "Talk04",
@@ -215,7 +215,7 @@ xAnimTable* ZNPC_AnimTable_Villager(xAnimTable* callerTable)
     S32 ourAnims[11] = { Idle01, Move01, Hurt01, Yawn01,    Talk01, Flee01,
                          Fear01, Pray01, Clap01, Special01, Unknown };
     xAnimTable* table = callerTable;
-    const char** names = g_strz_folkanim;
+    CChar** names = g_strz_folkanim;
 
     if (callerTable != NULL)
     {
@@ -264,7 +264,7 @@ xAnimTable* ZNPC_AnimTable_BalloonBoy(xAnimTable* callerTable)
 {
     S32 ourAnims[7] = { Ride01, Bump01, Fall01, Land01, Weep01, Swim01, Unknown };
     xAnimTable* table = callerTable;
-    const char** names = g_strz_folkanim;
+    CChar** names = g_strz_folkanim;
 
     if (callerTable != NULL)
     {
@@ -310,7 +310,7 @@ xAnimTable* ZNPC_AnimTable_SuperFriend(xAnimTable* callerTable)
     S32 ourAnims[10] = { Idle02, Idle03, Idle04, Yawn02, Yawn03,
                          Yawn04, Talk02, Talk03, Talk04, Unknown };
     xAnimTable* table;
-    const char** names = g_strz_folkanim;
+    CChar** names = g_strz_folkanim;
 
     if (callerTable != NULL)
     {

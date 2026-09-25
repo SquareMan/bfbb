@@ -1587,28 +1587,6 @@ void xsqrtfast(F32& out, F32 in)
     out = std::sqrtf(in);
 }
 
-#ifdef GAMECUBE
-// We don't have the implementation provided
-F32 std::sqrtf(F32 x)
-{
-    volatile F32 y;
-
-    if (x > 0.0f)
-    {
-        F64 guess = __frsqrte(x);
-        guess = 0.5 * guess * -(guess * guess * x - 3);
-        guess = 0.5 * guess * -(guess * guess * x - 3);
-        guess = 0.5 * guess * -(guess * guess * x - 3);
-        y = x * guess;
-        return y;
-    }
-    else
-    {
-        return x;
-    }
-}
-#endif
-
 S32 xSweptSphereToSphere(xSweptSphere* sws, xSphere* sph)
 {
     if (!sws->dist)

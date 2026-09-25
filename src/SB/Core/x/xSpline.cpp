@@ -1,10 +1,13 @@
 #include "xSpline.h"
 
+#include "xVec3.h"
 #include <types.h>
 #include <rwplcore.h>
 #include <xMathInlines.h>
 #include <xMemMgr.h>
 #include <xVec3.h>
+
+#include <string.h>
 
 static F32 sBasisUniformBspline[4][4];
 static F32 sBasisBezier[4][4] = { { -1.0f, 3.0f, -3.0f, 1.0f },
@@ -662,12 +665,12 @@ xSpline3* AllocSpline3(xVec3* points, F32* time, U32 numpoints, U32 numalloc, U3
     spl->coef = (xCoef3*)0x0;
     spl->arcSample = 0;
     spl->arcLength = (float*)0x0;
-    spl->points = (xVec3*)xMemAlloc(gActiveHeap, (spl->allocN + 1) * 0xc, 0);
+    spl->points = (xVec3*)xMemAllocSize((spl->allocN + 1) * sizeof(xVec3));
     memcpy(spl->points, points, (spl->N + 1) * 0xc);
 
     if (time != (F32*)0x0)
     {
-        spl->time = (F32*)xMemAlloc(gActiveHeap, (spl->allocN + 1) * 4, 0);
+        spl->time = (F32*)xMemAllocSize((spl->allocN + 1) * sizeof(F32));
         memcpy(spl->time, time, (spl->N + 1) * 4);
     }
     else

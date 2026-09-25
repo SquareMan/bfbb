@@ -68,7 +68,7 @@ bool xhud::font_meter_widget::is(U32 id) const
 // @stringBase0 ahead of update()'s format strings. Defined here it is strong
 // and lands in .text between is() and update(); it has to sit above update()
 // for the string pool to come out in the target's order.
-const char* xhud::font_meter_asset::type_name()
+CChar* xhud::font_meter_asset::type_name()
 {
     return "hud:meter:font";
 }
@@ -83,7 +83,7 @@ const char* xhud::font_meter_asset::type_name()
 void xhud::font_meter_widget::update(F32 dt)
 
 {
-    static const char* format_text[3] = { "%d", "%d/%d", "%d of %d" };
+    static CChar* format_text[3] = { "%d", "%d/%d", "%d of %d" };
 
     F32 a;
     S32 new_value;

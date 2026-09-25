@@ -17,7 +17,7 @@
 #include "zNPCSupplement.h"
 
 U32 g_hash_ambianim[12] = { 0 };
-const char* g_strz_ambianim[12] = {
+CChar* g_strz_ambianim[12] = {
     "Unknown",  "Idle01", "Idle02",   "Idle03",  "Fidget01", "Fidget02",
     "Fidget03", "Move01", "Bumped01", "Dance01", "Pray01",   "Attack01",
 };

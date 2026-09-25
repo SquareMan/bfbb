@@ -1,6 +1,5 @@
 #include <rwsdk/rwcore.h>
 #include <rwsdk/rpworld.h>
-#include <rwsdk/world/bageomet.h>
 
 #define rpGEOMETRYLOCKPOLYGONS 0x01
 #define rpGEOMETRYLOCKALL 0xfff

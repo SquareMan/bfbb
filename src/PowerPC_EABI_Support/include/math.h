@@ -54,6 +54,7 @@ double log(double);
 double log10(double);
 
 double fmod(double, double);
+float fmodf(float, float);
 
 double sin(double x);
 double cos(double x);

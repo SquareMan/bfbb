@@ -3573,11 +3573,11 @@ xAnimTable* ZNPC_AnimTable_LassoGuide()
     return table;
 }
 
-void NPCC_BuildStandardAnimTran(xAnimTable* table, const char** namelist, S32* ourAnims, S32 idx_dflt,
+void NPCC_BuildStandardAnimTran(xAnimTable* table, CChar** namelist, S32* ourAnims, S32 idx_dflt,
                                 F32 blend)
 {
     xAnimTransition* def = NULL;
-    const char** names = namelist;
+    CChar** names = namelist;
 
     S32 i = 0;
 

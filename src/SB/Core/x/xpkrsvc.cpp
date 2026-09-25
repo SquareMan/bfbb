@@ -869,9 +869,9 @@ U32 PKRAssetIDFromInst(void* asset_inst)
     return ((st_PACKER_ATOC_NODE*)asset_inst)->aid;
 }
 
-const char* PKR_AssetName(st_PACKER_READ_DATA* pr, U32 aid)
+CChar* PKR_AssetName(st_PACKER_READ_DATA* pr, U32 aid)
 {
-    const char* name = NULL;
+    CChar* name = NULL;
 
     if (aid == 0)
     {
@@ -1804,7 +1804,7 @@ void PKR_pop_memmark()
     xMemPopBase(xMemGetBase() - 1);
 }
 
-const char* st_PACKER_ATOC_NODE::Name() const
+CChar* st_PACKER_ATOC_NODE::Name() const
 {
     return "<unknown>";
 }

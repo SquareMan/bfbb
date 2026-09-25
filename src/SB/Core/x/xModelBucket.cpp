@@ -10,6 +10,10 @@
 #include <types.h>
 #include <stdlib.h>
 
+#ifdef GAMECUBE
+#include <driver/gcn/dlrendst.h>
+#endif
+
 static RpWorld* sBucketDummyWorld;
 static RwCamera* sBucketDummyCamera;
 static S32 sBucketCurr;

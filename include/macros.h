@@ -7,14 +7,9 @@
 #define BFBB_BIG_ENDIAN
 #endif
 
-#define MAX(x, y) ((x) > (y) ? (x) : (y))
-#define MIN(x, y) ((x) < (y) ? (x) : (y))
-
-// FIXME: I am editing this to move `x` to the beginning to be compatible with the clamp definition that used to be in
-// xMath.h. This header is included in a several non-bfbb files for some reason though so this may break something for GC
-// This needs to be cleaned up at some point.
-#define CLAMP(x, low, high) \
-    ((x) > (high) ? (high) : ((x) < (low) ? (low) : (x)))
+#define MAX(a, b) (((a) > (b)) ? (a) : (b))
+#define MIN(a, b) (((a) < (b)) ? (a) : (b))
+#define CLAMP(x, a, b) (MAX((a), MIN((x), (b))))
 
 #define ROUND_UP(x, align) (((x) + (align)-1) & (-(align)))
 #define ROUND_UP_PTR(x, align) \

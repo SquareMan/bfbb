@@ -929,15 +929,6 @@ void xCameraUpdate(xCamera* cam, F32 dt)
     }
 }
 
-#ifdef GAMECUBE
-#ifndef INLINE
-float std::ceilf(float x)
-{
-    return (float)ceil((double)x);
-}
-#endif
-#endif
-
 void xCameraBegin(xCamera* cam, S32 clear)
 {
     iCameraBegin(cam->lo_cam, clear);
@@ -1460,15 +1451,6 @@ F32 xasin(F32 x)
 {
     return std::asinf(x);
 }
-
-#ifdef GAMECUBE
-#ifndef INLINE
-float std::asinf(float x)
-{
-    return (float)asin((double)x);
-}
-#endif
-#endif
 
 F32 xQuatGetAngle(const xQuat* q)
 {

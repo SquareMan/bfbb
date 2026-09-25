@@ -22,7 +22,7 @@
 #include <rpmatfx.h>
 #include <rwplcore.h>
 #include <rpskin.h>
-#include <stdlib.h>
+#include <cstdlib>
 
 // SLOP: put in header
 template<>

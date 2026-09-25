@@ -30,7 +30,7 @@ void iTimeGameAdvance(F32 elapsed);
 void iTimeSetGame(F32 time);
 void iProfileClear(U32 sceneID);
 void iFuncProfileDump();
-void iFuncProfileParse(const char* elfPath, S32 profile);
+void iFuncProfileParse(CChar* elfPath, S32 profile);
 S32 iGetMinute();
 S32 iGetHour();
 S32 iGetDay();

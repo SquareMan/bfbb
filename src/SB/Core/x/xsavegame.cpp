@@ -452,7 +452,7 @@ S32 xSGSetup(st_XSAVEGAME_DATA* xsgdata)
     return xSGSetup(xsgdata, 0, "nothing", -1, 0, 0);
 }
 
-S32 xSGSetup(st_XSAVEGAME_DATA* xsgdata, S32 gidx, const char* label, S32 progress, iTime playtime,
+S32 xSGSetup(st_XSAVEGAME_DATA* xsgdata, S32 gidx, CChar* label, S32 progress, iTime playtime,
                S32 thumbIconIdx)
 {
     S32 result = 1;

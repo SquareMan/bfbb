@@ -1261,7 +1261,7 @@ xGroup* sTaxiConfirmGrp;
 void zUI_ParseINI(xIniFile* ini)
 {
     char itemName[16];
-    const char *value, *tok, *ltok;
+    CChar *value, *tok, *ltok;
 
     strcpy(itemName, "Menu00");
 

@@ -69,7 +69,10 @@ struct xNPCBasic : xEnt, xFactoryInst
         myNPCType = value;
     }
 
-    S32 SelfType() const;
+    S32 SelfType() const
+    {
+        return myNPCType;
+    };
     void RestoreColFlags()
     {
         flags2.flg_colCheck = ColChkFlags();

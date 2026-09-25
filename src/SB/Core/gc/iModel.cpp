@@ -1,17 +1,18 @@
 #include "iModel.h"
 
-#include "rpworld.h"
 #include <stdio.h>
 #include <types.h>
 #include <rpskin.h>
 #include <rpmatfx.h>
 #include <rpusrdat.h>
 #include <string.h>
-#include <world/bageomet.h>
 
 #include "iCamera.h"
 #include "iAnim.h"
 #include "xMathInlines.h"
+
+#include <rpworld.h>
+#include <rwplcore.h>
 
 #define MAX2(a, b) ((a) >= (b) ? (a) : (b))
 #define MAX3(a, b, c) (MAX2((a), MAX2((b), (c))))
@@ -322,8 +323,7 @@ void iModelAnimMatrices(RpAtomic* model, xQuat* quat, xVec3* tran, RwMatrix* mat
         matrixStack[0].pos.z = 0.0f;
         matrixStack[0].pos.y = 0.0f;
         matrixStack[0].pos.x = 0.0f;
-        matrixStack[0].flags |= rwMATRIXINTERNALINDENTITY | rwMATRIXTYPEORTHONORMAL;
-        
+        matrixStack[0].flags |= rwMATRIXINTERNALIDENTITY | rwMATRIXTYPEORTHONORMAL;
 
         // non-volatile registers are acting up and their instructions
         // are being scheduled weirdly

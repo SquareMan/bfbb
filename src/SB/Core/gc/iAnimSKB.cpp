@@ -131,19 +131,11 @@ F32 iAnimDurationSKB(iAnimSKBHeader* data)
     return ((F32*)((iAnimSKBKey*)(data + 1) + data->KeyCount))[data->TimeCount - 1];
 }
 
-// The retail object carries out-of-line copies of std::fabsf and of math.h's
-// inline fabs right here, between iAnimDurationSKB and _iAnimSKBAdjustTranslate,
-// and this is the only definition of fabsf__3stdFf in the whole DOL (zNPCTypeBossPlankton
-// calls it). SB is built with -inline off, so a plain `inline` definition is dropped when
-// nothing in this file calls it -- the two FABS() sites below expand to the __fabs
-// intrinsic instead. __declspec(weak) reproduces the retail linkage and placement.
-namespace std
+static float deadstripped(float f)
 {
-    __declspec(weak) float fabsf(float x)
-    {
-        return (float)fabs(x);
-    }
+    return std::fabsf(f);
 }
+
 
 void _iAnimSKBAdjustTranslate(iAnimSKBHeader* data, U32 bone, F32* starttran, F32* endtran)
 {

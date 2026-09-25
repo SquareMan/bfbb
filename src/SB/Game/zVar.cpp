@@ -108,14 +108,14 @@ namespace
 {
     static S32 selSceneID;
 
-    const char* var_text_ActivePad()
+    CChar* var_text_ActivePad()
     {
         static char buffer[0x0C];
         sprintf(buffer, "%d", globals.currentActivePad + 1);
         return buffer;
     }
 
-    const char* var_text_BadCard()
+    CChar* var_text_BadCard()
     {
         static char buffer[0x0C];
         S32 badCardCount = zMenuGetBadCard();
@@ -130,7 +130,7 @@ namespace
         return buffer;
     }
 
-    const char* var_text_BadCardAvailable()
+    CChar* var_text_BadCardAvailable()
     {
         static char buffer[0x0C];
         sprintf(buffer, "%d", bad_card_available);
@@ -138,7 +138,7 @@ namespace
     }
 
     // var_text_BadCardNeeded__18_esc__2_unnamed_esc__2_zVar_cpp_esc__2_Fv
-    const char* var_text_BadCardNeeded()
+    CChar* var_text_BadCardNeeded()
     {
         static char buffer[0x0C];
         sprintf(buffer, "%d", bad_card_needed);
@@ -147,7 +147,7 @@ namespace
 
     // Indexing into zVar_strings didn't get pulled out of the loop in the original
     // code for some reason.
-    const char* var_text_CorruptFileName()
+    CChar* var_text_CorruptFileName()
     {
         static char buffer[0x80];
         char corruptedNames[3][64];
@@ -162,19 +162,19 @@ namespace
         return buffer;
     }
 
-    static const char* var_text_CurrentArea()
+    static CChar* var_text_CurrentArea()
     {
         return (char*)zSceneGetAreaname(globals.sceneCur->sceneID);
     }
 
-    const char* var_text_CurrentDate()
+    CChar* var_text_CurrentDate()
     {
         static char buffer[0x20];
         iGetCurrFormattedDate(buffer);
         return buffer;
     }
 
-    const char* var_text_CurrentLevelCollectable()
+    CChar* var_text_CurrentLevelCollectable()
     {
         static char buffer[0x0C];
         sprintf(buffer, "%d",
@@ -182,7 +182,7 @@ namespace
         return buffer;
     }
 
-    const char* var_text_CurrentLevelPatsSocks()
+    CChar* var_text_CurrentLevelPatsSocks()
     {
         static char buffer[0x0C];
         sprintf(buffer, "%d",
@@ -190,7 +190,7 @@ namespace
         return buffer;
     }
 
-    const char* var_text_CurrentScene()
+    CChar* var_text_CurrentScene()
     {
         static char buffer[0x20];
         sprintf(buffer, "%s",
@@ -198,7 +198,7 @@ namespace
         return buffer;
     }
 
-    const char* var_text_CurrentTime()
+    CChar* var_text_CurrentTime()
     {
         static char buffer[0x20];
         iGetCurrFormattedTime(buffer);
@@ -211,7 +211,7 @@ const basic_rect<F32> default_adjust = { 0.0f, 0.0f, 1.0f, 1.0f };
 
 namespace
 {
-    const char* zVarGameSlotInfo(S32 i, char* buffer, size_t something)
+    CChar* zVarGameSlotInfo(S32 i, char* buffer, size_t something)
     {
         char date[0x20] = "";
         char time[0x20] = "";
@@ -270,57 +270,57 @@ namespace
         return buffer;
     }
 
-    const char* var_text_GameSlot0()
+    CChar* var_text_GameSlot0()
     {
         static char buffer[0x40];
         return zVarGameSlotInfo(0, buffer, 0x3f);
     }
 
-    const char* var_text_GameSlot1()
+    CChar* var_text_GameSlot1()
     {
         static char buffer[0x40];
         return zVarGameSlotInfo(1, buffer, 0x3f);
     }
 
-    const char* var_text_GameSlot2()
+    CChar* var_text_GameSlot2()
     {
         static char buffer[0x40];
         return zVarGameSlotInfo(2, buffer, 0x3f);
     }
 
-    const char* var_text_GameSlot3()
+    CChar* var_text_GameSlot3()
     {
         static char buffer[0x40];
         return zVarGameSlotInfo(3, buffer, 0x3f);
     }
 
-    const char* var_text_GameSlot4()
+    CChar* var_text_GameSlot4()
     {
         static char buffer[0x40];
         return zVarGameSlotInfo(4, buffer, 0x3f);
     }
 
-    const char* var_text_GameSlot5()
+    CChar* var_text_GameSlot5()
     {
         static char buffer[0x40];
         return zVarGameSlotInfo(5, buffer, 0x3f);
     }
 
-    const char* var_text_GameSlot6()
+    CChar* var_text_GameSlot6()
     {
         static char buffer[0x40];
         return zVarGameSlotInfo(6, buffer, 0x3f);
     }
 
-    const char* var_text_GameSlot7()
+    CChar* var_text_GameSlot7()
     {
         static char buffer[0x40];
         return zVarGameSlotInfo(7, buffer, 0x3f);
     }
 
-    const char* var_text_MCAccessType()
+    CChar* var_text_MCAccessType()
     {
-        static const char* state_text[4] =
+        static CChar* state_text[4] =
         {
             "Accessing",
             "Loading data",
@@ -330,14 +330,14 @@ namespace
         return state_text[zSaveLoad_getMCAccessType()];
     }
 
-    const char* var_text_MCAutoSaveCard()
+    CChar* var_text_MCAutoSaveCard()
     {
         static char buffer[0x0C];
         sprintf(buffer, "%c", 'A' + zSaveLoadGetAutoSaveCard());
         return buffer;
     }
 
-    const char* var_text_MCPS2MaxSpace()
+    CChar* var_text_MCPS2MaxSpace()
     {
         // Yes... this matches. Probably just stripped out during porting since it
         // was a PS2 thing.
@@ -346,30 +346,30 @@ namespace
         return buffer;
     }
 
-    const char* var_text_MCPS2MinSpace()
+    CChar* var_text_MCPS2MinSpace()
     {
         static char buffer[0x0C];
         sprintf(buffer, "%d", 0);
         return buffer;
     }
 
-    const char* var_text_MCSelectedCard()
+    CChar* var_text_MCSelectedCard()
     {
         static char buffer[0x0C];
         sprintf(buffer, "%c", 'A' + zSaveLoad_getcard());
         return buffer;
     }
 
-    const char* var_text_MCSelectedGame()
+    CChar* var_text_MCSelectedGame()
     {
         static char buffer[0x0C];
         sprintf(buffer, "%d", zSaveLoad_getgame() + 1);
         return buffer;
     }
 
-    const char* var_text_PlayerHeShe()
+    CChar* var_text_PlayerHeShe()
     {
-        static const char* text[3] =
+        static CChar* text[3] =
         {
             "{i:text_player_he}",
             "{i:text_player_he}",
@@ -378,9 +378,9 @@ namespace
         return text[gCurrentPlayer];
     }
 
-    const char* var_text_PlayerName()
+    CChar* var_text_PlayerName()
     {
-        static const char* text[3] =
+        static CChar* text[3] =
         {
             "{i:text_spongebob_name}",
             "{i:text_patrick_name}",
@@ -389,7 +389,7 @@ namespace
         return text[gCurrentPlayer];
     }
 
-    const char* var_text_PlayerPosition()
+    CChar* var_text_PlayerPosition()
     {
         static char buffer[0x30];
         xEntFrame* frame = globals.player.ent.frame;
@@ -398,19 +398,19 @@ namespace
         return buffer;
     }
 
-    const char* var_text_SelectedArea()
+    CChar* var_text_SelectedArea()
     {
         return (char*)zSceneGetAreaname(selSceneID);
     }
 
-    const char* var_text_ShinyCount()
+    CChar* var_text_ShinyCount()
     {
         static char buffer[0x0C];
         sprintf(buffer, "%d", globals.player.Inv_Shiny);
         return buffer;
     }
 
-    const char* var_text_ShinyCountText()
+    CChar* var_text_ShinyCountText()
     {
         static char buffer[0x40] = "4000000000 {i:text_shinies}";
         if (globals.player.Inv_Shiny == 0)
@@ -429,28 +429,28 @@ namespace
         return buffer;
     }
 
-    const char* var_text_SoundFXVolume()
+    CChar* var_text_SoundFXVolume()
     {
         static char buffer[0x0C];
         sprintf(buffer, "%d", zVarEntryCB_SndFXVol(NULL));
         return buffer;
     }
 
-    const char* var_text_SoundMusicVolume()
+    CChar* var_text_SoundMusicVolume()
     {
         static char buffer[0x0C];
         sprintf(buffer, "%d", zVarEntryCB_SndMusicVol(NULL));
         return buffer;
     }
 
-    const char* var_text_SpaceAvailable()
+    CChar* var_text_SpaceAvailable()
     {
         static char buffer[0x0C];
         sprintf(buffer, "%d", zSaveLoad_getMCavailable());
         return buffer;
     }
 
-    const char* var_text_SpaceAvailableString()
+    CChar* var_text_SpaceAvailableString()
     {
         // What a wierd dance... they could have just used buffer directly.
         static char buffer[0x40];
@@ -463,21 +463,21 @@ namespace
         return buffer;
     }
 
-    const char* var_text_SpaceNeeded()
+    CChar* var_text_SpaceNeeded()
     {
         static char buffer[0x0C];
         sprintf(buffer, "%d", zSaveLoad_getMCneeded());
         return buffer;
     }
 
-    const char* var_text_TotalPatsSocks()
+    CChar* var_text_TotalPatsSocks()
     {
         static char buffer[0x0C];
         sprintf(buffer, "%d", globals.player.Inv_PatsSock_Total);
         return buffer;
     }
 
-    const char* var_text_MCName()
+    CChar* var_text_MCName()
     {
         static char buffer[0x20];
 

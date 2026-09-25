@@ -55,7 +55,7 @@ void iFuncProfileDump()
 {
 }
 
-void iFuncProfileParse(const char* elfPath, S32 profile)
+void iFuncProfileParse(CChar* elfPath, S32 profile)
 {
 }
 

@@ -51,8 +51,11 @@ template <class T> struct basic_rect
     basic_rect& operator|=(const basic_rect& other);
 };
 
+#ifndef __MWERKS__
+// metrowerks doesn't support forward declaring these specializations
 template<> const basic_rect<F32> basic_rect<F32>::m_Null;
 template<> const basic_rect<F32> basic_rect<F32>::m_Unit;
+#endif
 
 struct xVec2
 {

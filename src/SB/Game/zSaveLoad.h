@@ -18,7 +18,7 @@ struct zSaveLoadUI
 {
     U32 entry;
     U32 nameID;
-    const char* name;
+    CChar* name;
 };
 
 

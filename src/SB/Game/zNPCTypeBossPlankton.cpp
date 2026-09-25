@@ -7,6 +7,7 @@
 
 #include <types.h>
 #include <string.h>
+#include <cmath>
 
 #define ANIM_Unknown 0
 #define ANIM_Idle01 1 // 0x4

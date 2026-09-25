@@ -10,7 +10,7 @@
 #include "zNPCHazard.h"
 
 struct zNPCRobot;
-extern const char* g_strz_roboanim[41];
+extern CChar* g_strz_roboanim[41];
 extern U32 g_hash_roboanim[41];
 
 struct NPCArena

@@ -1,4 +1,5 @@
 #include "PowerPC_EABI_Support/MSL_C/MSL_Common/mbstring.h"
+#include "PowerPC_EABI_Support/MSL_C/MSL_Common/stdint.h"
 
 void mblen(void)
 {
@@ -47,7 +48,7 @@ static int utf8_to_unicode(wchar_t *pwc, const char *s, size_t n)
 	int number_of_bytes;
 	int isUTF8;
 	char *source;
-	u16 result_chr = 0;
+	uint16_t result_chr = 0;
 
 	if (!s)
 	{
@@ -147,7 +148,7 @@ inline int wctomb(char* s, wchar_t wchar) { return (unicode_to_UTF8(s, wchar)); 
 
 inline int mbstowcs(wchar_t* pwc, const char* s, size_t n)
 {
-	u32 result_chr;
+	uint32_t result_chr;
 	int number_of_bytes = 0;
 	int isUTF8;
 	char* source;

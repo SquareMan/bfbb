@@ -1,11 +1,13 @@
-#include "types.h"
+#include "stddef.h"
+#include "PowerPC_EABI_Support/MSL_C/MSL_Common/stdint.h"
+
 //#define K1 0x80808080
 //#define K2 0xFEFEFEFF
 
-size_t(strlen)(const char* str)
+size_t strlen(const char* str)
 {
 	size_t len = -1;
-	u8* p      = (u8*)str - 1;
+	uint8_t* p      = (uint8_t*)str - 1;
 
 	do
 		len++;
@@ -13,15 +15,15 @@ size_t(strlen)(const char* str)
 	return (len);
 }
 
-char*(strcpy)(char* dst, const char* src)
+char* strcpy(char* dst, const char* src)
 {
-	register u8 *destb, *fromb;
-	register u32 w, t, align;
+	register uint8_t *destb, *fromb;
+	register uint32_t w, t, align;
 
-	u32 K1, K2;
+	uint32_t K1, K2;
 
-	fromb = (u8*)src;
-	destb = (u8*)dst;
+	fromb = (uint8_t*)src;
+	destb = (uint8_t*)dst;
 
 	if ((align = ((int)fromb & 3)) != ((int)destb & 3)) {
 		goto bytecopy;
@@ -92,8 +94,8 @@ char* strncpy(char* dst, const char* src, size_t n)
 
 char* strcat(char* dst, const char* src)
 {
-	const u8* p = (u8*)src - 1;
-	u8* q       = (u8*)dst - 1;
+	const uint8_t* p = (uint8_t*)src - 1;
+	uint8_t* q       = (uint8_t*)dst - 1;
 
 	while (*++q)
 		;
@@ -115,11 +117,11 @@ int strcmp(const char* str1, const char* str2)
 {
 	// bless metrowerks for this implementation
 
-	register u8* left  = (u8*)str1;
-	register u8* right = (u8*)str2;
-	u32 align, l1, r1, x;
+	register uint8_t* left  = (uint8_t*)str1;
+	register uint8_t* right = (uint8_t*)str2;
+	uint32_t align, l1, r1, x;
 
-	u32 K1, K2;
+	uint32_t K1, K2;
 
 	l1 = *left;
 	r1 = *right;
@@ -194,9 +196,9 @@ bytecopy:
 
 int strncmp(const char* str1, const char* str2, size_t n)
 {
-	const u8* p1 = (u8*)str1 - 1;
-	const u8* p2 = (u8*)str2 - 1;
-	u32 c1, c2;
+	const uint8_t* p1 = (uint8_t*)str1 - 1;
+	const uint8_t* p2 = (uint8_t*)str2 - 1;
+	uint32_t c1, c2;
 
 	n++;
 
@@ -210,9 +212,9 @@ int strncmp(const char* str1, const char* str2, size_t n)
 
 char* strchr(const char* str, int chr)
 {
-	const u8* p = (u8*)str - 1;
-	u32 c       = (chr & 0xFF);
-	u32 ch;
+	const uint8_t* p = (uint8_t*)str - 1;
+	uint32_t c       = (chr & 0xFF);
+	uint32_t ch;
 
 	while (ch = *++p)
 		if (ch == c)
@@ -233,10 +235,10 @@ void strxfrm(void)
 
 char* strrchr(const char* str, int chr)
 {
-	const u8* p = (u8*)str - 1;
-	const u8* q = 0;
-	u32 c       = (chr & 0xFF);
-	u32 ch;
+	const uint8_t* p = (uint8_t*)str - 1;
+	const uint8_t* q = 0;
+	uint32_t c       = (chr & 0xFF);
+	uint32_t ch;
 
 	while (ch = *++p)
 		if (ch == c)

@@ -134,6 +134,10 @@ U32 xModelGetPipeFlags(RpAtomic* model);
 void xModelInit();
 void xModelPoolInit(U32 count, U32 numMatrices);
 void xModelAnimCollStart(xModelInstance& m);
+inline void xModelAnimCollStop(xModelInstance& m)
+{
+    m.Flags = m.Flags & 0xe7ff;
+}
 void xModelSetFrame(xModelInstance* modelInst, const xMat4x3* frame);
 xModelInstance* xModelInstanceAlloc(RpAtomic* data, void* object, U16 flags, U8 boneIndex,
                                     U8* boneRemap);

@@ -19,7 +19,20 @@ typedef unsigned long long U64;
 typedef float F32;
 typedef double F64;
 
-typedef U32 uintptr_t;
+// Use this wrapper type for function arguments that should accept string literals
+//
+// The gamecube version compiles with string literals as non-const `char*`
+// This is evidenced by most function signatures accepting `char*` instead of `const char*`.
+//
+// This creates a problem for working with modern platforms where we want string literals to be const
+// - const string literals can't be passed to functions accepting just char*
+// - changing the argument type to be const changes the symbol mangling which affects the gamecube build
+#ifdef GAMECUBE
+typedef char CChar;
+#else
+typedef const char CChar;
+#endif
+
 
 #ifdef NULL
 #undef NULL

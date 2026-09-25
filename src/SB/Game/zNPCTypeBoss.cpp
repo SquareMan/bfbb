@@ -17,7 +17,7 @@ void foo(zNPCBPatrick* pat)
 }
 
 // clang-format off
-const char* g_strz_bossanim[ANIM_COUNT] =
+CChar* g_strz_bossanim[ANIM_COUNT] =
 {
     "Unknown",
     "Idle01",

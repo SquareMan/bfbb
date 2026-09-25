@@ -99,7 +99,7 @@ int main(S32 argc, char** argv)
 {
     U32 options;
     S32 i;
-    const char* tmpStr;
+    CChar* tmpStr;
 
     memset(&globals, 0, 0x1fc8);
     globals.firstStartPressed = TRUE;
@@ -849,7 +849,7 @@ void zMainLoop()
 
 void zMainReadINI()
 {
-    const char* str;
+    CChar* str;
     void* buf;
     U32 size;
     xIniFile* ini;

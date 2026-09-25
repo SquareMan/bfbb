@@ -216,7 +216,7 @@ struct zShrapnelAsset
 
 struct zShrapnelInitTable
 {
-    const char* name;
+    CChar* name;
     void (*initCB)(zShrapnelAsset*, xModelInstance*, xVec3*, void(*)(zFrag*, zFragAsset*));
     U32 ID;
 };

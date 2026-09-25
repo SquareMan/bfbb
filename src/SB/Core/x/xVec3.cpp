@@ -4,6 +4,10 @@
 #include "iMath.h"
 #include "xMath.h"
 
+#ifdef GAMECUBE
+#include <fastmath.h>
+#endif
+
 #include <types.h>
 
 const xVec3 xVec3::m_Null = { 0.0f, 0.0f, 0.0f };
@@ -85,22 +89,25 @@ F32 xVec3NormalizeFast(xVec3* o, const xVec3* v)
 }
 
 #ifdef GAMECUBE
-#include <fastmath.h>
-#endif
+void xVec3Copy(register xVec3* dst, register const xVec3* src)
+{
+    PSVECCopy(dst, src);
+}
+#else
 void xVec3Copy(xVec3* dst, const xVec3* src)
 {
-    #ifdef GAMECUBE
-    PSVECCopy(dst, src);
-    #else
     *dst = *src;
-    #endif
 }
+#endif
 
+#ifdef GAMECUBE
+asm F32 xVec3Dot(register const xVec3* a, register const xVec3* b)
+{
+    PSVECDotProduct(a, b);
+}
+#else
 F32 xVec3Dot(const xVec3* a, const xVec3* b)
 {
-    #ifdef GAMECUBE
-    return PSVECDotProduct(a, b);
-    #else
     return a->x * b->x + a->y * b->y + a->z * b->z;
-    #endif
 }
+#endif

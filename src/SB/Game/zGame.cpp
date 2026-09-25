@@ -1153,7 +1153,7 @@ void zGameScreenTransitionBegin()
     }
 }
 
-void zGameScreenTransitionUpdate(F32 percentComplete, const char* msg)
+void zGameScreenTransitionUpdate(F32 percentComplete, CChar* msg)
 {
     if (!zMenuIsFirstBoot())
     {
@@ -1177,7 +1177,7 @@ eGameWhereAmI gGameWhereAmI;
 // load-use gap, while our compiler interleaves the next vertex's stores between
 // each `lbz`/`stb` and `lfs`/`stfs` pair.  Same instruction multiset - SCHED,
 // same family as zGame_HackDrawCard.
-void zGameScreenTransitionUpdate(F32 percentComplete, const char* msg, U8* rgba)
+void zGameScreenTransitionUpdate(F32 percentComplete, CChar* msg, U8* rgba)
 {
     RwTexture* tex;
     RwRaster* ras;

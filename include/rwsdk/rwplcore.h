@@ -883,6 +883,33 @@ typedef struct rwGameCube2DVertex RwIm2DVertex;
 typedef RwUInt16 RxVertexIndex;
 typedef RxVertexIndex RwImVertexIndex;
 
+#define RwIm2DVertexSetPos(_vert, _imx, _imy, _imz)                                               \
+MACRO_START                                                                                       \
+{                                                                                                 \
+    (_vert)->x = _imx;                                                                            \
+    (_vert)->y = _imy;                                                                            \
+    (_vert)->z = _imz;                                                                            \
+}                                                                                                 \
+MACRO_STOP
+
+#define RwIm2DVertexSetRGBA(_vert, _r, _g, _b, _a)                                                \
+MACRO_START                                                                                       \
+{                                                                                                 \
+    (_vert)->emissiveColor.red = _r;                                                                              \
+    (_vert)->emissiveColor.green = _g;                                                                              \
+    (_vert)->emissiveColor.blue = _b;                                                                              \
+    (_vert)->emissiveColor.alpha = _a;                                                                              \
+}                                                                                                 \
+MACRO_STOP
+
+#define RwIm2DVertexSetUV(_vert, _u, _v)                                                          \
+MACRO_START                                                                                       \
+{                                                                                                 \
+    (_vert)->u = _u;                                                                              \
+    (_vert)->v = _v;                                                                              \
+}                                                                                                 \
+MACRO_STOP
+
 #define RwIm2DVertexSetCameraX(vert, camx) /* Nothing */
 #define RwIm2DVertexSetCameraY(vert, camy) /* Nothing */
 #define RwIm2DVertexSetCameraZ(vert, camz) /* Nothing */
@@ -1018,6 +1045,14 @@ typedef RxVertexIndex RwImVertexIndex;
         rwSqrtMacro(&(_result), _result);                                                          \
     }                                                                                              \
     MACRO_STOP
+
+#define RwV3dAdd(o, a, b) RwV3dAddMacro(o, a, b)
+#define RwV3dSub(o, a, b) RwV3dSubMacro(o, a ,b)
+#define RwV3dScale(o, a, s) RwV3dScaleMacro(o, a, s)
+#define RwV3dIncrementScaled(o, a, s) RwV3dIncrementScaledMacro(o, a, s)
+#define RwV3dNegate(o, a) RwV3dNegateMacro(o, a)
+#define RwV3dDotProduct(a, b) RwV3dDotProductMacro(a, b)
+#define RwV3dCrossProduct(o, a, b) RwV3dCrossProductMacro(o, a, b)
 
 enum RwRenderState
 {

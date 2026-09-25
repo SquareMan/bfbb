@@ -59,7 +59,7 @@ static const char* g_strz_hazModel[30] = {
 };
 
 static U32 g_hash_hazanim[3] = { 0, 0, 0 };
-static const char* g_strz_hazanim[3] = { "Unknown", "Idle01", "Active01" };
+static CChar* g_strz_hazanim[3] = { "Unknown", "Idle01", "Active01" };
 
 static NPCHazard* g_haz_uvAnimQue[27] = { NULL };
 

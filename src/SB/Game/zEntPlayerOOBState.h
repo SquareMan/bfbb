@@ -218,7 +218,7 @@ namespace oob_state
             F32 cam_height;
             F32 cam_pitch;
             F32 reorient_time;
-            const char* hand_model;
+            CChar* hand_model;
             xVec2 in_loc;
             xVec2 out_loc;
             struct

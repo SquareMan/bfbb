@@ -372,7 +372,7 @@ constexpr RwMatrixType rwMATRIXTYPEORTHOGONAL = rw::Matrix::TYPEORTHOGONAL;
 constexpr RwMatrixType rwMATRIXTYPEORTHONORMAL = rw::Matrix::TYPEORTHONORMAL;
 constexpr RwMatrixType rwMATRIXTYPEMASK = rw::Matrix::TYPEMASK;
 
-constexpr RwMatrixFlags rwMATRIXINTERNALINDENTITY = rw::Matrix::IDENTITY;
+constexpr RwMatrixFlags rwMATRIXINTERNALIDENTITY = rw::Matrix::IDENTITY;
 
 inline void RwMatrixCopy(RwMatrix* dst, RwMatrix* src)
 {

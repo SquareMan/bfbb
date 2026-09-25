@@ -27,6 +27,6 @@ xFactoryInst* ZNPC_Create_SubBoss(S32 who, RyzMemGrow* grow, void*);
 void ZNPC_Destroy_SubBoss(xFactoryInst* inst);
 
 extern U32 g_hash_subbanim[];
-extern const char* g_strz_subbanim[];
+extern CChar* g_strz_subbanim[];
 
 #endif

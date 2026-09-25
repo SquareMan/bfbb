@@ -52,9 +52,4 @@ void zEntSave(zEnt* ent, xSerial* s);
 void zEntSetup(zEnt* ent);
 void zEntInit(zEnt* ent, xEntAsset* asset, U32 type);
 
-// Weak functions retail emitted into zEnt.o. The name says x-layer, but the
-// body is in zEnt.cpp, so this header is where the declaration belongs.
-// (xEntGetFrame used to be re-declared here as well; xEnt.h already had it.)
-WEAK void xModelAnimCollStop(xModelInstance& m);
-
 #endif

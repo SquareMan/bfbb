@@ -6,8 +6,6 @@
 #include "xMathInlines.h"
 #include <stdio.h>
 
-#include <math.h>
-
 namespace xhud
 {
     namespace

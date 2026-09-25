@@ -1,4 +1,5 @@
-#include "types.h"
+#include <stddef.h>
+
 extern "C"{
 
 void* __copy(char *dest, char *src, size_t size)

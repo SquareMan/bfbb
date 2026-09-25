@@ -10,12 +10,14 @@
 #include "rpusrdat.h"
 
 #include "xDebug.h"
+#include "xPad.h"
 #include "xSnd.h"
 #include "xFX.h"
 #include "xShadow.h"
 #include "xstransvc.h"
 
 #include "iMemMgr.h"
+#include "iPad.h"
 #include "iSystem.h"
 #include "iFMV.h"
 #include "iTRC.h"
@@ -452,9 +454,9 @@ static void* _rwDolphinHeapRealloc(void* p1, u32 p2)
 
 S32 DolphinInitMemorySystem(RwMemoryFunctions* memoryFuncs)
 {
-    memoryFuncs->rwmalloc = reinterpret_cast<typeof(memoryFuncs->rwmalloc)>(_rwDolphinHeapAlloc);
-    memoryFuncs->rwcalloc = reinterpret_cast<typeof(memoryFuncs->rwcalloc)>(_rwDolphinHeapCalloc);
-    memoryFuncs->rwrealloc = reinterpret_cast<typeof(memoryFuncs->rwrealloc)>(_rwDolphinHeapRealloc);
+    memoryFuncs->rwmalloc = _rwDolphinHeapAlloc;
+    memoryFuncs->rwcalloc = _rwDolphinHeapCalloc;
+    memoryFuncs->rwrealloc = _rwDolphinHeapRealloc;
     memoryFuncs->rwfree = _rwDolphinHeapFree;
 
     return 1;

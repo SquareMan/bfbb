@@ -364,18 +364,6 @@ void xAnimTempTransitionInit(U32 count)
                   sizeof(xAnimTransition), count, count / 2);
 }
 
-#ifdef GAMECUBE
-#ifndef INLINE
-namespace std
-{
-    extern inline float atan2f(float y, float x)
-    {
-        return (float)atan2((double)y, (double)x);
-    }
-} // namespace std
-#endif
-#endif
-
 F32 xatan2(F32 y, F32 x)
 {
     return xAngleClampFast(std::atan2f(y, x));

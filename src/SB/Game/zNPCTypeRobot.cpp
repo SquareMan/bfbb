@@ -58,7 +58,7 @@ void __deadstripped_zNPCTypeRobot()
 
 U32 g_hash_roboanim[41] = { 0 };
 
-const char* g_strz_roboanim[41] = {
+CChar* g_strz_roboanim[41] = {
     "Unknown",        "Idle01",          "Fidget01",       "Move01",       "Notice01",
     "Taunt01",        "Respawn01",       "LassoGrab01",    "LassoHold01",  "StunBegin01",
     "StunLoop01",     "EndTag_Standard", "AlertIdle01",    "AlertMove01",  "Attack01",
@@ -72,23 +72,23 @@ const char* g_strz_roboanim[41] = {
 
 static U32 g_hash_ttsanim[2] = { 0, 0 };
 
-static const char* g_strz_ttsanim[2] = { "Unknown", "TarTar_Slosh01" };
+static CChar* g_strz_ttsanim[2] = { "Unknown", "TarTar_Slosh01" };
 
 static U32 g_hash_cloudanim[3] = { 0, 0, 0 };
 
-static const char* g_strz_cloudanim[3] = { "Unknown", "Cloud_Idle01", "Cloud_Attack01" };
+static CChar* g_strz_cloudanim[3] = { "Unknown", "Cloud_Idle01", "Cloud_Attack01" };
 
 static U32 g_hash_nytlytanim[2] = { 0, 0 };
 
-static const char* g_strz_nytlytanim[2] = { "Unknown", "Light_Idle01" };
+static CChar* g_strz_nytlytanim[2] = { "Unknown", "Light_Idle01" };
 
 static U32 g_hash_flotanim[2] = { 0, 0 };
 
-static const char* g_strz_flotanim[2] = { "Unknown", "Wiggle01" };
+static CChar* g_strz_flotanim[2] = { "Unknown", "Wiggle01" };
 
 static U32 g_hash_shieldanim[2] = { 0, 0 };
 
-static const char* g_strz_shieldanim[2] = { "Unknown", "Shield_Idle01" };
+static CChar* g_strz_shieldanim[2] = { "Unknown", "Shield_Idle01" };
 
 static UVAModelInfo g_uvaShield;
 

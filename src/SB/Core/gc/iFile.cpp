@@ -34,7 +34,7 @@ void iFileExit()
 {
 }
 
-U32* iFileLoad(const char* name, U32* buffer, U32* size)
+U32* iFileLoad(CChar* name, U32* buffer, U32* size)
 {
     char path[128];
     tag_xFile file;
@@ -335,7 +335,7 @@ void iFileFullPath(const char* relname, char* fullname)
     strcpy(fullname, relname);
 }
 
-void iFileSetPath(const char* path)
+void iFileSetPath(CChar* path)
 {
 }
 

@@ -1,7 +1,8 @@
 #ifndef _MSL_COMMON_ANSI_FILES_H
 #define _MSL_COMMON_ANSI_FILES_H
 
-#include "types.h"
+#include "stdint.h"
+#include "stddef.h"
 
 typedef unsigned long __file_handle;
 typedef unsigned long fpos_t;
@@ -14,26 +15,26 @@ enum __file_kinds { __closed_file, __disk_file, __console_file, __unavailable_fi
 enum __file_orientation { __unoriented, __char_oriented, __wide_oriented };
 
 typedef struct __file_modes {
-	u32 open_mode : 2;
-	u32 io_mode : 3;
-	u32 buffer_mode : 2;
-	u32 file_kind : 3;
+	uint32_t open_mode : 2;
+	uint32_t io_mode : 3;
+	uint32_t buffer_mode : 2;
+	uint32_t file_kind : 3;
 
 #ifdef _MSL_WIDE_CHAR
-	u32 file_orientation : 2;
+	uint32_t file_orientation : 2;
 #endif /* _MSL_WIDE_CHAR */
 
-	u32 binary_io : 1;
+	uint32_t binary_io : 1;
 } file_modes;
 
 enum __io_states { __neutral, __writing, __reading, __rereading };
 
 typedef struct __file_states {
-	u32 io_state : 3;
-	u32 free_buffer : 1;
+	uint32_t io_state : 3;
+	uint32_t free_buffer : 1;
 
-	u8 eof;
-	u8 error;
+	uint8_t eof;
+	uint8_t error;
 } file_states;
 
 typedef void* __ref_con;
@@ -46,19 +47,19 @@ struct _IO_FILE {
 	__file_handle mHandle;                           // _00
 	file_modes mMode;                                // _04
 	file_states mState;                              // _08
-	u8 mIsDynamicallyAllocated;                      // _0C
-	u8 mCharBuffer;                                  // _0D
-	u8 mCharBufferOverflow;                          // _0E
-	u8 mUngetcBuffer[__ungetc_buffer_size];          // _0F
+	uint8_t mIsDynamicallyAllocated;                 // _0C
+	uint8_t mCharBuffer;                             // _0D
+	uint8_t mCharBufferOverflow;                     // _0E
+	uint8_t mUngetcBuffer[__ungetc_buffer_size];     // _0F
 	wchar_t mUngetcWideBuffer[__ungetc_buffer_size]; // _12
-	u32 mPosition;                                   // _18
+	uint32_t mPosition;                              // _18
 	char* mBuffer;                                   // _1C
-	u32 mBufferSize;                                 // _20
+	uint32_t mBufferSize;                            // _20
 	char* mBufferPtr;                                // _24
-	u32 mBufferLength;                               // _28
-	u32 mBufferAlignment;                            // _2C
-	u32 mBufferLength2;                              // _30
-	u32 mBufferPosition;                             // _34
+	uint32_t mBufferLength;                          // _28
+	uint32_t mBufferAlignment;                       // _2C
+	uint32_t mBufferLength2;                         // _30
+	uint32_t mBufferPosition;                        // _34
 	__pos_proc positionFunc;                         // _38
 	__io_proc readFunc;                              // _3C
 	__io_proc writeFunc;                             // _40
@@ -81,7 +82,7 @@ int fflush(FILE* __stream);
 void free(void*);
 int __flush_buffer(FILE* file, size_t* length);
 void __prep_buffer(FILE* file);
-u32 __flush_all();
+uint32_t __flush_all();
 
 #ifdef __cplusplus
 };

@@ -2,7 +2,7 @@
 #define XSTRING_H
 
 #include <types.h>
-//#include <stddef.h>
+#include <stddef.h>
 
 struct substr
 {
@@ -18,7 +18,7 @@ struct substr
 U32 xStrHash(const char* str);
 U32 xStrHash(const char* str, size_t size);
 U32 xStrHashCat(U32 prefix, const char* str);
-char* xStrTok(char* string, const char* control, const char** nextoken);
+char* xStrTok(char* string, const char* control, CChar** nextoken);
 char* xStrTokBuffer(const char* string, const char* control, void* buffer);
 S32 xStricmp(const char* string1, const char* string2);
 char* xStrupr(char* string);

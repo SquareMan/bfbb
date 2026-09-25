@@ -9,7 +9,7 @@
 U32 g_hash_subbanim[ANIM_COUNT] = {};
 
 // clang-format off
-const char* g_strz_subbanim[ANIM_COUNT] =
+CChar* g_strz_subbanim[ANIM_COUNT] =
 {
     "Unknown",
     "Idle01",

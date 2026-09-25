@@ -11,6 +11,10 @@
 #define ONES(x) ((1 << (x)) - 1)
 #define VI_BITMASK(index) (1ull << (63 - (index)))
 
+#undef CLAMP
+#define CLAMP(low, high, x) \
+    ((x) > (high) ? (high) : ((x) < (low) ? (low) : (x)))
+
 const char* __VIVersion = "<< Dolphin SDK - VI\trelease build: Apr 17 2003 12:33:22 (0x2301) >>";
 
 static BOOL IsInitialized;

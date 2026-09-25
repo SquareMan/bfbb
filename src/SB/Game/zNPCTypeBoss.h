@@ -35,6 +35,6 @@ void zNPCBoss_SceneFinish();
 xAnimTable* ZNPC_AnimTable_BossSBobbyArm();
 
 extern U32 g_hash_bossanim[];
-extern const char* g_strz_bossanim[];
+extern CChar* g_strz_bossanim[];
 
 #endif

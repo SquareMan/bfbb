@@ -930,18 +930,3 @@ void zEntGetShadowParams(xEnt* ent, xVec3* center, F32* radius, xEntShadow::radi
         }
     }
 }
-
-void xModelAnimCollStop(xModelInstance& m)
-{
-    m.Flags = m.Flags & 0xe7ff;
-}
-
-xMat4x3* xEntGetFrame(const xEnt* ent)
-{
-    return xModelGetFrame(ent->model);
-}
-
-S32 xNPCBasic::SelfType() const
-{
-    return myNPCType;
-};

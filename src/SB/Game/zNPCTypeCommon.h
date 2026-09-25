@@ -589,7 +589,7 @@ void ZNPC_Common_Shutdown();
 #define NPCC_ANIM_LIST_END
 #endif
 
-void NPCC_BuildStandardAnimTran(xAnimTable* table, const char** namelist, S32* ourAnims, S32 idx_dflt,
+void NPCC_BuildStandardAnimTran(xAnimTable* table, CChar** namelist, S32* ourAnims, S32 idx_dflt,
                                 F32 blend);
 void zNPCCommon_Timestep(xScene* xscn, F32 dt);
 

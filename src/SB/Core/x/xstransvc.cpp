@@ -225,9 +225,9 @@ S32 xSTSwitchScene(U32 sid, void* userdata, S32 (*progmon)(void*, F32))
     return rc;
 }
 
-const char* xSTAssetName(U32 aid)
+CChar* xSTAssetName(U32 aid)
 {
-    const char* aname = NULL;
+    CChar* aname = NULL;
 
     S32 cnt = XST_cnt_locked();
     for (int i = 0; i < cnt; i++)
@@ -246,9 +246,9 @@ const char* xSTAssetName(U32 aid)
     return aname;
 }
 
-const char* xSTAssetName(void* raw_HIP_asset)
+CChar* xSTAssetName(void* raw_HIP_asset)
 {
-    const char* aname = NULL;
+    CChar* aname = NULL;
 
     S32 cnt = XST_cnt_locked();
     for (int i = 0; i < cnt; i++)

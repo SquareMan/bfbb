@@ -16,8 +16,8 @@
 #define NOVEMBER 11
 #define DECEMBER 12
 
-#include "iSystem.h"
-#define ITIME_FROM_SECS(s) (iTime)((s) * (GET_BUS_FREQUENCY() / 4))
+typedef S64 iTime;
+#define ITIME_FROM_SECS(s) ((s) * (GET_BUS_FREQUENCY() / 4))
 
 S32 iGetMinute();
 S32 iGetHour();
@@ -34,6 +34,6 @@ void iTimeGameAdvance(F32 elapsed);
 void iTimeSetGame(F32 time);
 void iProfileClear(U32 sceneID);
 void iFuncProfileDump();
-void iFuncProfileParse(const char* elfPath, S32 profile);
+void iFuncProfileParse(CChar* elfPath, S32 profile);
 
 #endif
