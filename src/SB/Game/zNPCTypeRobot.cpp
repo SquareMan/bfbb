@@ -58,7 +58,7 @@ void __deadstripped_zNPCTypeRobot()
 
 U32 g_hash_roboanim[41] = { 0 };
 
-char* g_strz_roboanim[41] = {
+CChar* g_strz_roboanim[41] = {
     "Unknown",        "Idle01",          "Fidget01",       "Move01",       "Notice01",
     "Taunt01",        "Respawn01",       "LassoGrab01",    "LassoHold01",  "StunBegin01",
     "StunLoop01",     "EndTag_Standard", "AlertIdle01",    "AlertMove01",  "Attack01",
@@ -72,23 +72,23 @@ char* g_strz_roboanim[41] = {
 
 static U32 g_hash_ttsanim[2] = { 0, 0 };
 
-static char* g_strz_ttsanim[2] = { "Unknown", "TarTar_Slosh01" };
+static CChar* g_strz_ttsanim[2] = { "Unknown", "TarTar_Slosh01" };
 
 static U32 g_hash_cloudanim[3] = { 0, 0, 0 };
 
-static char* g_strz_cloudanim[3] = { "Unknown", "Cloud_Idle01", "Cloud_Attack01" };
+static CChar* g_strz_cloudanim[3] = { "Unknown", "Cloud_Idle01", "Cloud_Attack01" };
 
 static U32 g_hash_nytlytanim[2] = { 0, 0 };
 
-static char* g_strz_nytlytanim[2] = { "Unknown", "Light_Idle01" };
+static CChar* g_strz_nytlytanim[2] = { "Unknown", "Light_Idle01" };
 
 static U32 g_hash_flotanim[2] = { 0, 0 };
 
-static char* g_strz_flotanim[2] = { "Unknown", "Wiggle01" };
+static CChar* g_strz_flotanim[2] = { "Unknown", "Wiggle01" };
 
 static U32 g_hash_shieldanim[2] = { 0, 0 };
 
-static char* g_strz_shieldanim[2] = { "Unknown", "Shield_Idle01" };
+static CChar* g_strz_shieldanim[2] = { "Unknown", "Shield_Idle01" };
 
 static UVAModelInfo g_uvaShield;
 
@@ -1637,6 +1637,8 @@ S32 zNPCRobot::SetCarryState(en_NPC_CARRY_STATE stat)
             result = 1;
         }
         break;
+    default:
+        break;
     }
 
     return result;
@@ -1721,6 +1723,8 @@ void zNPCRobot::LassoNotify(en_LASSO_EVENT event)
         {
         case LASS_EVNT_GRABSTART:
             psy_instinct->GoalSet(0x4e47525d, 0); // NPC_GOAL_LASSOGRAB??
+            break;
+        default:
             break;
         }
     }
@@ -3693,7 +3697,7 @@ void zNPCSleepy::RenderExtra()
     }
 }
 
-static RxObjSpace3DVertex g_vert_list[34];
+static RwIm3DVertex g_vert_list[34];
 
 void zNPCSleepy::RendConeOfDeath(S32 tgt_isBowlingBall)
 {
@@ -3727,7 +3731,7 @@ void zNPCSleepy::RendConeOfDeath(S32 tgt_isBowlingBall)
     F32 u_end = zNPCSleepy::uv_deathcone[0] + zNPCSleepy::uv_slice_deathcone[0];
     F32 v_end = zNPCSleepy::uv_deathcone[1] + zNPCSleepy::uv_slice_deathcone[1];
 
-    RxObjSpace3DVertex* vtx = g_vert_list;
+    RwIm3DVertex* vtx = g_vert_list;
 
     for (S32 i = 0; i < 16; i++)
     {
@@ -3831,7 +3835,7 @@ void zNPCSleepy::RendConeRange()
 
     xVec3 vec_ray = { 0.0f, 0.0f, 1.0f };
 
-    RxObjSpace3DVertex* vtx = g_vert_list;
+    RwIm3DVertex* vtx = g_vert_list;
 
     uv_top[0] = zNPCSleepy::uv_nightlight[0];
     uv_top[1] = zNPCSleepy::uv_nightlight[1];
@@ -4102,6 +4106,8 @@ void zNPCArfArf::DuploNotice(en_SM_NOTICES note, void* data)
                 return;
             }
         }
+        break;
+    default:
         break;
     }
 }
@@ -4713,6 +4719,8 @@ S32 zNPCTubelet::RoboHandleMail(NPCMsg* mail)
         Bonk();
         break;
     }
+    default:
+        break;
     }
 
     return handled;
@@ -4756,6 +4764,8 @@ void zNPCTubelet::LassoNotify(en_LASSO_EVENT event)
                 tubestat = TUBE_STAT_DUCKLING;
             }
         }
+        break;
+    default:
         break;
     }
 }
@@ -5125,6 +5135,8 @@ S32 zNPCTubeSlave::RoboHandleMail(NPCMsg* mail)
             }
         }
         break;
+    default:
+        break;
     }
 
     return handled;
@@ -5351,6 +5363,8 @@ void zNPCSlick::Damage(en_NPC_DAMAGE_TYPE dmg_type, xBase* who, const xVec3* vec
         break;
     case DMGTYP_BUBBOWL:
         zEntEvent(who, eEventKill);
+        break;
+    default:
         break;
     }
 

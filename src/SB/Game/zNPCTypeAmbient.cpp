@@ -17,7 +17,7 @@
 #include "zNPCSupplement.h"
 
 U32 g_hash_ambianim[12] = { 0 };
-char* g_strz_ambianim[12] = {
+CChar* g_strz_ambianim[12] = {
     "Unknown",  "Idle01", "Idle02",   "Idle03",  "Fidget01", "Fidget02",
     "Fidget03", "Move01", "Bumped01", "Dance01", "Pray01",   "Attack01",
 };
@@ -552,14 +552,12 @@ void zNPCJelly::PlayWithAlpha(F32 dt)
     F32 t = NPCC_TmrCycle(&this->tmr_pulseAlpha, dt, 0.5f);
     F32 x = PI * t;
 
-    this->SetAlpha(LERP(MAX(0.0f, MIN((F32)__fabs(isin(x)), 1.0f)), 0.7f, 0.95f));
+    this->SetAlpha(LERP(MAX(0.0f, MIN(xabs(isin(x)), 1.0f)), 0.7f, 0.95f));
 }
 
 void zNPCJelly::SetAlpha(F32 alf)
 {
-    xModelInstance* minst = this->model;
-
-    for (minst; minst != NULL; minst = minst->Next)
+    for (xModelInstance* minst = this->model; minst != NULL; minst = minst->Next)
     {
         minst->Flags |= 0x4000;
         minst->Alpha = alf;

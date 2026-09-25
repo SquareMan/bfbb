@@ -12,7 +12,7 @@
 
 #include "zEnt.h"
 
-#include <PowerPC_EABI_Support\MSL_C++\MSL_Common\Include\new.h>
+#include <new.h>
 #include <types.h>
 
 #define lengthof(x) (sizeof(x) / sizeof((x)[0]))
@@ -64,7 +64,7 @@ namespace xhud
 
     block_allocator::block_allocator(U32 a0, U32 a1)
     {
-        _block_size = ALIGN(a0, 4) + 4;
+        _block_size = ALIGN_NEXT(a0, 4) + 4;
         _top = NULL;
         _next_alloc = _head_alloc;
         _head_alloc = this;
@@ -648,7 +648,7 @@ namespace xhud
         return true;
     }
 
-    void xhud::render_model(xModelInstance& m, const xhud::render_context& rc)
+    void render_model(xModelInstance& m, const xhud::render_context& rc)
     {
         basic_rect<F32> r = { 0 };
         r.x = rc.loc.x;
@@ -713,12 +713,6 @@ inline void widget::dispatch(xBase* b1, U32 event, const F32* toParam, xBase* b2
 
 } // namespace xhud
 
-// NOTE: this belongs in <new.h>. It is inline, so the compiler emits a weak
-// out-of-line copy into every translation unit that placement-news.
-inline void* operator new(size_t, void* ptr) throw()
-{
-    return ptr;
-}
 
 // NOTE: the original is a weak symbol, i.e. an inline in xColor.h, but it is
 // emitted only here and nothing in this object references it. Defining it here

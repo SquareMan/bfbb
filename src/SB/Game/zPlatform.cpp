@@ -12,6 +12,7 @@
 #include "zFX.h"
 #include "zCollGeom.h"
 #include "zGoo.h"
+#include "xSnd.h"
 #include "xSkyDome.h"
 #include "zShrapnel.h"
 #include "xEntMotionAsset.h"
@@ -428,7 +429,7 @@ void zPlatform_PaddleStartRotate(xEnt* entplat, S32 direction, S32 stutter)
 
 U32 zPlatform_PaddleCollide(xCollis* coll, const xVec3* hitsource, const xVec3* hitvel, U32 worldSpaceNorm)
 {
-    zPlatform* plat = (zPlatform*)coll->optr;
+    zPlatform* plat = XCOLLIDE_DOWNCAST_OPTR(zPlatform*, coll->optr);
     if (plat->state != 0) {
         return 0;
     }

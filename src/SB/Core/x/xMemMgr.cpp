@@ -7,6 +7,8 @@
 #include "iSystem.h"
 #include "iMemMgr.h"
 
+#include <cstdlib>
+
 xMemInfo_tag gMemInfo;
 xMemHeap_tag gxHeap[3];
 

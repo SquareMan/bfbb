@@ -1,3 +1,5 @@
+#include "iPad.h"
+
 #include <types.h>
 #include <dolphin.h>
 
@@ -58,6 +60,7 @@ S32 iPadConvStick(F32 value)
     return convertedValue;
 }
 
+static S32 iPadConvFromGCN(U32 gcnButtons, U32 gcnMask, U32 xpadButton);
 S32 iPadUpdate(_tagxPad* pad, U32* on)
 {
     U16 buttons;
@@ -141,7 +144,7 @@ S32 iPadUpdate(_tagxPad* pad, U32* on)
 
 // Maps one GameCube pad button onto one xPad button: gcnMask selects the bit in
 // the PADStatus button word, xpadButton is the bit to report when it is held.
-S32 iPadConvFromGCN(U32 gcnButtons, U32 gcnMask, U32 xpadButton)
+static S32 iPadConvFromGCN(U32 gcnButtons, U32 gcnMask, U32 xpadButton)
 {
     return (gcnButtons & gcnMask) ? xpadButton : 0;
 }

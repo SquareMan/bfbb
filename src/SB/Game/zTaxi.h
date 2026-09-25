@@ -19,6 +19,13 @@ struct taxi_asset : xDynAsset
     F32 portalDelay;
 };
 
+#define TAXI_STATE_IDLE 0
+#define TAXI_STATE_PLAYER_ENTERED 1
+#define TAXI_STATE_CANCELLED 2
+#define TAXI_STATE_CONFIRMED 3
+#define TAXI_STATE_HIDE_PLAYER 4
+#define TAXI_STATE_FINISHED 5
+
 struct zTaxi : xBase
 {
     taxi_asset* basset;

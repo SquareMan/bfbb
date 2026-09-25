@@ -111,7 +111,7 @@ static xVec3 sBoneOffset[13] = { {},
                                  { 0.0f, -0.6f, 0.3f },
                                  {},
                                  { 0.0f, -0.6f, 0.3f } };
-static char* sNFSoundLabel[30] = {
+static const char* sNFSoundLabel[30] = {
     "FAB1006", "FAB1007",   "FAB1008",   "FAB1009", "FAB1010", "FAB1011", "FAB1012", "FAB1013",
     "FAB1014", "FAB1015",   "FAB1016",   "FAB1017", "FAB1018", "FAB1019", "FAB1020", "FAB1021",
     "FAB1022", "FAB1023",   "FAB1024",   "FAB1025", "FAB1026", "FAB1027", "FAB1028", "FAB1029",
@@ -677,13 +677,13 @@ void zNPCBSandy::Reset()
     this->feetRaster = 0;
 
     RwRaster** x;
-
-    if (x = (RwRaster**)xSTFindAsset(xStrHash("target"), 0))
+    x = (RwRaster**)xSTFindAsset(xStrHash("target"), 0);
+    if (x != NULL)
     {
         this->helmetRaster = *x;
     }
-
-    if (x = (RwRaster**)xSTFindAsset(xStrHash("target_foot"), 0))
+    x = (RwRaster**)xSTFindAsset(xStrHash("target_foot"), 0);
+    if (x != NULL)
     {
         this->feetRaster = *x;
     }
@@ -862,6 +862,7 @@ U32 zNPCBSandy::AnimPick(S32 gid, en_NPC_GOAL_SPOT param_2, xGoal* rawgoal)
         index = 6;
         break;
     case 'NGB5':
+    {
         zNPCGoalBossSandyNoHead* noHeadGoal = (zNPCGoalBossSandyNoHead*)rawgoal;
         U32 anid = noHeadGoal->stage;
         if (anid == 0)
@@ -903,6 +904,7 @@ U32 zNPCBSandy::AnimPick(S32 gid, en_NPC_GOAL_SPOT param_2, xGoal* rawgoal)
             index = 27;
         }
         break;
+    }
     case 'NGB6':
         index = 11;
         break;
@@ -910,6 +912,7 @@ U32 zNPCBSandy::AnimPick(S32 gid, en_NPC_GOAL_SPOT param_2, xGoal* rawgoal)
         index = 12;
         break;
     case 'NGB8':
+    {
         zNPCGoalBossSandySit* sitGoal = (zNPCGoalBossSandySit*)rawgoal;
         if ((sitGoal->sitFlags & 2) != 0x0)
         {
@@ -920,10 +923,12 @@ U32 zNPCBSandy::AnimPick(S32 gid, en_NPC_GOAL_SPOT param_2, xGoal* rawgoal)
             index = 16;
         }
         break;
+    }
     case 'NGB:':
         index = 4;
         break;
     case 'NGB;':
+    {
         zNPCGoalBossSandyClothesline* cl = (zNPCGoalBossSandyClothesline*)rawgoal;
         if (cl->stage == 0)
         {
@@ -938,6 +943,7 @@ U32 zNPCBSandy::AnimPick(S32 gid, en_NPC_GOAL_SPOT param_2, xGoal* rawgoal)
             index = 20;
         }
         break;
+    }
     case 'NGB9':
         index = 9;
         break;
@@ -966,7 +972,7 @@ static void SpringRender(SandyLimbSpring* spring)
     F32 step;
     F32 node1Dist;
     F32 node2Dist;
-    RxObjSpace3DVertex* verts = gRenderArr.m_vertex;
+    RwIm3DVertex* verts = gRenderArr.m_vertex;
     U32 numVerts = 0;
     S32 done = 0;
     S32 currSin = 0;

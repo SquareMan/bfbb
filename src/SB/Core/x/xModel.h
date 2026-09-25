@@ -134,6 +134,10 @@ U32 xModelGetPipeFlags(RpAtomic* model);
 void xModelInit();
 void xModelPoolInit(U32 count, U32 numMatrices);
 void xModelAnimCollStart(xModelInstance& m);
+inline void xModelAnimCollStop(xModelInstance& m)
+{
+    m.Flags = m.Flags & 0xe7ff;
+}
 void xModelSetFrame(xModelInstance* modelInst, const xMat4x3* frame);
 xModelInstance* xModelInstanceAlloc(RpAtomic* data, void* object, U16 flags, U8 boneIndex,
                                     U8* boneRemap);
@@ -152,7 +156,7 @@ void xModelResetMaterial(xModelInstance* model);
 void xModel_SceneEnter(RpWorld* world);
 void xModel_SceneExit(RpWorld* world);
 xSphere* xModelGetLocalSBound(xModelInstance* model);
-void xModelGetBoneMat(xMat4x3& mat, const xModelInstance& model, size_t index);
+void xModelGetBoneMat(xMat4x3& mat, const xModelInstance& model, u32 index);
 void xModelInstanceUpgradeBrotherShared(xModelInstance* inst, U32 flags);
 xVec3 xModelGetBoneLocation(const xModelInstance& model, u32 index);
 

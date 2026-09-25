@@ -243,6 +243,8 @@ void zGameStateSwitch(S32 theNewState)
         theEvent = sGameState_DispatchTable[theNewState];
         break;
     }
+    default:
+        break;
     }
 
     if (theEvent)

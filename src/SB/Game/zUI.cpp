@@ -20,7 +20,7 @@
 
 #include "iMath.h"
 
-#include <PowerPC_EABI_Support\MSL_C\MSL_Common\stdlib.h>
+#include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
 
@@ -566,7 +566,7 @@ void zUI_PreUpdate(_zUI* ent, xScene*, F32)
             }
             else if (globals.firstStartPressed)
             {
-                if (pad->pressed & 0x1)
+                if (pad->pressed & XPAD_BUTTON_START)
                 {
                     pad->pressed &= ~XPAD_BUTTON_START;
                     gTrcPad[0].state = TRC_PadInserted;
@@ -574,7 +574,7 @@ void zUI_PreUpdate(_zUI* ent, xScene*, F32)
                     xTRCReset();
                 }
             }
-            else if (pad->pressed & 0x1 && (ui->asset->id == xStrHash("MNU3 PRESS START UIF") ||
+            else if (pad->pressed & XPAD_BUTTON_START && (ui->asset->id == xStrHash("MNU3 PRESS START UIF") ||
                                             ui->asset->id == xStrHash("MNU3 PRESS START 02 UIF")))
             {
                 globals.currentActivePad = i;
@@ -1261,7 +1261,7 @@ xGroup* sTaxiConfirmGrp;
 void zUI_ParseINI(xIniFile* ini)
 {
     char itemName[16];
-    char *value, *tok, *ltok;
+    CChar *value, *tok, *ltok;
 
     strcpy(itemName, "Menu00");
 
@@ -1286,7 +1286,7 @@ void zUI_ParseINI(xIniFile* ini)
         }
         else
         {
-            tok = xStrTok(value, " ", &ltok);
+            tok = xStrTok(const_cast<char*>(value), " ", &ltok);
 
             sWorld[i].worldPrefix[0] = tok[0];
             sWorld[i].worldPrefix[1] = tok[1];
@@ -1474,7 +1474,7 @@ void zUI_ScenePortalInit(zScene* zsc)
             {
                 sWorld[i].task[j].portalAsset.sceneID = (sWorld[i].task[j].levelSuffix[1] << 24) |
                                                         (sWorld[i].task[j].levelSuffix[0] << 16) |
-                                                        'BH';
+                                                        '\0\0BH';
             }
             else
             {

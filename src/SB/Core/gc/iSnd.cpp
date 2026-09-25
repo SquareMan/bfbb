@@ -26,7 +26,7 @@
 #include <types.h>
 
 // FIXME: declared in zGame.h, which Core must not include
-void zGameScreenTransitionUpdate(F32 percentComplete, char* msg, U8* rgba);
+void zGameScreenTransitionUpdate(F32 percentComplete, CChar* msg, U8* rgba);
 
 u32 aram_array[40];
 
@@ -359,7 +359,10 @@ static void fcb()
         return;
     }
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-volatile"
     fc++;
+#pragma clang diagnostic pop
     S32 i;
     S32 need_update = FALSE;
     for (i = 0; i < 6; i++)

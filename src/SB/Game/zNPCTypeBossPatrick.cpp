@@ -14,6 +14,7 @@
 #include "zCamera.h"
 #include "zEntSimpleObj.h"
 #include "zEntDestructObj.h"
+#include "zEntPlayer.h"
 #include "zGlobals.h"
 #include "zGrid.h"
 #include "zNPCTypeBossPatrick.h"
@@ -24,23 +25,6 @@
 #include "zParPTank.h"
 #include "xMarkerAsset.h"
 #include <xMathInlines.h>
-
-// zEntPlayerDyingInGoo() is DEFINED as S32 in zEntPlayer.cpp and declared U8 here.
-// That looks like something to clean up and is not: retail had the same split, and
-// both halves are load-bearing.
-//
-//   - Declaring it S32 here to agree with the definition costs a whole function:
-//     zNPCTypeBossPatrick drops from 70/71 exact to 69/71, and the 6040-byte
-//     zNPCBPatrick::Process is what falls out. It tests only the low byte of the
-//     result, which is what the U8 return gives it.
-//   - Moving the declaration into zEntPlayer.h is not possible either. zEntPlayer.h
-//     already reaches this file transitively, so a U8 declaration there collides
-//     with the S32 definition ("illegal function overloading"), and an S32
-//     declaration there loses the function above. Retail's header cannot have
-//     declared it, which is exactly why this local declaration exists.
-//
-// So this stays. Do not "fix" it.
-U8 zEntPlayerDyingInGoo();
 
 #define ANIM_IDLE01 1
 #define ANIM_IDLE02 2
@@ -1487,7 +1471,7 @@ void zNPCBPatrick::Process(xScene* xscn, F32 dt)
                     {
                         this->glob[0].flags |= 8;
                         xVec3Init(&this->glob[0].norm, 0.0f, 1.0f, 0.0f);
-                        this->glob[0].conv = (zPlatform*)colls.optr;
+                        this->glob[0].conv = XCOLLIDE_DOWNCAST_OPTR(zPlatform*, colls.optr);
                         xVec3SMul(&this->glob[0].convVel,
                                   &this->glob[0].conv->bound.mat->right,
                                   this->glob[0].conv->passet->cb.speed);
@@ -1881,7 +1865,7 @@ void zNPCBPatrick::RenderFrozenPlayer()
             xMat3x3Rot(&globMat, &this->shard[i].rotVec, this->shard[i].ang);
             xVec3Copy(&globMat.pos, &player_pos);
             xMat3x3SMul(&globMat, &globMat, this->shard[i].size);
-            if (!iModelCull(this->shardModel, (RwMatrixTag*)&globMat))
+            if (!iModelCull(this->shardModel, (RwMatrix*)&globMat))
             {
                 F32 ivar1 = 100.0f * ((1.0f - this->shard[i].maxSize) + this->shard[i].size);
                 iModelSetMaterialAlpha(this->shardModel, ivar1);
@@ -3010,7 +2994,7 @@ S32 zNPCGoalBossPatSpit::Process(en_trantype* trantype, F32 dt, void* updCtxt, x
             {
                 glob->flags |= 8;
                 xVec3Init(&glob->norm, 0.0f, 1.0f, 0.0f);
-                glob->conv = (zPlatform*)colls.optr;
+                glob->conv = XCOLLIDE_DOWNCAST_OPTR(zPlatform*, colls.optr);
                 xVec3SMul(&glob->convVel, &glob->conv->bound.mat->right,
                           glob->conv->passet->cb.speed);
             }
@@ -3159,7 +3143,7 @@ S32 zNPCGoalBossPatSmack::Process(en_trantype* trantype, F32 dt, void* updCtxt, 
                 {
                     glob->flags |= 8;
                     xVec3Init(&glob->norm, 0.0f, 1.0f, 0.0f);
-                    glob->conv = (zPlatform*)colls.optr;
+                    glob->conv = XCOLLIDE_DOWNCAST_OPTR(zPlatform*, colls.optr);
 
                     xVec3SMul(&glob->convVel, (xVec3*)&glob->conv->bound.mat->right,
                               glob->conv->passet->cb.speed);
@@ -3597,7 +3581,7 @@ S32 zNPCGoalBossPatSpin::Process(en_trantype* trantype, F32 dt, void* ctxt, xSce
                     {
                         glob->flags |= 8;
                         xVec3Init(&glob->norm, 0.0f, 1.0f, 0.0f);
-                        glob->conv = (zPlatform*)colls.optr;
+                        glob->conv = XCOLLIDE_DOWNCAST_OPTR(zPlatform*, colls.optr);
                         xVec3SMul(&glob->convVel, &glob->conv->bound.mat->right,
                                   glob->conv->passet->cb.speed);
                     }
@@ -4184,7 +4168,7 @@ S32 zNPCGoalBossPatFudge::Process(en_trantype* trantype, F32 dt, void* ctxt, xSc
                 {
                     glob->flags |= 8;
                     xVec3Init(&glob->norm, 0.0f, 1.0f, 0.0f);
-                    glob->conv = (zPlatform*)colls.optr;
+                    glob->conv = XCOLLIDE_DOWNCAST_OPTR(zPlatform*, colls.optr);
 
                     xVec3SMul(&glob->convVel, (xVec3*)&glob->conv->bound.mat->right,
                               glob->conv->passet->cb.speed);

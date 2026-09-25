@@ -97,6 +97,7 @@ F32 xsqrt(F32 x)
 
     // non-matching: frsp instruction
 
+#ifdef GAMECUBE
     F32 guess = __frsqrte(x);
     guess = half * guess * (three - guess * guess * x);
 
@@ -106,6 +107,9 @@ F32 xsqrt(F32 x)
     }
 
     return 100000.0f;
+#else
+    return sqrtf(x);
+#endif
 }
 
 U32 xBoundSphereHitsOBB(const xSphere* s, const xBox* b, const xMat4x3* m, xCollis* coll)

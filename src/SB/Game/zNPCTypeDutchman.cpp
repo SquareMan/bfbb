@@ -2,34 +2,61 @@
 #include "xMath3.h"
 #include "xMathInlines.h"
 #include "xDebug.h"
+#include "xSnd.h"
 #include "zGlobals.h"
 #include "zNPCTypeDutchman.h"
+#include "xParEmitter.h"
 
 #include <types.h>
+
+// SLOP: Put in header
+namespace auto_tweak
+{
+    template <>
+    inline void load_param<S32, S32>(S32& value, S32 scale, S32 lo, S32 hi, xModelAssetParam* ap,
+                              U32 apsize, const char* name)
+    {
+        S32 v = zParamGetInt(ap, apsize, name, value);
+        if (v < lo)
+        {
+            v = lo;
+        }
+        else if (v > hi)
+        {
+            v = hi;
+        }
+        v = v * scale;
+        value = v;
+    }
+
+    template <>
+    inline void load_param<xVec3, S32>(xVec3& value, S32, S32, S32, xModelAssetParam* ap, U32 apsize,
+                                const char* name)
+    {
+        xVec3 def = value;
+        zParamGetVector(ap, apsize, name, def, &value);
+    }
+
+    template <>
+    inline void load_param<F32, F32>(F32& value, F32 scale, F32 lo, F32 hi, xModelAssetParam* ap,
+                              U32 apsize, const char* name)
+    {
+        value = zParamGetFloat(ap, apsize, name, value);
+        if (value < lo)
+        {
+            value = lo;
+        }
+        else if (value > hi)
+        {
+            value = hi;
+        }
+        value = value * scale;
+    }
+} // namespace auto_tweak
 
 // Defined here, not in a header: the retail object carries it as a common
 // symbol in this translation unit, and zEntPlayer.cpp declares it extern.
 xVec3 dutchman_reticle_center;
-
-// These two belong in xParEmitter.h and xFX.h respectively -- both are weak
-// (inline) in the retail object and this is the only translation unit that
-// uses either, so they are defined here until those shared headers can carry
-// them. Bodies recovered byte-exact from the target.
-inline void xParInterp::set(F32 value)
-{
-    val[0] = val[1] = value;
-    interp = 0;
-    freq = oofreq = 1.0f;
-}
-
-inline void xFXRibbon::init(S32, const char* name)
-{
-    init(name, NULL);
-}
-
-U32 xSndPlay3DFade(U32 id, F32 vol, F32 pitch, U32 priority, U32 flags, const xVec3* pos,
-                   F32 innerRadius, F32 outerRadius, sound_category category, F32 fadeTime,
-                   F32 delay);
 
 // xCollide.h declares neither of these; retail's header carried the xSphere overload inline.
 bool xSphereHitsCapsule(const xVec3& center, F32 radius, const xVec3& v1, const xVec3& v2,
@@ -197,7 +224,7 @@ namespace
 
     struct sound_asset
     {
-        char* name;
+        const char* name;
         U32 priority;
         U32 flags;
     };
@@ -464,7 +491,7 @@ void zNPCDutchman::Init(xEntAsset* asset)
     flg_move = 1;
     flg_vuln = 1;
 
-    char* scorch_name[2] = { "Dutchman Left Burn", "Dutchman Right Burn" };
+    const char* scorch_name[2] = { "Dutchman Left Burn", "Dutchman Right Burn" };
 
     for (S32 i = 0; i < 2; i++)
     {
@@ -1550,6 +1577,8 @@ void zNPCDutchman::LassoNotify(en_LASSO_EVENT event)
         break;
     case LASS_EVNT_GRABEND:
         break;
+    default:
+        break;
     }
 
     zNPCCommon::LassoNotify(event);
@@ -1743,6 +1772,8 @@ void zNPCDutchman::update_move(F32 dt)
         break;
     case MOVE_STOP:
         update_move_stop(frame->mat.pos, move, dt);
+        break;
+    default:
         break;
     }
 }
@@ -2125,6 +2156,8 @@ void zNPCDutchman::update_fade(F32 dt)
             set_alpha(frac);
             set_volume(SOUND_VAPOR, fade.sound_handle, 1.0f - frac);
         }
+        break;
+    default:
         break;
     }
 }
@@ -2749,9 +2782,9 @@ void zNPCDutchman::halt(F32 decel)
 
 namespace
 {
-    void set_vert(RxObjSpace3DVertex& vert, const xVec3& loc, F32 u, F32 v, U8 alpha);
+    void set_vert(RwIm3DVertex& vert, const xVec3& loc, F32 u, F32 v, U8 alpha);
 
-    void set_beam_verts(RxObjSpace3DVertex* vert, const xVec3& loc0, const xVec3& loc1, U8 a0,
+    void set_beam_verts(RwIm3DVertex* vert, const xVec3& loc0, const xVec3& loc1, U8 a0,
                         U8 a1, const xVec3& half_right)
     {
         set_vert(vert[0], loc0 - half_right, 0.0f, 0.0f, a0);
@@ -2762,7 +2795,7 @@ namespace
         set_vert(vert[5], loc1 + half_right, 1.0f, 1.0f, a1);
     }
 
-    void set_vert(RxObjSpace3DVertex& vert, const xVec3& loc, F32 u, F32 v, U8 alpha)
+    void set_vert(RwIm3DVertex& vert, const xVec3& loc, F32 u, F32 v, U8 alpha)
     {
         RwIm3DVertexSetPos(&vert, loc.x, loc.y, loc.z);
         RwIm3DVertexSetUV(&vert, u, v);
@@ -2786,7 +2819,7 @@ namespace
         return screen_loc;
     }
 
-    RxObjSpace3DVertex* render_beam(RxObjSpace3DVertex* vert, const zNPCDutchman::beam_info& beam,
+    RwIm3DVertex* render_beam(RwIm3DVertex* vert, const zNPCDutchman::beam_info& beam,
                                     unsigned long which, U8 alpha)
     {
         const xVec3& start_loc = beam.start_loc;
@@ -2821,7 +2854,7 @@ namespace
         return vert + 12;
     }
 
-    RxObjSpace3DVertex* render_beam(RxObjSpace3DVertex* vert, const zNPCDutchman::beam_info& beam)
+    RwIm3DVertex* render_beam(RwIm3DVertex* vert, const zNPCDutchman::beam_info& beam)
     {
         U32 segments = beam.segments;
         U8 alpha = (S32)(0.5f + 255.0f * beam.alpha / segments);
@@ -2837,12 +2870,12 @@ namespace
 
 void zNPCDutchman::render_beam()
 {
-    RxObjSpace3DVertex* verts =
-        (RxObjSpace3DVertex*)xMemPushTemp((beam[0].segments + beam[1].segments) * 0x1b0);
+    RwIm3DVertex* verts =
+        (RwIm3DVertex*)xMemPushTemp((beam[0].segments + beam[1].segments) * 0x1b0);
 
     RwRenderStateSet(rwRENDERSTATETEXTURERASTER, laser_raster);
 
-    RxObjSpace3DVertex* vert = ::render_beam(verts, beam[0]);
+    RwIm3DVertex* vert = ::render_beam(verts, beam[0]);
 
     vert = ::render_beam(vert, beam[1]);
 
@@ -2867,12 +2900,12 @@ void zNPCDutchman::render_halo()
 
 xFactoryInst* zNPCGoalDutchmanNil::create(S32 who, RyzMemGrow* grow, void* info)
 {
-    return new (who, grow) zNPCGoalDutchmanNil(who, (zNPCDutchman&)*info);
+    return new (who, grow) zNPCGoalDutchmanNil(who, *(zNPCDutchman*)info);
 }
 
 xFactoryInst* zNPCGoalDutchmanInitiate::create(S32 who, RyzMemGrow* grow, void* info)
 {
-    return new (who, grow) zNPCGoalDutchmanInitiate(who, (zNPCDutchman&)*info);
+    return new (who, grow) zNPCGoalDutchmanInitiate(who, *(zNPCDutchman*)info);
 }
 
 S32 zNPCGoalDutchmanInitiate::Enter(F32 dt, void* updCtxt)
@@ -2937,7 +2970,7 @@ S32 zNPCGoalDutchmanInitiate::Process(en_trantype* trantype, F32 dt, void* updCt
 
 xFactoryInst* zNPCGoalDutchmanIdle::create(S32 who, RyzMemGrow* grow, void* info)
 {
-    return new (who, grow) zNPCGoalDutchmanIdle(who, (zNPCDutchman&)*info);
+    return new (who, grow) zNPCGoalDutchmanIdle(who, *(zNPCDutchman*)info);
 }
 
 S32 zNPCGoalDutchmanIdle::Enter(F32 dt, void* updCtxt)
@@ -2964,7 +2997,7 @@ S32 zNPCGoalDutchmanIdle::Process(en_trantype* trantype, float dt, void* updCtxt
 
 xFactoryInst* zNPCGoalDutchmanDisappear::create(S32 who, RyzMemGrow* grow, void* info)
 {
-    return new (who, grow) zNPCGoalDutchmanDisappear(who, (zNPCDutchman&)*info);
+    return new (who, grow) zNPCGoalDutchmanDisappear(who, *(zNPCDutchman*)info);
 }
 
 S32 zNPCGoalDutchmanDisappear::Enter(F32 dt, void* updCtxt)
@@ -2993,7 +3026,7 @@ S32 zNPCGoalDutchmanDisappear::Process(en_trantype* trantype, F32 dt, void* updC
 
 xFactoryInst* zNPCGoalDutchmanTeleport::create(S32 who, RyzMemGrow* grow, void* info)
 {
-    return new (who, grow) zNPCGoalDutchmanTeleport(who, (zNPCDutchman&)*info);
+    return new (who, grow) zNPCGoalDutchmanTeleport(who, *(zNPCDutchman*)info);
 }
 
 S32 zNPCGoalDutchmanTeleport::Enter(F32 dt, void* updCtxt)
@@ -3028,7 +3061,7 @@ S32 zNPCGoalDutchmanTeleport::Process(en_trantype* trantype, F32 dt, void* updCt
 
 xFactoryInst* zNPCGoalDutchmanReappear::create(S32 who, RyzMemGrow* grow, void* info)
 {
-    return new (who, grow) zNPCGoalDutchmanReappear(who, (zNPCDutchman&)*info);
+    return new (who, grow) zNPCGoalDutchmanReappear(who, *(zNPCDutchman*)info);
 }
 
 S32 zNPCGoalDutchmanReappear::Enter(F32 dt, void* updCtxt)
@@ -3061,7 +3094,7 @@ S32 zNPCGoalDutchmanReappear::Process(en_trantype* trantype, F32 dt, void* updCt
 
 xFactoryInst* zNPCGoalDutchmanBeam::create(S32 who, RyzMemGrow* grow, void* info)
 {
-    return new (who, grow) zNPCGoalDutchmanBeam(who, (zNPCDutchman&)*info);
+    return new (who, grow) zNPCGoalDutchmanBeam(who, *(zNPCDutchman*)info);
 }
 
 S32 zNPCGoalDutchmanBeam::Enter(F32 dt, void* updCtxt)
@@ -3381,7 +3414,7 @@ void zNPCGoalDutchmanBeam::predict_target(xVec3& target) const
 
 xFactoryInst* zNPCGoalDutchmanFlame::create(S32 who, RyzMemGrow* grow, void* info)
 {
-    return new (who, grow) zNPCGoalDutchmanFlame(who, (zNPCDutchman&)*info);
+    return new (who, grow) zNPCGoalDutchmanFlame(who, *(zNPCDutchman*)info);
 }
 
 S32 zNPCGoalDutchmanFlame::Enter(F32 dt, void* updCtxt)
@@ -3568,7 +3601,7 @@ namespace
 
 xFactoryInst* zNPCGoalDutchmanPostFlame::create(S32 who, RyzMemGrow* grow, void* info)
 {
-    return new (who, grow) zNPCGoalDutchmanPostFlame(who, (zNPCDutchman&)*info);
+    return new (who, grow) zNPCGoalDutchmanPostFlame(who, *(zNPCDutchman*)info);
 }
 
 S32 zNPCGoalDutchmanPostFlame::Enter(F32 dt, void* updCtxt)
@@ -3636,7 +3669,7 @@ S32 zNPCGoalDutchmanPostFlame::Process(en_trantype* trantype, F32 dt, void* updC
 
 xFactoryInst* zNPCGoalDutchmanCaught::create(S32 who, RyzMemGrow* grow, void* info)
 {
-    return new (who, grow) zNPCGoalDutchmanCaught(who, (zNPCDutchman&)*info);
+    return new (who, grow) zNPCGoalDutchmanCaught(who, *(zNPCDutchman*)info);
 }
 
 S32 zNPCGoalDutchmanCaught::Enter(float dt, void* updCtxt)
@@ -3683,7 +3716,7 @@ S32 zNPCGoalDutchmanCaught::Process(en_trantype* trantype, F32 dt, void* updCtxt
 
 xFactoryInst* zNPCGoalDutchmanDamage::create(S32 who, RyzMemGrow* grow, void* info)
 {
-    return new (who, grow) zNPCGoalDutchmanDamage(who, (zNPCDutchman&)*info);
+    return new (who, grow) zNPCGoalDutchmanDamage(who, *(zNPCDutchman*)info);
 }
 
 S32 zNPCGoalDutchmanDamage::Enter(F32 dt, void* updCtxt)
@@ -3733,7 +3766,7 @@ S32 zNPCGoalDutchmanDamage::Process(en_trantype* trantype, F32 dt, void* updCtxt
 
 xFactoryInst* zNPCGoalDutchmanDeath::create(S32 who, RyzMemGrow* grow, void* info)
 {
-    return new (who, grow) zNPCGoalDutchmanDeath(who, (zNPCDutchman&)*info);
+    return new (who, grow) zNPCGoalDutchmanDeath(who, *(zNPCDutchman*)info);
 }
 
 S32 zNPCGoalDutchmanDeath::Enter(F32 dt, void* updCtxt)
@@ -3788,47 +3821,3 @@ WEAK void zNPCDutchman::face_player()
 {
     flag.face_player = true;
 }
-
-namespace auto_tweak
-{
-    template <>
-    inline void load_param<S32, S32>(S32& value, S32 scale, S32 lo, S32 hi, xModelAssetParam* ap,
-                              U32 apsize, const char* name)
-    {
-        S32 v = zParamGetInt(ap, apsize, name, value);
-        if (v < lo)
-        {
-            v = lo;
-        }
-        else if (v > hi)
-        {
-            v = hi;
-        }
-        v = v * scale;
-        value = v;
-    }
-
-    template <>
-    inline void load_param<xVec3, S32>(xVec3& value, S32, S32, S32, xModelAssetParam* ap, U32 apsize,
-                                const char* name)
-    {
-        xVec3 def = value;
-        zParamGetVector(ap, apsize, name, def, &value);
-    }
-
-    template <>
-    inline void load_param<F32, F32>(F32& value, F32 scale, F32 lo, F32 hi, xModelAssetParam* ap,
-                              U32 apsize, const char* name)
-    {
-        value = zParamGetFloat(ap, apsize, name, value);
-        if (value < lo)
-        {
-            value = lo;
-        }
-        else if (value > hi)
-        {
-            value = hi;
-        }
-        value = value * scale;
-    }
-} // namespace auto_tweak

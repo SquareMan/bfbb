@@ -1,8 +1,5 @@
 #include "zFX.h"
 
-#include "rpworld.h"
-#include "rpskin.h"
-#include "rwplcore.h"
 #include "iAnim.h"
 #include "xDebug.h"
 #include "xDraw.h"
@@ -19,11 +16,11 @@
 #include "zScene.h"
 #include "zTextBox.h"
 
+#include <rpskin.h>
 #include <stdio.h>
 #include <types.h>
 #include <string.h>
 #include <stdlib.h>
-#include <PowerPC_EABI_Support\MSL_C\MSL_Common\cmath>
 
 void zParPTankSpawnBubbles(xVec3* pos, xVec3* vel, U32 count, F32 scale);
 void zParPTankSpawnMenuBubbles(xVec3* pos, xVec3* vel, U32 count);
@@ -277,7 +274,8 @@ void zFXGooEnable(RpAtomic* atomic, S32 freezeGroup)
     S32 numTriangles = geom->numTriangles;
     if (geom->preLitLum == NULL)
     {
-        RpGeometry* new_geom = RpGeometryCreate(numVertices, numTriangles, 0x7E);
+        RpGeometry* new_geom = RpGeometryCreate(numVertices, numTriangles,
+            rpGEOMETRYPOSITIONS | rpGEOMETRYTEXTURED | rpGEOMETRYPRELIT | rpGEOMETRYNORMALS | rpGEOMETRYLIGHT | rpGEOMETRYMODULATEMATERIALCOLOR);
         RpMorphTarget* new_morph = new_geom->morphTarget;
         RwV3d* verts = geom->morphTarget->verts;
         RwV3d* new_verts = new_morph->verts;
@@ -407,7 +405,8 @@ void zFXGooUpdateInstance(zFXGooInstance* goo, F32 dt)
         }
     }
 
-    if (xabs(goo->state_time[goo->state] < 1e-5f))
+    // silence this warning, they really did convert the float to a bool...
+    if ((bool)xabs(goo->state_time[goo->state] < 1e-5f))
     {
         goo->state_time[goo->state] = 1e-5f;
     }
@@ -454,6 +453,8 @@ void zFXGooUpdateInstance(zFXGooInstance* goo, F32 dt)
         goo->max *= rate;
         break;
     }
+    default:
+        break;
     }
 
     goo->warbc[0] = goo->w0 * (1.0f - goo->alpha);
@@ -525,7 +526,7 @@ void zFXGooUpdate(F32 dt)
     }
 }
 
-RpAtomic* zFXGooRenderAtomic(class RpAtomic* atomic)
+RpAtomic* zFXGooRenderAtomic(RpAtomic* atomic)
 {
     if (g_txtr_gooFrozen == NULL)
     {
@@ -892,6 +893,8 @@ F32 zFXGooFreezeTimeLeft()
             time += (goo->timer - goo->time);
             break;
         }
+        default:
+            break;
         }
 
         if (maxTime < time)
@@ -1278,7 +1281,7 @@ namespace
 
     struct entrail_type
     {
-        char* model_name;
+        const char* model_name;
         S32 bone;
         F32 rate;
         F32 cull_dist;
@@ -1350,7 +1353,7 @@ namespace
 
     bool model_is_preinstanced(RpAtomic* atomic)
     {
-        RpGeometry* geom = RpAtomicGetGeometryMacro(atomic);
+        RpGeometry* geom = RpAtomicGetGeometry(atomic);
         if (geom == NULL)
         {
             return TRUE;
@@ -1762,6 +1765,8 @@ namespace
             set_popper_alpha(popper, xSCurve(1.0f - t));
             break;
         }
+        case STATE_NONE:        
+            break;
         }
 
         F32 size;
@@ -1834,6 +1839,8 @@ namespace
             m->PipeFlags = (m->PipeFlags & ~0xc) | data.pipe_flags;
             break;
         }
+        case STATE_NONE:
+            break;
         }
 
         data.state = STATE_NONE;

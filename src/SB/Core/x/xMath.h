@@ -5,19 +5,14 @@
 
 #include "iMath.h"
 
-#define MAX(a, b) (((a) > (b)) ? (a) : (b))
-#define MIN(a, b) (((a) < (b)) ? (a) : (b))
 #define xabs(x) iabs(x)
 
 #define xeq(a, b, e) (xabs((a) - (b)) <= (e))
 #define xfeq0(x) (((x) >= -1e-5f) && ((x) <= 1e-5f))
 
-#define CLAMP(x, a, b) (MAX((a), MIN((x), (b))))
 #define xlerp(a, b, t) ((a) + (t) * ((b) - (a)))
 
 #define SQR(x) ((x) * (x))
-
-#define ALIGN(x, a) ((x) + ((a)-1) & ~((a)-1))
 
 // Override these to point to their corresponding symbols in .sdata2
 // For example:
@@ -26,7 +21,11 @@
 //     #define PI _771_1
 //     #define ONEEIGHTY _778_0
 #define PI 3.1415927f
+#define HALF_PI 1.5707964f
 #define ONEEIGHTY 180.0f
+
+#define TAU 6.2831855f
+#define LONG_TAU 6.2831854820251465
 
 #define DEG2RAD(x) ((PI) * (x) / (ONEEIGHTY))
 #define RAD2DEG(x) ((ONEEIGHTY) * (x) / (PI))
@@ -71,6 +70,19 @@ void xsqrtfast(F32& dst, F32 num);
 
 F32 xrmod(F32 ang);
 
-template <class T> T range_limit(T v, T minv, T maxv);
+template <class T> T range_limit(T v, T minv, T maxv)
+{
+    if (v <= minv)
+    {
+        return minv;
+    }
+
+    if (v >= maxv)
+    {
+        return maxv;
+    }
+
+    return v;
+}
 
 #endif

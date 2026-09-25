@@ -9,13 +9,6 @@
 extern "C" {
 #endif // ifdef __cplusplus
 
-#ifndef __MWERKS__
-// Get clangd to shut up about __fabs being undefined.
-#define __fabs(x) (x)
-#define __fabsf(x) (x)
-#define __frsqrte(x) (x)
-#endif
-
 #define FABS(x) (float)__fabs(x)
 // #define __frsqrtes opword
 
@@ -37,11 +30,8 @@ extern int __double_huge[];
 #define NAN (*(float*)__float_nan)
 #define HUGE_VAL (*(double*)__double_huge)
 
-inline long double fabsl(long double x)
-{
-    return __fabs((double)x);
-}
 
+double __fabs(double);
 inline double fabs(double x)
 {
     return __fabs(x);
@@ -64,6 +54,7 @@ double log(double);
 double log10(double);
 
 double fmod(double, double);
+float fmodf(float, float);
 
 double sin(double x);
 double cos(double x);

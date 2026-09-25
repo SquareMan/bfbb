@@ -51,7 +51,7 @@ void iParMgrRenderParSys_Sprite(void* data, xParGroup* ps)
     S32 indexCount;
     S32 vertexCount;
     U16* i3d;
-    RxObjSpace3DVertex* v3d;
+    RwIm3DVertex* v3d;
     xParCmdTex* tex;
     U32 pivot;
     xVec3 offset[4];
@@ -248,7 +248,7 @@ void iRenderPushQuadStreak(xPar* p, xParCmdTex* tex)
 {
     void* vertices;
     U16* indices;
-    static RxObjSpace3DVertex v3d[4];
+    static RwIm3DVertex v3d[4];
     static U16 i3d[6] = { 0, 1, 2, 0, 2, 3 };
 
     // vertices/indices are bound to the two function-scope templates up here,
@@ -389,7 +389,7 @@ static void iRenderPushFlat(xPar* p, xParCmdTex* tex)
 {
     void* vertices;
     U16* indices;
-    static RxObjSpace3DVertex v3d[4];
+    static RwIm3DVertex v3d[4];
     static U16 i3d[6] = { 0, 1, 2, 0, 2, 3 };
 
     // vertices/indices are bound to the two function-scope templates up here,
@@ -554,7 +554,7 @@ void iParMgrRenderParSys_Streak(void* data, xParGroup* ps)
     zParSys* s;
     RwTexture* texture;
     RwRaster* raster;
-    RxObjSpace3DVertex* v3d;
+    RwIm3DVertex* v3d;
 
     iRenderSetCameraViewMatrix(NULL);
 
@@ -667,7 +667,7 @@ void iParMgrRenderParSys_InvStreak(void* data, xParGroup* ps)
     zParSys* s;
     RwTexture* texture;
     RwRaster* raster;
-    RxObjSpace3DVertex* v3d;
+    RwIm3DVertex* v3d;
 
     iRenderSetCameraViewMatrix(NULL);
 
@@ -807,7 +807,7 @@ void iParMgrRenderParSys_Ground(void* data, xParGroup* ps)
     RwTexture* texture;
     RwRaster* raster;
     xParCmdTex* tex;
-    static RxObjSpace3DVertex v3d[4];
+    static RwIm3DVertex v3d[4];
     static U16 i3d[6] = { 0, 1, 2, 3, 0, 1 };
 
     iRenderSetCameraViewMatrix(NULL);

@@ -1,6 +1,5 @@
 
 #include "zNPCTypeBossSB2.h"
-#include "PowerPC_EABI_Support/MSL_C++/MSL_Common/Include/new.h"
 #include "xLightKit.h"
 #include "zNPCGoalCommon.h"
 #include <types.h>
@@ -30,7 +29,9 @@
 #include "zScene.h"
 #include "zEnv.h"
 #include "zNPCTypeVillager.h"
-#include <xMathInlines.h>
+#include "xMathInlines.h"
+
+#include <new.h>
 
 #define ANIM_Unknown 0 //0x0
 #define ANIM_Idle01 1 // 0x4
@@ -71,17 +72,72 @@
 #define SOUND_HIT_SLAP 8
 #define SOUND_HIT_FLAIL 9
 
-U32 xSndPlay3DFade(U32 id, F32 vol, F32 pitch, U32 priority, U32 flags, const xVec3* pos,
-                   F32 innerRadius, F32 outerRadius, sound_category category, F32 fade, F32 delay);
 F32 xSCurveInverse(F32 val);
 bool xSphereHitsBound(const xSphere& o, const xBound& b);
 void xBoundGetSphere(xSphere& o, const xBound& bound);
 U32 iModelTagSetup(xModelTagWithNormal* tag, RpAtomic* model, F32 x, F32 y, F32 z);
-void iModelTagEval(RpAtomic* model, const xModelTagWithNormal* tag, RwMatrixTag* mat, xVec3* dest,
+void iModelTagEval(RpAtomic* model, const xModelTagWithNormal* tag, RwMatrix* mat, xVec3* dest,
                    xVec3* normal);
 U8 xOBBHitsOBB(const xBox& a, const xMat4x3& amat, const xBox& b, const xMat4x3& bmat);
 
 zNPCB_SB2* zNPCB_SB2::_singleton;
+
+// SLOP: This needs to be part of the header to prevent explicit specialization after instantiation errors
+namespace auto_tweak
+{
+    template <>
+    inline void load_param<S32, S32>(S32& value, S32 scale, S32 lo, S32 hi, xModelAssetParam* ap,
+                              U32 apsize, const char* name)
+    {
+        S32 v = zParamGetInt(ap, apsize, name, value);
+
+        if (v < lo)
+        {
+            v = lo;
+        }
+        else if (v > hi)
+        {
+            v = hi;
+        }
+
+        v *= scale;
+
+        value = v;
+    }
+
+    template <>
+    inline void load_param<bool, S32>(bool& value, S32, S32, S32, xModelAssetParam* ap, U32 apsize,
+                               const char* name)
+    {
+        value = zParamGetInt(ap, apsize, name, value) != 0;
+    }
+
+    template <>
+    inline void load_param<xVec3, S32>(xVec3& value, S32, S32, S32, xModelAssetParam* ap, U32 apsize,
+                                const char* name)
+    {
+        xVec3 def = value;
+        zParamGetVector(ap, apsize, name, def, &value);
+    }
+
+    template <>
+    inline void load_param<F32, F32>(F32& value, F32 scale, F32 lo, F32 hi, xModelAssetParam* ap,
+                              U32 apsize, const char* name)
+    {
+        value = zParamGetFloat(ap, apsize, name, value);
+
+        if (value < lo)
+        {
+            value = lo;
+        }
+        else if (value > hi)
+        {
+            value = hi;
+        }
+
+        value = value * scale;
+    }
+} // namespace auto_tweak
 
 namespace
 {
@@ -125,7 +181,7 @@ namespace
     struct sound_asset
     {
         S32 group;
-        char* name;
+        const char* name;
         U32 priority;
         U32 flags;
     };
@@ -138,12 +194,12 @@ namespace
 
     struct platform_hook
     {
-        char* name;
+        const char* name;
     };
 
     struct node_hook
     {
-        char* name;
+        const char* name;
         S32 model;
         bool midpoint;
         S32 points;
@@ -162,7 +218,7 @@ namespace
         U32 size;
     };
 
-    static char* sound_asset_names[10][4];
+    static const char* sound_asset_names[10][4];
     static U32 sound_asset_ids[10][4];
     static S32 sound_asset_names_size[10];
     static sound_data_type sound_data[10];
@@ -1988,7 +2044,7 @@ void zNPCB_SB2::emit_slug(zNPCB_SB2::slug_enum which)
         xMat3x3RMulVec(&offset, &slug.mat, &tweak.karate.emit_offset);
         slug.mat.pos += offset;
 
-        F32 launch_ang = which - 1.0f;
+        F32 launch_ang = (F32)which - 1.0f;
 
         launch_ang *= tweak.karate.emit_arc;
 
@@ -2319,6 +2375,8 @@ void zNPCB_SB2::update_move(F32 dt)
     case MOVE_Y:
         update_ymove(dt);
         break;
+    default:
+        break;
     }
 }
 
@@ -2416,7 +2474,7 @@ void zNPCB_SB2::move_nodes()
         xVec3 norm;
         xVec3 uploc;
         RpAtomic* m = n.skin_model;
-        RwMatrixTag* skin_mat = n.skin_mat;
+        RwMatrix* skin_mat = n.skin_mat;
 
         if (node_hooks[i].points == 3)
         {
@@ -2498,7 +2556,7 @@ void zNPCB_SB2::bind_nodes()
     setup_node_tags();
 }
 
-void zNPCB_SB2::rebind_nodes(RpAtomic* skin_model, RwMatrixTag* skin_mat)
+void zNPCB_SB2::rebind_nodes(RpAtomic* skin_model, RwMatrix* skin_mat)
 {
     RpAtomic* skin_models[4];
 
@@ -3492,7 +3550,7 @@ void zNPCB_SB2::say(int which)
 
 xFactoryInst* zNPCGoalBossSB2Intro::create(S32 who, RyzMemGrow* grow, void* info)
 {
-    return new (who, grow) zNPCGoalBossSB2Intro(who, (zNPCB_SB2&)*info);
+    return new (who, grow) zNPCGoalBossSB2Intro(who, *(zNPCB_SB2*)info);
 }
 
 S32 zNPCGoalBossSB2Intro::Enter(F32 dt, void* updCtxt)
@@ -3526,7 +3584,7 @@ S32 zNPCGoalBossSB2Intro::Exit(F32 dt, void* updCtxt)
 
 xFactoryInst* zNPCGoalBossSB2Idle::create(S32 who, RyzMemGrow* grow, void* info)
 {
-    return new (who, grow) zNPCGoalBossSB2Idle(who, (zNPCB_SB2&)*info);
+    return new (who, grow) zNPCGoalBossSB2Idle(who, *(zNPCB_SB2*)info);
 }
 
 S32 zNPCGoalBossSB2Idle::Enter(F32 dt, void* updCtxt)
@@ -3572,7 +3630,7 @@ S32 zNPCGoalBossSB2Idle::Process(en_trantype* trantype, F32 dt, void* updCtxt, x
 
 xFactoryInst* zNPCGoalBossSB2Taunt::create(S32 who, RyzMemGrow* grow, void* info)
 {
-    return new (who, grow) zNPCGoalBossSB2Taunt(who, (zNPCB_SB2&)*info);
+    return new (who, grow) zNPCGoalBossSB2Taunt(who, *(zNPCB_SB2*)info);
 }
 
 S32 zNPCGoalBossSB2Taunt::Enter(F32 dt, void* updCtxt)
@@ -3600,7 +3658,7 @@ S32 zNPCGoalBossSB2Taunt::Exit(F32 dt, void* updCtxt)
 
 xFactoryInst* zNPCGoalBossSB2Dizzy::create(S32 who, RyzMemGrow* grow, void* info)
 {
-    return new (who, grow) zNPCGoalBossSB2Dizzy(who, (zNPCB_SB2&)*info);
+    return new (who, grow) zNPCGoalBossSB2Dizzy(who, *(zNPCB_SB2*)info);
 }
 
 S32 zNPCGoalBossSB2Dizzy::Enter(F32 dt, void* updCtxt)
@@ -3650,7 +3708,7 @@ S32 zNPCGoalBossSB2Dizzy::Process(en_trantype* trantype, F32 dt, void* updCtxt, 
 
 xFactoryInst* zNPCGoalBossSB2Hit::create(S32 who, RyzMemGrow* grow, void* info)
 {
-    return new (who, grow) zNPCGoalBossSB2Hit(who, (zNPCB_SB2&)*info);
+    return new (who, grow) zNPCGoalBossSB2Hit(who, *(zNPCB_SB2*)info);
 }
 
 S32 zNPCGoalBossSB2Hit::Enter(F32 dt, void* updCtxt) 
@@ -3686,7 +3744,7 @@ S32 zNPCGoalBossSB2Hit::Exit(F32 dt, void* updCtxt)
 
 xFactoryInst* zNPCGoalBossSB2Hunt::create(S32 who, RyzMemGrow* grow, void* info)
 {
-    return new (who, grow) zNPCGoalBossSB2Hunt(who, (zNPCB_SB2&)*info);
+    return new (who, grow) zNPCGoalBossSB2Hunt(who, *(zNPCB_SB2*)info);
 }
 
 S32 zNPCGoalBossSB2Hit::Process(en_trantype* trantype, F32 dt, void* updCtxt, xScene* xscn)
@@ -3809,7 +3867,7 @@ S32 zNPCGoalBossSB2Hunt::Process(en_trantype* trantype, F32 dt, void* updCtxt, x
 
 xFactoryInst* zNPCGoalBossSB2Swipe::create(S32 who, RyzMemGrow* grow, void* info)
 {
-    return new (who, grow) zNPCGoalBossSB2Swipe(who, (zNPCB_SB2&)*info);
+    return new (who, grow) zNPCGoalBossSB2Swipe(who, *(zNPCB_SB2*)info);
 }
 
 S32 zNPCGoalBossSB2Swipe::Enter(F32 dt, void* updCtxt)
@@ -3906,7 +3964,7 @@ bool zNPCGoalBossSB2Swipe::can_start() const
 
 xFactoryInst* zNPCGoalBossSB2Chop::create(S32 who, RyzMemGrow* grow, void* info)
 {
-    return new (who, grow) zNPCGoalBossSB2Chop(who, (zNPCB_SB2&)*info);
+    return new (who, grow) zNPCGoalBossSB2Chop(who, *(zNPCB_SB2*)info);
 }
 
 S32 zNPCGoalBossSB2Chop::Enter(F32 dt, void* updCtxt)
@@ -4025,7 +4083,7 @@ bool zNPCGoalBossSB2Chop::can_start() const
 
 xFactoryInst* zNPCGoalBossSB2Karate::create(S32 who, RyzMemGrow* grow, void* info)
 {
-    return new (who, grow) zNPCGoalBossSB2Karate(who, (zNPCB_SB2&)*info);
+    return new (who, grow) zNPCGoalBossSB2Karate(who, *(zNPCB_SB2*)info);
 }
 
 S32 zNPCGoalBossSB2Karate::Enter(F32 dt, void* updCtxt)
@@ -4156,7 +4214,7 @@ bool zNPCGoalBossSB2Karate::can_start() const
 
 xFactoryInst* zNPCGoalBossSB2Death::create(S32 who, RyzMemGrow* grow, void* info)
 {
-    return new (who, grow) zNPCGoalBossSB2Death(who, (zNPCB_SB2&)*info);
+    return new (who, grow) zNPCGoalBossSB2Death(who, *(zNPCB_SB2*)info);
 }
 
 S32 zNPCGoalBossSB2Death::Enter(F32 dt, void* updCtxt)
@@ -4175,61 +4233,6 @@ S32 zNPCGoalBossSB2Death::Process(en_trantype*, F32, void*, xScene*)
     return 0;
 }
 
-namespace auto_tweak
-{
-    template <>
-    inline void load_param<S32, S32>(S32& value, S32 scale, S32 lo, S32 hi, xModelAssetParam* ap,
-                              U32 apsize, const char* name)
-    {
-        S32 v = zParamGetInt(ap, apsize, name, value);
-
-        if (v < lo)
-        {
-            v = lo;
-        }
-        else if (v > hi)
-        {
-            v = hi;
-        }
-
-        v *= scale;
-
-        value = v;
-    }
-
-    template <>
-    inline void load_param<bool, S32>(bool& value, S32, S32, S32, xModelAssetParam* ap, U32 apsize,
-                               const char* name)
-    {
-        value = zParamGetInt(ap, apsize, name, value) != 0;
-    }
-
-    template <>
-    inline void load_param<xVec3, S32>(xVec3& value, S32, S32, S32, xModelAssetParam* ap, U32 apsize,
-                                const char* name)
-    {
-        xVec3 def = value;
-        zParamGetVector(ap, apsize, name, def, &value);
-    }
-
-    template <>
-    inline void load_param<F32, F32>(F32& value, F32 scale, F32 lo, F32 hi, xModelAssetParam* ap,
-                              U32 apsize, const char* name)
-    {
-        value = zParamGetFloat(ap, apsize, name, value);
-
-        if (value < lo)
-        {
-            value = lo;
-        }
-        else if (value > hi)
-        {
-            value = hi;
-        }
-
-        value = value * scale;
-    }
-} // namespace auto_tweak
 
 void zNPCB_SB2::choose_hand()
 {

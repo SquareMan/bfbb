@@ -88,7 +88,7 @@ void zBusStop_Update(xBase* to, xScene* scene, F32 dt)
         {
             if (!cruise_bubble::active())
             {
-                if (globals.pad0->pressed & (1 << 12))
+                if (globals.pad0->pressed & XPAD_BUTTON_R1)
                 {
                     bstop->currState = 2;
                     zEntPlayer_SNDPlay(ePlayerSnd_Bus, 0.0f);

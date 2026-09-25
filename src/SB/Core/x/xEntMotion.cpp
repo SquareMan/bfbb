@@ -30,7 +30,7 @@ static void xEntMechMove(xEntMotion* motion, xScene* sc, F32 dt, xEntFrame* fram
 static void xEntPenMove(xEntMotion* motion, xScene* sc, F32 dt, xEntFrame* frame);
 static U32 xEntSldMove(xEntMotion* motion, xScene* sc, F32 dt, xEntFrame* frame);
 static U32 xEntRotMove(xEntMotion* motion, xScene* sc, F32 dt, xEntFrame* frame);
-char* xbtoa(U32 param);
+const char* xbtoa(U32 param);
 
 void xEntMotionInit(xEntMotion* motion, xEnt* owner, xEntMotionAsset* asset)
 {
@@ -1332,7 +1332,7 @@ void xDrawSetColor(iColor_tag color)
 {
 }
 
-char* xbtoa(U32 param)
+const char* xbtoa(U32 param)
 {
     if (param != 0)
     {
@@ -1343,7 +1343,7 @@ char* xbtoa(U32 param)
 
 static void xEntMotionDebugIPad(xEntMotion* xem)
 {
-    if (gDebugPad->pressed & 0x20)
+    if (gDebugPad->pressed & XPAD_BUTTON_RIGHT)
     {
         *(volatile S16*)(&dbg_idx) = *(volatile S16*)(&dbg_idx) + 1;
         if (*(volatile S16*)(&dbg_idx) >= *(volatile U16*)(&dbg_num))
@@ -1351,7 +1351,7 @@ static void xEntMotionDebugIPad(xEntMotion* xem)
             *(volatile S16*)(&dbg_idx) = 0;
         }
     }
-    if (gDebugPad->pressed & 0x80)
+    if (gDebugPad->pressed & XPAD_BUTTON_LEFT)
     {
         *(volatile S16*)(&dbg_idx) = *(volatile S16*)(&dbg_idx) - 1;
         if (*(volatile S16*)(&dbg_idx) < 0)
@@ -1359,7 +1359,7 @@ static void xEntMotionDebugIPad(xEntMotion* xem)
             *(volatile S16*)(&dbg_idx) = *(volatile U16*)(&dbg_num) - 1;
         }
     }
-    if (gDebugPad->pressed & 0x10000)
+    if (gDebugPad->pressed & XPAD_BUTTON_X)
     {
         if (xem->owner != NULL)
         {
@@ -1367,7 +1367,7 @@ static void xEntMotionDebugIPad(xEntMotion* xem)
         }
         xEntMotionReset(xem, g_xSceneCur);
     }
-    if (gDebugPad->pressed & 0x20000)
+    if (gDebugPad->pressed & XPAD_BUTTON_SQUARE)
     {
         if (xEntMotionIsStopped(xem))
         {

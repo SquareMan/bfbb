@@ -11,13 +11,14 @@
 #include "xDebug.h"
 #include "xMath.h"
 #include "xMathInlines.h"
+#include "xSnd.h"
 
 #include "iModel.h"
 #include "iMath.h"
 
 #include <string.h>
 #include <stdio.h>
-#include <PowerPC_EABI_Support\MSL_C\MSL_Common\stdlib.h>
+#include <stdlib.h>
 
 namespace
 {
@@ -152,7 +153,10 @@ namespace
                 bit_index = 0x20;
                 init = 1;
             }
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-volatile"
             bit_index++;
+#pragma clang diagnostic pop
             if (bit_index >= 0x20)
             {
                 bit_index = 0;
@@ -1242,34 +1246,4 @@ S32 z_disco_floor::event_handler(xBase*, xBase* to, U32 event, const F32* argf, 
     }
 
     return 1;
-}
-
-template <> size_t range_limit(size_t v, size_t minv, size_t maxv)
-{
-    if (v <= minv)
-    {
-        return minv;
-    }
-
-    if (v >= maxv)
-    {
-        return maxv;
-    }
-
-    return v;
-}
-
-template <> S32 range_limit(S32 v, S32 minv, S32 maxv)
-{
-    if (v <= minv)
-    {
-        return minv;
-    }
-
-    if (v >= maxv)
-    {
-        return maxv;
-    }
-
-    return v;
 }

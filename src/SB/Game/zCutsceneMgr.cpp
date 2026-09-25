@@ -160,7 +160,9 @@ RpAtomic* HackBoundCB(RpAtomic* atomic, void* data)
     atomic->worldBoundingSphere.radius = *(RwReal*)data;
     atomic->boundingSphere.radius = *(RwReal*)data;
     atomic->geometry->morphTarget->boundingSphere.radius = *(RwReal*)data;
+#ifndef WITH_LIBRW
     atomic->interpolator.flags = atomic->interpolator.flags & 0xfffffffd;
+#endif
     return atomic;
 }
 
@@ -466,7 +468,7 @@ void zCutsceneMgrUpdate(xBase* to, xScene* sc, F32 dt)
             else
             {
                 if (gCutsceneSkipOK && t->csn->Time > gSkipTimeCutscene &&
-                    globals.pad0->pressed & 0x50000)
+                    globals.pad0->pressed & (XPAD_BUTTON_X | XPAD_BUTTON_SQUARE))
                 {
                     zEntEvent(to, to, 0x13);
                 }

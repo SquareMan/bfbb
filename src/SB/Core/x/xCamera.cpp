@@ -11,8 +11,8 @@
 
 #include "iMath.h"
 
-#include <PowerPC_EABI_Support\MSL_C\MSL_Common\cmath>
-#include <PowerPC_EABI_Support\MSL_C\MSL_Common\cstring>
+#include <cmath>
+#include <cstring>
 
 #define CAMERAFX_ZOOM_MODE_0 0
 #define CAMERAFX_ZOOM_MODE_1 1
@@ -22,6 +22,24 @@
 #define CAMERAFX_TYPE_NONE 0
 #define CAMERAFX_TYPE_ZOOM 1
 #define CAMERAFX_TYPE_SHAKE 2
+
+// SLOP: put in header
+template <>
+inline F32 range_limit<F32>(F32 v, F32 minv, F32 maxv)
+{
+    if (v <= minv)
+    {
+        return minv;
+    }
+
+    if (v >= maxv)
+    {
+        return maxv;
+    }
+
+    return v;
+}
+
 
 void xCameraFXZoomUpdate(cameraFX* f, F32 dt, const xMat4x3*, xMat4x3* m);
 void xCameraFXShakeUpdate(cameraFX* f, F32 dt, const xMat4x3*, xMat4x3* m);
@@ -39,7 +57,6 @@ cameraFXTableEntry sCameraFXTable[3] = { { CAMERAFX_TYPE_NONE, NULL, NULL },
                                          { CAMERAFX_TYPE_ZOOM, xCameraFXZoomUpdate, NULL },
                                          { CAMERAFX_TYPE_SHAKE, xCameraFXShakeUpdate, NULL } };
 
-zGlobals globals;
 
 // These structs were used in deadstripped functions.
 // This function is here to force the symbols to be linked.
@@ -912,13 +929,6 @@ void xCameraUpdate(xCamera* cam, F32 dt)
     }
 }
 
-#ifndef INLINE
-float std::ceilf(float x)
-{
-    return (float)ceil((double)x);
-}
-#endif
-
 void xCameraBegin(xCamera* cam, S32 clear)
 {
     iCameraBegin(cam->lo_cam, clear);
@@ -1442,13 +1452,6 @@ F32 xasin(F32 x)
     return std::asinf(x);
 }
 
-#ifndef INLINE
-float std::asinf(float x)
-{
-    return (float)asin((double)x);
-}
-#endif
-
 F32 xQuatGetAngle(const xQuat* q)
 {
     if (q->s > 0.99998999f)
@@ -1756,13 +1759,6 @@ F32 xacos(F32 x)
     return std::acosf(x);
 }
 
-#ifndef INLINE
-float std::acosf(float x)
-{
-    return (float)acos((double)x);
-}
-#endif
-
 void xVec3AddTo(xVec3* o, const xVec3* v)
 {
     o->x += v->x;
@@ -1783,13 +1779,6 @@ F32 xexp(F32 x)
 {
     return std::expf(x);
 }
-
-#ifndef INLINE
-float std::expf(float x)
-{
-    return (float)exp((double)x);
-}
-#endif
 
 F32 xrmod(F32 ang)
 {
@@ -1836,23 +1825,6 @@ xVec3& xVec3::safe_normalize(const xVec3& val)
         return (*this *= 1.0f / xsqrt(len));
     }
 }
-
-template <>
-inline F32 range_limit<F32>(F32 v, F32 minv, F32 maxv)
-{
-    if (v <= minv)
-    {
-        return minv;
-    }
-
-    if (v >= maxv)
-    {
-        return maxv;
-    }
-
-    return v;
-}
-
 xVec2& xVec2::operator=(F32 f)
 {
     this->x = this->y = f;

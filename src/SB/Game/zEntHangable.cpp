@@ -458,7 +458,7 @@ void zEntHangable_SetShaggy(zEntHangable* ent, zEnt* shaggy)
             shaggy->frame->vel.z = 0.0f;
             shaggy->frame->mat.pos.x = ent->model->Mat->pos.x;
             shaggy->frame->mat.pos.z = ent->model->Mat->pos.z;
-            *shaggy->model->Mat = *(RwMatrixTag *)(&shaggy->frame->mat);
+            *shaggy->model->Mat = *(RwMatrix *)(&shaggy->frame->mat);
         }
     }
     else if (ent->shaggy != NULL)

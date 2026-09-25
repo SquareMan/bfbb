@@ -1,4 +1,5 @@
 #include "xCutscene.h"
+#include "rwcore.h"
 #include "xSnd.h"
 #include "xAnim.h"
 #include "xDebug.h"
@@ -20,7 +21,7 @@
 
 #include <types.h>
 #include <string.h>
-#include <PowerPC_EABI_Support\MSL_C\MSL_Common\cmath>
+#include <cmath>
 
 struct xCutsceneMphFrame
 {
@@ -56,7 +57,6 @@ void xShadowCameraUpdate(void* model, void (*renderCB)(void*), xVec3* center, F3
 xCutscene sActiveCutscene;
 U32 sCutTocCount;
 xCutsceneInfo* sCutTocInfo;
-extern RwGlobals* RwEngineInstance;
 static xModelInstance sCutsceneFakeModel[8];
 
 void xCutscene_Init(void* toc)
@@ -76,7 +76,7 @@ void xCutscene_Init(void* toc)
     for (i = 0; i < 8; i++)
     {
         sCutsceneFakeModel[i].Mat =
-            (RwMatrix*)xMemAlloc(gActiveHeap, sizeof(RwMatrixTag) * 65, 0);
+            (RwMatrix*)xMemAlloc(gActiveHeap, sizeof(RwMatrix) * 65, 0);
         sCutsceneFakeModel[i].Bucket =
             (xModelBucket**)xMemAlloc(gActiveHeap, sizeof(xModelBucket*) * 2, 0);
         sCutsceneFakeModel[i].Bucket[0] =
@@ -323,17 +323,14 @@ F32 xlog(F32 x)
     return std::logf(x);
 }
 
-float std::logf(float x)
-{
-    return (float)log((double)x);
-}
-
 // A camera chunk's payload sits directly after its xCutsceneData header: the
 // number of fly keys, then the keys themselves.
+//
+// DST, length of Keys is determined by NumKeys
 struct xCutsceneCameraData
 {
     U32 NumKeys;
-    zFlyKey Keys[1];
+    zFlyKey Keys[];
 };
 
 void xCutscene_SetCamera(xCutscene* csn, xCamera* cam)
@@ -406,11 +403,11 @@ void xCutscene_SetCamera(xCutscene* csn, xCamera* cam)
             xCameraSetFOV(&xglobals->camera, camFOV);
         }
 
-        data = (xCutsceneData*)((U8*)data + 0x10 + ((data->ChunkSize + 0xf) & 0xfffffff0));
+        data = (xCutsceneData*)((U8*)data + sizeof(xCutsceneData) + ALIGN_NEXT(data->ChunkSize, 0x10));
     }
 }
 
-static void xcsCalcAnimMatrices(RwMatrixTag* animMat, RpAtomic* model, xCutsceneAnimHdr* ahdr,
+static void xcsCalcAnimMatrices(RwMatrix* animMat, RpAtomic* model, xCutsceneAnimHdr* ahdr,
                                 F32 time, U32 tworoot)
 {
     xQuat quatresult[65];
@@ -469,7 +466,7 @@ static void xcsCalcAnimMatrices(RwMatrixTag* animMat, RpAtomic* model, xCutscene
             ttt->y = 0.0f;
             ttt->z = 0.0f;
 
-            if (FABS(qqq->s) < 0.9999f)
+            if (xabs(qqq->s) < 0.9999f)
             {
                 break;
             }
@@ -677,7 +674,7 @@ void xCutscene_Render(xCutscene* csn, xEnt**, S32*, F32*)
     xCutsceneData* data;
     RpAtomic* model;
     RpAtomic* shadowModel;
-    RwMatrixTag animMat[65];
+    RwMatrix animMat[65];
     xVec3* camVec;
     U32 tempSize;
     F32 radius;
@@ -704,8 +701,8 @@ void xCutscene_Render(xCutscene* csn, xEnt**, S32*, F32*)
 
     fakeCount = 0;
     XCSNNosey* nosey = csn->cb_nosey;
-    camVec = (xVec3*)&((RwFrame*)((RwCamera*)RwEngineInstance->curCamera)->object.object.parent)
-                 ->modelling.pos;
+    
+    camVec = (xVec3*)&RwCameraGetFrame(RwCameraGetCurrentCamera())->modelling.pos;
     data = (xCutsceneData*)&csn->Play[1];
     animIndex = 0;
 
@@ -931,7 +928,7 @@ void xCutscene_Render(xCutscene* csn, xEnt**, S32*, F32*)
                                         sCutsceneFakeModel[fakeCount].BoneCount =
                                             iModelNumBones(model);
                                         memcpy(sCutsceneFakeModel[fakeCount].Mat, animMat,
-                                               sizeof(RwMatrixTag) * 65);
+                                               sizeof(RwMatrix) * 65);
                                         sCutsceneFakeModel[fakeCount].Flags = 1;
                                         sCutsceneFakeModel[fakeCount].FadeStart = 100.0f;
                                         sCutsceneFakeModel[fakeCount].FadeEnd = 100.0f;
@@ -957,8 +954,8 @@ void xCutscene_Render(xCutscene* csn, xEnt**, S32*, F32*)
                                 goto nextmodel;
                             }
 
-                            mphdata = (xCutsceneData*)((U8*)mphdata + 0x10 +
-                                                       ((mphdata->ChunkSize + 0xf) & 0xfffffff0));
+                            mphdata = (xCutsceneData*)((U8*)mphdata + sizeof(xCutsceneData) +
+                                                       ALIGN_NEXT(mphdata->ChunkSize, 0x10));
                         }
 
                         if (hasAlpha)
@@ -968,7 +965,7 @@ void xCutscene_Render(xCutscene* csn, xEnt**, S32*, F32*)
                                 sCutsceneFakeModel[fakeCount].Data = model;
                                 sCutsceneFakeModel[fakeCount].BoneCount = iModelNumBones(model);
                                 memcpy(sCutsceneFakeModel[fakeCount].Mat, animMat,
-                                       sizeof(RwMatrixTag) * 65);
+                                       sizeof(RwMatrix) * 65);
                                 sCutsceneFakeModel[fakeCount].Flags = 1;
                                 sCutsceneFakeModel[fakeCount].FadeStart = 100.0f;
                                 sCutsceneFakeModel[fakeCount].FadeEnd = 100.0f;
@@ -1020,7 +1017,7 @@ void xCutscene_Render(xCutscene* csn, xEnt**, S32*, F32*)
             animIndex++;
         }
 
-        data = (xCutsceneData*)((U8*)data + 0x10 + ((data->ChunkSize + 0xf) & 0xfffffff0));
+        data = (xCutsceneData*)((U8*)data + sizeof(xCutsceneData) + ALIGN_NEXT(data->ChunkSize, 0x10));
     }
 
     if (nosey != NULL && (nosey->flg_nosey & 1))
@@ -1032,19 +1029,4 @@ void xCutscene_Render(xCutscene* csn, xEnt**, S32*, F32*)
 xCutscene* xCutscene_CurrentCutscene()
 {
     return &sActiveCutscene;
-}
-
-namespace std
-{
-    float atanf(float x);
-}
-
-float std::atan(float x)
-{
-    return std::atanf(x);
-}
-
-float std::atanf(float x)
-{
-    return (float)::atan((double)x);
 }

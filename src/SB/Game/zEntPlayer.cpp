@@ -1,5 +1,6 @@
 // Retail called the 9-argument xVec3* xSndPlay3D out of line from this TU (see
 // zEntPlayerDriveUpdate), so opt out of zEnt.h's inline definition of it.
+#include "rwcore.h"
 #define XSNDPLAY3D_OUT_OF_LINE
 
 #include "xAnim.h"
@@ -2982,7 +2983,7 @@ static xEnt* GetPatrickTarget(xEnt* ent)
 {
     xEnt* result = NULL;
     zPlatform* plat =
-        ent->collis->colls[0].flags & 1 ? (zPlatform*)ent->collis->colls[0].optr : NULL;
+        ent->collis->colls[0].flags & 1 ? XCOLLIDE_DOWNCAST_OPTR(zPlatform*, ent->collis->colls[0].optr) : NULL;
 
     if (plat && plat->baseType == eBaseTypePlatform && plat->plat_flags & 2)
     {
@@ -3174,6 +3175,8 @@ void zEntPlayer_LassoNotify(en_LASSO_EVENT event)
     case LASS_EVNT_ABORT:
         globals.player.lassoInfo.lasso.flags = 0;
         globals.player.lassoInfo.target = NULL;
+        break;
+    default:
         break;
     }
 }
@@ -6383,22 +6386,22 @@ static void zEntPlayer_BoulderVehicleUpdate(xEnt* ent, xScene* sc, F32 dt)
 
         getPadDefl(&globals.pad0->analog1, &inputDefl);
 
-        if (globals.pad0->on & 0x20)
+        if (globals.pad0->on & XPAD_BUTTON_RIGHT)
         {
             inputDefl.x = 1.0f;
         }
 
-        if (globals.pad0->on & 0x80)
+        if (globals.pad0->on & XPAD_BUTTON_LEFT)
         {
             inputDefl.x = -1.0f;
         }
 
-        if (globals.pad0->on & 0x40)
+        if (globals.pad0->on & XPAD_BUTTON_DOWN)
         {
             inputDefl.y = 1.0f;
         }
 
-        if (globals.pad0->on & 0x10)
+        if (globals.pad0->on & XPAD_BUTTON_UP)
         {
             inputDefl.y = -1.0f;
         }
@@ -6447,10 +6450,10 @@ static void zEntPlayer_BoulderVehicleUpdate(xEnt* ent, xScene* sc, F32 dt)
         for (i = collis.dyn_sidx; i < collis.dyn_eidx; i++)
         {
             if ((collis.colls[i].flags & 0x1) && collis.colls[i].optr &&
-                ((xEntBoulder*)collis.colls[i].optr)->baseType == eBaseTypeBoulder &&
-                (((xEntBoulder*)collis.colls[i].optr)->basset->flags & 0x2))
+                XCOLLIDE_DOWNCAST_OPTR(xEntBoulder*, collis.colls[i].optr)->baseType == eBaseTypeBoulder &&
+                (XCOLLIDE_DOWNCAST_OPTR(xEntBoulder*, collis.colls[i].optr)->basset->flags & 0x2))
             {
-                shouldDamagePlayer = (xEntBoulder*)collis.colls[i].optr;
+                shouldDamagePlayer = XCOLLIDE_DOWNCAST_OPTR(xEntBoulder*, collis.colls[i].optr);
             }
         }
 
@@ -7015,6 +7018,8 @@ void zEntPlayer_Update(xEnt* ent, xScene* sc, F32 dt)
                 gReticleTarget = NULL;
                 globals.player.IsBubbleBowling = 0;
             }
+            break;
+        default:
             break;
         }
     }
@@ -7863,7 +7868,7 @@ void zEntPlayer_Update(xEnt* ent, xScene* sc, F32 dt)
 
         if (!(bbc.flags & 0x11))
         {
-            zEntEvent(ent, 0x11);
+            zEntEvent(ent, eEventOutOfBounds);
         }
     }
 
@@ -8543,7 +8548,7 @@ catchtunnel_done:
                 xVec3SubFrom(&objMat.pos, &rotatedLC);
             }
 
-            *globals.player.carry.grabbed->model->Mat = *(RwMatrixTag*)&objMat;
+            *globals.player.carry.grabbed->model->Mat = *(RwMatrix*)&objMat;
 
             if (globals.player.carry.grabbed->frame)
             {
@@ -8661,7 +8666,7 @@ catchtunnel_done:
         globals.player.ControlOnEvent = 0;
     }
 
-    RwMatrixTag rootOldMat = *ent->model->Mat;
+    RwMatrix rootOldMat = *ent->model->Mat;
 
     if (1.0f != globals.player.RootUp.y)
     {
@@ -9214,7 +9219,7 @@ void zEntPlayer_CheckCritterContact(xEnt* player, F32 dt)
             continue;
         }
 
-        zNPCCommon* npc = (zNPCCommon*)colrec->optr;
+        zNPCCommon* npc = XCOLLIDE_DOWNCAST_OPTR(zNPCCommon*, colrec->optr);
 
         if (npc->baseType != eBaseTypeNPC)
         {
@@ -9403,7 +9408,7 @@ static void zEntPlayer_BubbleBowlLaneRender(zEnt* ent)
     xMat3x3SMul(&matrix, &matrix, 1.0f);
 
     gShadowObjectRadius = 0.5f * factor + 0.7f;
-    xShadowVertical_DrawCache(&cache, factor, 0.0f, 1, (RwMatrixTag*)&matrix, sBowlingLaneRast);
+    xShadowVertical_DrawCache(&cache, factor, 0.0f, 1, (RwMatrix*)&matrix, sBowlingLaneRast);
 
     for (i = 0; i < cache.entCount; i++)
     {
@@ -9411,7 +9416,7 @@ static void zEntPlayer_BubbleBowlLaneRender(zEnt* ent)
 
         if (xShadowReceiveShadowSetup(ep))
         {
-            xShadowReceiveShadow(ep, factor, 1, (RwMatrixTag*)&matrix, sBowlingLaneRast);
+            xShadowReceiveShadow(ep, factor, 1, (RwMatrix*)&matrix, sBowlingLaneRast);
         }
     }
 }
@@ -9470,9 +9475,9 @@ static void zEntPlayer_ReticleRender(zEnt* ent)
 
         sReticleMat.pos.y = sReticleMat.pos.y + (radius + bob);
 
-        if (!iModelCull(sReticleModel, (RwMatrixTag*)&sReticleMat))
+        if (!iModelCull(sReticleModel, (RwMatrix*)&sReticleMat))
         {
-            iModelRender(sReticleModel, (RwMatrixTag*)&sReticleMat);
+            iModelRender(sReticleModel, (RwMatrix*)&sReticleMat);
         }
 
         sReticleMat.up.y = -scale;
@@ -9480,9 +9485,9 @@ static void zEntPlayer_ReticleRender(zEnt* ent)
         sReticleMat.right.z = -sReticleMat.right.z;
         sReticleMat.pos.y -= 2.0f * (radius + bob);
 
-        if (!iModelCull(sReticleModel, (RwMatrixTag*)&sReticleMat))
+        if (!iModelCull(sReticleModel, (RwMatrix*)&sReticleMat))
         {
-            iModelRender(sReticleModel, (RwMatrixTag*)&sReticleMat);
+            iModelRender(sReticleModel, (RwMatrix*)&sReticleMat);
         }
 
         sReticleMat.up.y = 1.0f;
@@ -9776,7 +9781,7 @@ void zEntPlayer_Render(zEnt* ent)
 
     F32 lerp = 0.0f;
 
-    RwMatrixTag rootOldMat = *ent->model->Mat;
+    RwMatrix rootOldMat = *ent->model->Mat;
 
     xAnimSingle* single = ent->model->Anim->Single;
     xAnimSingle* blend = single->Blend;
@@ -9951,11 +9956,11 @@ void zEntPlayer_Render(zEnt* ent)
         xModelInstance* m = ent->model->Next;
         m->Flags |= 1;
 
-        RwRenderStateSet((RwRenderState)0x14, (void*)3);
+        RwRenderStateSet(rwRENDERSTATECULLMODE, (void*)3);
         xModelRenderSingle(m);
-        RwRenderStateSet((RwRenderState)0x14, (void*)2);
+        RwRenderStateSet(rwRENDERSTATECULLMODE, (void*)2);
         xModelRenderSingle(m);
-        RwRenderStateSet((RwRenderState)0x14, (void*)1);
+        RwRenderStateSet(rwRENDERSTATECULLMODE, (void*)1);
     }
 
     if (dot > 0.0f)
@@ -11923,6 +11928,7 @@ static void zEntPlayerSurfDamageUpdate(xEnt* ent, xScene* sc, F32 dt)
                     damaged = 1;
                     break;
                 case 1:
+                {
                     xEnt* cent = (xEnt*)coll->optr;
 
                     if (cent && cent->baseType == eBaseTypeEGenerator &&
@@ -11931,6 +11937,7 @@ static void zEntPlayerSurfDamageUpdate(xEnt* ent, xScene* sc, F32 dt)
                         break;
                     }
                     // fall through
+                }
                 case 2:
                 case 3:
                 case 5:
@@ -12004,7 +12011,10 @@ static void zEntPlayerDriveUpdate(xEnt* ent, xScene* sc, F32 dt)
 
         if (globals.player.Health)
         {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wmicrosoft-goto"
             goto do_bounce;
+#pragma clang diagnostic pop
         }
     }
 
@@ -12048,7 +12058,7 @@ static void zEntPlayerDriveUpdate(xEnt* ent, xScene* sc, F32 dt)
 
     if (coll->flags & 0x1)
     {
-        plat = (zPlatform*)coll->optr;
+        plat = XCOLLIDE_DOWNCAST_OPTR(zPlatform*, coll->optr);
     }
     else
     {
@@ -13624,6 +13634,8 @@ void zEntPlayerCollTrigger(xEnt* ent, xScene* sc)
                     case eCurrentPlayerSandy:
                         zEntEvent(trig, eEventEnterSandy);
                         break;
+                default:
+                    break;
                     }
                 }
             }
@@ -13641,6 +13653,8 @@ void zEntPlayerCollTrigger(xEnt* ent, xScene* sc)
                     break;
                 case eCurrentPlayerSandy:
                     zEntEvent(trig, eEventEnterSandy);
+                    break;
+                default:
                     break;
                 }
             }
@@ -13665,6 +13679,8 @@ void zEntPlayerCollTrigger(xEnt* ent, xScene* sc)
                     case eCurrentPlayerSandy:
                         zEntEvent(trig, eEventExitSandy);
                         break;
+                    default:
+                        break;
                     }
                 }
             }
@@ -13682,6 +13698,8 @@ void zEntPlayerCollTrigger(xEnt* ent, xScene* sc)
                     break;
                 case eCurrentPlayerSandy:
                     zEntEvent(trig, eEventExitSandy);
+                    break;
+                default:
                     break;
                 }
             }
@@ -15411,7 +15429,7 @@ void _iAnimSKBAdjustTranslate(iAnimSKBHeader* skb, U32 bone, F32* tranStart, F32
 
 static void PlayerHackFixBbashMiss(xModelInstance* model)
 {
-    static char* bbstate[4] = { "BbashStart01", "BbashAttack01", "BbashStrike01",
+    static const char* bbstate[4] = { "BbashStart01", "BbashAttack01", "BbashStrike01",
                                 "BbashMiss01" };
     static F32 bbadjust[4][2] = { { 0.0f, -0.55f },
                                   { -0.55f, -0.55f },
@@ -15546,7 +15564,7 @@ static void PlayerLedgeUpdate(xEnt* ent, xScene* sc, F32 dt)
         {
             xMat4x3 delta;
 
-            RwMatrixInvert((RwMatrixTag*)&delta, (RwMatrixTag*)&ledge->omat);
+            RwMatrixInvert((RwMatrix*)&delta, (RwMatrix*)&ledge->omat);
             xMat4x3Mul(&delta, &delta, (xMat4x3*)ledge->optr->model->Mat);
             xMat4x3Toworld(&ledge->spos, &delta, &ledge->spos);
             xMat4x3Toworld(&ledge->epos, &delta, &ledge->epos);
@@ -16270,7 +16288,7 @@ void zEntPlayer_MinimalRender(zEnt* ent)
     }
 }
 
-S32 zEntPlayerDyingInGoo()
+bool zEntPlayerDyingInGoo()
 {
     return in_goo != 0;
 }

@@ -614,6 +614,8 @@ struct RwFrame
 
 typedef RwFrame* (*RwFrameCallBack)(RwFrame* frame, void* data);
 
+#define RwFrameSyncDirty() (_rwFrameSyncDirty())
+
 #define RwFrameGetParent(_f) ((RwFrame*)rwObjectGetParent(_f))
 
 #define RwFrameGetMatrix(_f) (&(_f)->modelling)

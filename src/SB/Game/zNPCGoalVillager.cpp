@@ -329,6 +329,8 @@ S32 zNPCGoalPlayerNear::NPCMessage(NPCMsg* mail)
             flg_plyrnear |= (1 << 0);
         }
         break;
+    default:
+        break;
     }
 
     return handled;
@@ -494,7 +496,7 @@ S32 zNPCGoalTalk::Process(en_trantype* trantype, F32 dt, void* updCtxt, xScene* 
 
     ds2_plyr = npc->XYZDstSqToPlayer(&dir_plyr);
 
-    if (!((F32)__fabs(dir_plyr.y) > 6.0f))
+    if (!(xabs(dir_plyr.y) > 6.0f))
     {
         SQ(dir_plyr.z);
         SQ(dir_plyr.x);
@@ -1074,6 +1076,8 @@ S32 zNPCGoalBoyWeep::NPCMessage(NPCMsg* mail)
             zNPCBalloonBoy* npc = (zNPCBalloonBoy*)psyche->clt_owner;
             npc->SndPlayRandom(NPC_STYP_EXCLAIM);
         }
+        break;
+    default:
         break;
     }
 

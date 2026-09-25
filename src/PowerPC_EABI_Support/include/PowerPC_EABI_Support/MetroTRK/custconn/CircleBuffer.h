@@ -1,7 +1,7 @@
 #ifndef TRK_CIRCLE_BUFFER_H
 #define TRK_CIRCLE_BUFFER_H
 
-#include "types.h"
+#include <dolphin/types.h>
 
 typedef struct CircleBuffer {
 	u8* unk0;

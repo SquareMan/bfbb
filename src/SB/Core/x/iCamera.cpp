@@ -49,7 +49,7 @@ void iCameraDestroy(RwCamera* camera)
     RwRaster* raster;
     RwFrame* frame;
 
-    _rwFrameSyncDirty();
+    RwFrameSyncDirty();
 
     pWorld = RwCameraGetWorld(camera);
 
@@ -294,7 +294,7 @@ void iCameraSetFogParams(iFogParams* fp, F32 time)
         xglobals->fogB = *fp;
 
         xglobals->fog_t0 = iTimeGet();
-        xglobals->fog_t1 = xglobals->fog_t0 + (iTime)(time * (GET_BUS_FREQUENCY() / 4));
+        xglobals->fog_t1 = xglobals->fog_t0 + (iTime)(ITIME_FROM_SECS(time));
     }
 }
 
@@ -368,8 +368,15 @@ void iCameraSetFogRenderStates()
     }
     else
     {
+        #ifdef WITH_LIBRW
+        // hmmm, this one's odd. RwRGBA is defined in RGBA order in RW and librw, but it seems that 
+        // actual RW wanted BGRA for fogcolor. librw unpacks this int in RGBA order instead
+        bite_me = (pFogParams->fogcolor.alpha << 24) | (pFogParams->fogcolor.blue << 16) |
+                  (pFogParams->fogcolor.green << 8) | pFogParams->fogcolor.red;
+        #else
         bite_me = (pFogParams->fogcolor.alpha << 24) | (pFogParams->fogcolor.red << 16) |
                   (pFogParams->fogcolor.green << 8) | pFogParams->fogcolor.blue;
+        #endif
 
         RwRenderStateSet(rwRENDERSTATEFOGENABLE, (void*)TRUE);
         RwRenderStateSet(rwRENDERSTATEFOGTYPE, (void*)pFogParams->type);

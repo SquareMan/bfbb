@@ -35,20 +35,9 @@
 #include "zSurface.h"
 #include "zTextBox.h"
 #include "zEntButton.h"
-#include <PowerPC_EABI_Support\MSL_C\MSL_Common\cstring>
+#include <cstring>
 #include <types.h>
 
-
-// The declaration now lives in xMath3.h; the body has to stay here. Moving the
-// inline into the header makes zDiscoFloor.cpp expand it, and that emits weak
-// __apl__5xVec3Ff / __ami__5xVec3Ff copies into zDiscoFloor.o that retail's
-// zDiscoFloor.o does not contain. Measured, not assumed.
-inline void xBoxFromSphere(xBox& box, const xSphere& o)
-{
-    box.upper = box.lower = o.center;
-    box.upper += o.r;
-    box.lower -= o.r;
-}
 
 // These structs were used in deadstripped functions.
 // This function is here to force the symbols to be linked.
@@ -1193,7 +1182,7 @@ namespace bungee_state
             xQuatFromMat(&detach.end_dir, &mat);
 
             detach.time = 0.0f;
-            detach.end_time = xsqrt(__fabs(loc.length() / h.detach.accel));
+            detach.end_time = xsqrt(xabs(loc.length() / h.detach.accel));
             if (detach.end_time >= -1e-5f && detach.end_time <= 1e-5f)
             {
                 detach.end_time = 0.01f;
@@ -1244,7 +1233,7 @@ namespace bungee_state
         }
     } // namespace
 
-    void load(class xBase& data, class xDynAsset& asset, unsigned long)
+    void load(class xBase& data, class xDynAsset& asset, size_t)
     {
         xBaseInit(&data, &asset);
         hook_type& hook = (hook_type&)data;

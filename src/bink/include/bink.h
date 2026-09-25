@@ -1,6 +1,9 @@
 #ifndef __BINKH__
 #define __BINKH__
 
+#include <stddef.h>
+#include <stdint.h>
+
 #define BINKMAJORVERSION 1
 #define BINKMINORVERSION 5
 #define BINKSUBVERSION 21
@@ -18,19 +21,19 @@ RADDEFSTART
 typedef struct BINK PTR4* HBINK;
 
 struct BINKIO;
-typedef s32(RADLINK PTR4* BINKIOOPEN)(struct BINKIO PTR4* Bnkio, const char PTR4* name, u32 flags);
-typedef u32(RADLINK PTR4* BINKIOREADHEADER)(struct BINKIO PTR4* Bnkio, s32 Offset, void PTR4* Dest,
-                                            u32 Size);
-typedef u32(RADLINK PTR4* BINKIOREADFRAME)(struct BINKIO PTR4* Bnkio, u32 Framenum, s32 origofs,
-                                           void PTR4* dest, u32 size);
-typedef u32(RADLINK PTR4* BINKIOGETBUFFERSIZE)(struct BINKIO PTR4* Bnkio, u32 Size);
-typedef void(RADLINK PTR4* BINKIOSETINFO)(struct BINKIO PTR4* Bnkio, void PTR4* Buf, u32 Size,
-                                          u32 FileSize, u32 simulate);
-typedef u32(RADLINK PTR4* BINKIOIDLE)(struct BINKIO PTR4* Bnkio);
+typedef int32_t(RADLINK PTR4* BINKIOOPEN)(struct BINKIO PTR4* Bnkio, const char PTR4* name, uint32_t flags);
+typedef uint32_t(RADLINK PTR4* BINKIOREADHEADER)(struct BINKIO PTR4* Bnkio, int32_t Offset, void PTR4* Dest,
+                                            uint32_t Size);
+typedef uint32_t(RADLINK PTR4* BINKIOREADFRAME)(struct BINKIO PTR4* Bnkio, uint32_t Framenum, int32_t origofs,
+                                           void PTR4* dest, uint32_t size);
+typedef uint32_t(RADLINK PTR4* BINKIOGETBUFFERSIZE)(struct BINKIO PTR4* Bnkio, uint32_t Size);
+typedef void(RADLINK PTR4* BINKIOSETINFO)(struct BINKIO PTR4* Bnkio, void PTR4* Buf, uint32_t Size,
+                                          uint32_t FileSize, uint32_t simulate);
+typedef uint32_t(RADLINK PTR4* BINKIOIDLE)(struct BINKIO PTR4* Bnkio);
 typedef void(RADLINK PTR4* BINKIOCLOSE)(struct BINKIO PTR4* Bnkio);
 
 typedef void(RADLINK PTR4* BINKCBSUSPEND)(struct BINKIO PTR4* Bnkio);
-typedef s32(RADLINK PTR4* BINKCBTRYSUSPEND)(struct BINKIO PTR4* Bnkio);
+typedef int32_t(RADLINK PTR4* BINKCBTRYSUSPEND)(struct BINKIO PTR4* Bnkio);
 typedef void(RADLINK PTR4* BINKCBRESUME)(struct BINKIO PTR4* Bnkio);
 typedef void(RADLINK PTR4* BINKCBIDLE)(struct BINKIO PTR4* Bnkio);
 
@@ -49,46 +52,46 @@ typedef struct BINKIO
     BINKIOIDLE Idle;
     BINKIOCLOSE Close;
     HBINK bink;
-    volatile u32 ReadError;
-    volatile u32 DoingARead;
-    volatile u32 BytesRead;
-    volatile u32 Working;
-    volatile u32 TotalTime;
-    volatile u32 ForegroundTime;
-    volatile u32 IdleTime;
-    volatile u32 ThreadTime;
-    volatile u32 BufSize;
-    volatile u32 BufHighUsed;
-    volatile u32 CurBufSize;
-    volatile u32 CurBufUsed;
-    volatile u8 iodata[128 + 32];
+    volatile uint32_t ReadError;
+    volatile uint32_t DoingARead;
+    volatile uint32_t BytesRead;
+    volatile uint32_t Working;
+    volatile uint32_t TotalTime;
+    volatile uint32_t ForegroundTime;
+    volatile uint32_t IdleTime;
+    volatile uint32_t ThreadTime;
+    volatile uint32_t BufSize;
+    volatile uint32_t BufHighUsed;
+    volatile uint32_t CurBufSize;
+    volatile uint32_t CurBufUsed;
+    volatile uint8_t iodata[128 + 32];
 
     // filled in by the caller
     BINKCBSUSPEND suspend_callback;
     BINKCBTRYSUSPEND try_suspend_callback;
     BINKCBRESUME resume_callback;
     BINKCBIDLE idle_on_callback;
-    volatile u32 callback_control[16]; // buffer for background IO callback
+    volatile uint32_t callback_control[16]; // buffer for background IO callback
 } BINKIO;
 
 struct BINKSND;
-typedef s32(RADLINK PTR4* BINKSNDOPEN)(struct BINKSND PTR4* BnkSnd, u32 freq, s32 bits, s32 chans,
-                                       u32 flags, HBINK bink);
-typedef s32(RADLINK PTR4* BINKSNDREADY)(struct BINKSND PTR4* BnkSnd);
-typedef s32(RADLINK PTR4* BINKSNDLOCK)(struct BINKSND PTR4* BnkSnd, u8 PTR4* PTR4* addr,
-                                       u32 PTR4* len);
-typedef s32(RADLINK PTR4* BINKSNDUNLOCK)(struct BINKSND PTR4* BnkSnd, u32 filled);
-typedef void(RADLINK PTR4* BINKSNDVOLUME)(struct BINKSND PTR4* BnkSnd, s32 volume);
-typedef void(RADLINK PTR4* BINKSNDPAN)(struct BINKSND PTR4* BnkSnd, s32 pan);
-typedef void(RADLINK PTR4* BINKSNDMIXBINS)(struct BINKSND PTR4* BnkSnd, u32 PTR4* mix_bins,
-                                           u32 total);
-typedef void(RADLINK PTR4* BINKSNDMIXBINVOLS)(struct BINKSND PTR4* BnkSnd, u32 PTR4* vol_mix_bins,
-                                              s32 PTR4* volumes, u32 total);
-typedef s32(RADLINK PTR4* BINKSNDONOFF)(struct BINKSND PTR4* BnkSnd, s32 status);
-typedef s32(RADLINK PTR4* BINKSNDPAUSE)(struct BINKSND PTR4* BnkSnd, s32 status);
+typedef int32_t(RADLINK PTR4* BINKSNDOPEN)(struct BINKSND PTR4* BnkSnd, uint32_t freq, int32_t bits, int32_t chans,
+                                       uint32_t flags, HBINK bink);
+typedef int32_t(RADLINK PTR4* BINKSNDREADY)(struct BINKSND PTR4* BnkSnd);
+typedef int32_t(RADLINK PTR4* BINKSNDLOCK)(struct BINKSND PTR4* BnkSnd, uint8_t PTR4* PTR4* addr,
+                                       uint32_t PTR4* len);
+typedef int32_t(RADLINK PTR4* BINKSNDUNLOCK)(struct BINKSND PTR4* BnkSnd, uint32_t filled);
+typedef void(RADLINK PTR4* BINKSNDVOLUME)(struct BINKSND PTR4* BnkSnd, int32_t volume);
+typedef void(RADLINK PTR4* BINKSNDPAN)(struct BINKSND PTR4* BnkSnd, int32_t pan);
+typedef void(RADLINK PTR4* BINKSNDMIXBINS)(struct BINKSND PTR4* BnkSnd, uint32_t PTR4* mix_bins,
+                                           uint32_t total);
+typedef void(RADLINK PTR4* BINKSNDMIXBINVOLS)(struct BINKSND PTR4* BnkSnd, uint32_t PTR4* vol_mix_bins,
+                                              int32_t PTR4* volumes, uint32_t total);
+typedef int32_t(RADLINK PTR4* BINKSNDONOFF)(struct BINKSND PTR4* BnkSnd, int32_t status);
+typedef int32_t(RADLINK PTR4* BINKSNDPAUSE)(struct BINKSND PTR4* BnkSnd, int32_t status);
 typedef void(RADLINK PTR4* BINKSNDCLOSE)(struct BINKSND PTR4* BnkSnd);
 
-typedef BINKSNDOPEN(RADLINK PTR4* BINKSNDSYSOPEN)(u32 param);
+typedef BINKSNDOPEN(RADLINK PTR4* BINKSNDSYSOPEN)(uint32_t param);
 
 typedef struct BINKSND
 {
@@ -103,33 +106,33 @@ typedef struct BINKSND
     BINKSNDMIXBINS MixBins;
     BINKSNDMIXBINVOLS MixBinVols;
 
-    u32 sndbufsize; // sound buffer size
-    u8 PTR4* sndbuf; // sound buffer
-    u8 PTR4* sndend; // end of the sound buffer
-    u8 PTR4* sndwritepos; // current write position
-    u8 PTR4* sndreadpos; // current read position
-    u32 sndcomp; // sound compression handle
-    u32 sndamt; // amount of sound currently in the buffer
-    u32 sndconvert8; // convert back to 8-bit sound at runtime
-    u32 sndendframe; // frame number that the sound ends on
-    u32 sndprime; // amount of data to prime the playahead
-    u32 sndpad; // padded this much audio
+    uint32_t sndbufsize; // sound buffer size
+    uint8_t PTR4* sndbuf; // sound buffer
+    uint8_t PTR4* sndend; // end of the sound buffer
+    uint8_t PTR4* sndwritepos; // current write position
+    uint8_t PTR4* sndreadpos; // current read position
+    uint32_t sndcomp; // sound compression handle
+    uint32_t sndamt; // amount of sound currently in the buffer
+    uint32_t sndconvert8; // convert back to 8-bit sound at runtime
+    uint32_t sndendframe; // frame number that the sound ends on
+    uint32_t sndprime; // amount of data to prime the playahead
+    uint32_t sndpad; // padded this much audio
 
-    u32 BestSizeIn16;
-    u32 BestSizeMask;
-    u32 SoundDroppedOut;
-    s32 NoThreadService;
-    s32 OnOff;
-    u32 Latency;
-    u32 VideoScale;
-    u32 freq;
-    s32 bits, chans;
-    u8 snddata[256];
+    uint32_t BestSizeIn16;
+    uint32_t BestSizeMask;
+    uint32_t SoundDroppedOut;
+    int32_t NoThreadService;
+    int32_t OnOff;
+    uint32_t Latency;
+    uint32_t VideoScale;
+    uint32_t freq;
+    int32_t bits, chans;
+    uint8_t snddata[256];
 } BINKSND;
 
 typedef struct BINKRECT
 {
-    s32 Left, Top, Width, Height;
+    int32_t Left, Top, Width, Height;
 } BINKRECT;
 
 #define BINKMAXDIRTYRECTS 8
@@ -149,181 +152,181 @@ typedef struct BUNDLEPOINTERS
 
 typedef struct BINK
 {
-    u32 Width; // Width (1 based, 640 for example)
-    u32 Height; // Height (1 based, 480 for example)
-    u32 Frames; // Number of frames (1 based, 100 = 100 frames)
-    u32 FrameNum; // Frame to *be* displayed (1 based)
-    u32 LastFrameNum; // Last frame decompressed or skipped (1 based)
+    uint32_t Width; // Width (1 based, 640 for example)
+    uint32_t Height; // Height (1 based, 480 for example)
+    uint32_t Frames; // Number of frames (1 based, 100 = 100 frames)
+    uint32_t FrameNum; // Frame to *be* displayed (1 based)
+    uint32_t LastFrameNum; // Last frame decompressed or skipped (1 based)
 
-    u32 FrameRate; // Frame Rate Numerator
-    u32 FrameRateDiv; // Frame Rate Divisor (frame rate=numerator/divisor)
+    uint32_t FrameRate; // Frame Rate Numerator
+    uint32_t FrameRateDiv; // Frame Rate Divisor (frame rate=numerator/divisor)
 
-    u32 ReadError; // Non-zero if a read error has ocurred
-    u32 OpenFlags; // flags used on open
-    u32 BinkType; // Bink flags
+    uint32_t ReadError; // Non-zero if a read error has ocurred
+    uint32_t OpenFlags; // flags used on open
+    uint32_t BinkType; // Bink flags
 
-    u32 Size; // size of file
-    u32 FrameSize; // The current frame's size in bytes
-    u32 SndSize; // The current frame sound tracks' size in bytes
+    uint32_t Size; // size of file
+    uint32_t FrameSize; // The current frame's size in bytes
+    uint32_t SndSize; // The current frame sound tracks' size in bytes
 
     BINKRECT FrameRects[BINKMAXDIRTYRECTS]; // Dirty rects from BinkGetRects
-    s32 NumRects;
+    int32_t NumRects;
 
-    u32 PlaneNum; // which set of planes is current
+    uint32_t PlaneNum; // which set of planes is current
     void PTR4* YPlane[2]; // pointer to the uncompressed Y (Cr and Cr follow)
     void PTR4* APlane[2]; // decompressed alpha plane (if present)
-    u32 YWidth; // widths and heights of the video planes
-    u32 YHeight;
-    u32 UVWidth;
-    u32 UVHeight;
+    uint32_t YWidth; // widths and heights of the video planes
+    uint32_t YHeight;
+    uint32_t UVWidth;
+    uint32_t UVHeight;
 
     void PTR4* MaskPlane; // pointer to the mask plane (Ywidth/16*Yheight/16)
-    u32 MaskPitch; // Mask Pitch
-    u32 MaskLength; // total length of the mask plane
+    uint32_t MaskPitch; // Mask Pitch
+    uint32_t MaskLength; // total length of the mask plane
 
-    u32 LargestFrameSize; // Largest frame size
-    u32 InternalFrames; // how many frames were potentially compressed
+    uint32_t LargestFrameSize; // Largest frame size
+    uint32_t InternalFrames; // how many frames were potentially compressed
 
-    s32 NumTracks; // how many tracks
+    int32_t NumTracks; // how many tracks
 
-    u32 Highest1SecRate; // Highest 1 sec data rate
-    u32 Highest1SecFrame; // Highest 1 sec data rate starting frame
+    uint32_t Highest1SecRate; // Highest 1 sec data rate
+    uint32_t Highest1SecFrame; // Highest 1 sec data rate starting frame
 
-    s32 Paused; // is the bink movie paused?
+    int32_t Paused; // is the bink movie paused?
 
-    u32 BackgroundThread; // handle to background thread
+    uint32_t BackgroundThread; // handle to background thread
 
     // everything below is for internal Bink use
 
     void PTR4* compframe; // compressed frame data
     void PTR4* preloadptr; // preloaded compressed frame data
-    u32* frameoffsets; // offsets of each of the frames
+    uint32_t* frameoffsets; // offsets of each of the frames
 
     BINKIO bio; // IO structure
-    u8 PTR4* ioptr; // io buffer ptr
-    u32 iosize; // io buffer size
-    u32 decompwidth; // width not include scaling
-    u32 decompheight; // height not include scaling
+    int8_t PTR4* ioptr; // io buffer ptr
+    uint32_t iosize; // io buffer size
+    uint32_t decompwidth; // width not include scaling
+    uint32_t decompheight; // height not include scaling
 
-    s32 PTR4* trackindexes; // track indexes
-    u32 PTR4* tracksizes; // largest single frame of track
-    u32 PTR4* tracktypes; // type of each sound track
-    s32 PTR4* trackIDs; // external track numbers
+    int32_t PTR4* trackindexes; // track indexes
+    uint32_t PTR4* tracksizes; // largest single frame of track
+    uint32_t PTR4* tracktypes; // type of each sound track
+    int32_t PTR4* trackIDs; // external track numbers
 
-    u32 numrects; // number of rects from BinkGetRects
+    uint32_t numrects; // number of rects from BinkGetRects
 
-    u32 playedframes; // how many frames have we played
-    u32 firstframetime; // very first frame start
-    u32 startframetime; // start frame start
-    u32 startblittime; // start of blit period
-    u32 startsynctime; // start of synched time
-    u32 startsyncframe; // frame of startsynctime
-    u32 twoframestime; // two frames worth of time
-    u32 entireframetime; // entire frame time
+    uint32_t playedframes; // how many frames have we played
+    uint32_t firstframetime; // very first frame start
+    uint32_t startframetime; // start frame start
+    uint32_t startblittime; // start of blit period
+    uint32_t startsynctime; // start of synched time
+    uint32_t startsyncframe; // frame of startsynctime
+    uint32_t twoframestime; // two frames worth of time
+    uint32_t entireframetime; // entire frame time
 
-    u32 slowestframetime; // slowest frame in ms
-    u32 slowestframe; // slowest frame number
-    u32 slowest2frametime; // second slowest frame in ms
-    u32 slowest2frame; // second slowest frame
+    uint32_t slowestframetime; // slowest frame in ms
+    uint32_t slowestframe; // slowest frame number
+    uint32_t slowest2frametime; // second slowest frame in ms
+    uint32_t slowest2frame; // second slowest frame
 
-    u32 soundon; // sound turned on?
-    u32 videoon; // video turned on?
+    uint32_t soundon; // sound turned on?
+    uint32_t videoon; // video turned on?
 
-    u32 totalmem; // total memory used
-    u32 timevdecomp; // total time decompressing video
-    u32 timeadecomp; // total time decompressing audio
-    u32 timeblit; // total time blitting
-    u32 timeopen; // total open time
+    uint32_t totalmem; // total memory used
+    uint32_t timevdecomp; // total time decompressing video
+    uint32_t timeadecomp; // total time decompressing audio
+    uint32_t timeblit; // total time blitting
+    uint32_t timeopen; // total open time
 
-    u32 fileframerate; // frame rate originally in the file
-    u32 fileframeratediv;
+    uint32_t fileframerate; // frame rate originally in the file
+    uint32_t fileframeratediv;
 
-    u32 runtimeframes; // max frames for runtime analysis
-    u32 runtimemoveamt; // bytes to move each frame
-    u32 PTR4* rtframetimes; // start times for runtime frames
-    u32 PTR4* rtadecomptimes; // decompress times for runtime frames
-    u32 PTR4* rtvdecomptimes; // decompress times for runtime frames
-    u32 PTR4* rtblittimes; // blit times for runtime frames
-    u32 PTR4* rtreadtimes; // read times for runtime frames
-    u32 PTR4* rtidlereadtimes; // idle read times for runtime frames
-    u32 PTR4* rtthreadreadtimes; // thread read times for runtime frames
+    uint32_t runtimeframes; // max frames for runtime analysis
+    uint32_t runtimemoveamt; // bytes to move each frame
+    uint32_t PTR4* rtframetimes; // start times for runtime frames
+    uint32_t PTR4* rtadecomptimes; // decompress times for runtime frames
+    uint32_t PTR4* rtvdecomptimes; // decompress times for runtime frames
+    uint32_t PTR4* rtblittimes; // blit times for runtime frames
+    uint32_t PTR4* rtreadtimes; // read times for runtime frames
+    uint32_t PTR4* rtidlereadtimes; // idle read times for runtime frames
+    uint32_t PTR4* rtthreadreadtimes; // thread read times for runtime frames
 
-    u32 lastblitflags; // flags used on last blit
-    u32 lastdecompframe; // last frame number decompressed
+    uint32_t lastblitflags; // flags used on last blit
+    uint32_t lastdecompframe; // last frame number decompressed
 
-    u32 lastresynctime; // last loop point that we did a resync on
-    u32 doresync; // should we do a resync in the next doframe?
+    uint32_t lastresynctime; // last loop point that we did a resync on
+    uint32_t doresync; // should we do a resync in the next doframe?
 
-    u32 playingtracks; // how many tracks are playing
-    u32 soundskips; // number of sound stops
+    uint32_t playingtracks; // how many tracks are playing
+    uint32_t soundskips; // number of sound stops
     BINKSND PTR4* bsnd; // SND structures
-    u32 skippedlastblit; // skipped last frame?
-    u32 skipped_this_frame; // skipped the current frame?
-    u32 skippedblits; // how many blits were skipped
+    uint32_t skippedlastblit; // skipped last frame?
+    uint32_t skipped_this_frame; // skipped the current frame?
+    uint32_t skippedblits; // how many blits were skipped
 
     BUNDLEPOINTERS bunp; // pointers to internal temporary memory
-    u32 skipped_in_a_row; // how many frames have we skipped in a row
-    u32 big_sound_skip_adj; // adjustment for large skips
-    u32 big_sound_skip_reduce; // amount to reduce large skips by each frame
-    u32 last_time_almost_empty; // time of last almost empty IO buffer
-    u32 last_read_count; // counter to keep track of the last bink IO
-    u32 last_sound_count; // counter to keep track of the last bink sound
-    u32 snd_callback_buffer[16]; // buffer for background sound callback
+    uint32_t skipped_in_a_row; // how many frames have we skipped in a row
+    uint32_t big_sound_skip_adj; // adjustment for large skips
+    uint32_t big_sound_skip_reduce; // amount to reduce large skips by each frame
+    uint32_t last_time_almost_empty; // time of last almost empty IO buffer
+    uint32_t last_read_count; // counter to keep track of the last bink IO
+    uint32_t last_sound_count; // counter to keep track of the last bink sound
+    uint32_t snd_callback_buffer[16]; // buffer for background sound callback
 } BINK;
 
 typedef struct BINKSUMMARY
 {
-    u32 Width; // Width of frames
-    u32 Height; // Height of frames
-    u32 TotalTime; // total time (ms)
-    u32 FileFrameRate; // frame rate
-    u32 FileFrameRateDiv; // frame rate divisor
-    u32 FrameRate; // frame rate
-    u32 FrameRateDiv; // frame rate divisor
-    u32 TotalOpenTime; // Time to open and prepare for decompression
-    u32 TotalFrames; // Total Frames
-    u32 TotalPlayedFrames; // Total Frames played
-    u32 SkippedFrames; // Total number of skipped frames
-    u32 SkippedBlits; // Total number of skipped blits
-    u32 SoundSkips; // Total number of sound skips
-    u32 TotalBlitTime; // Total time spent blitting
-    u32 TotalReadTime; // Total time spent reading
-    u32 TotalVideoDecompTime; // Total time spent decompressing video
-    u32 TotalAudioDecompTime; // Total time spent decompressing audio
-    u32 TotalIdleReadTime; // Total time spent reading while idle
-    u32 TotalBackReadTime; // Total time spent reading in background
-    u32 TotalReadSpeed; // Total io speed (bytes/second)
-    u32 SlowestFrameTime; // Slowest single frame time (ms)
-    u32 Slowest2FrameTime; // Second slowest single frame time (ms)
-    u32 SlowestFrameNum; // Slowest single frame number
-    u32 Slowest2FrameNum; // Second slowest single frame number
-    u32 AverageDataRate; // Average data rate of the movie
-    u32 AverageFrameSize; // Average size of the frame
-    u32 HighestMemAmount; // Highest amount of memory allocated
-    u32 TotalIOMemory; // Total extra memory allocated
-    u32 HighestIOUsed; // Highest extra memory actually used
-    u32 Highest1SecRate; // Highest 1 second rate
-    u32 Highest1SecFrame; // Highest 1 second start frame
+    uint32_t Width; // Width of frames
+    uint32_t Height; // Height of frames
+    uint32_t TotalTime; // total time (ms)
+    uint32_t FileFrameRate; // frame rate
+    uint32_t FileFrameRateDiv; // frame rate divisor
+    uint32_t FrameRate; // frame rate
+    uint32_t FrameRateDiv; // frame rate divisor
+    uint32_t TotalOpenTime; // Time to open and prepare for decompression
+    uint32_t TotalFrames; // Total Frames
+    uint32_t TotalPlayedFrames; // Total Frames played
+    uint32_t SkippedFrames; // Total number of skipped frames
+    uint32_t SkippedBlits; // Total number of skipped blits
+    uint32_t SoundSkips; // Total number of sound skips
+    uint32_t TotalBlitTime; // Total time spent blitting
+    uint32_t TotalReadTime; // Total time spent reading
+    uint32_t TotalVideoDecompTime; // Total time spent decompressing video
+    uint32_t TotalAudioDecompTime; // Total time spent decompressing audio
+    uint32_t TotalIdleReadTime; // Total time spent reading while idle
+    uint32_t TotalBackReadTime; // Total time spent reading in background
+    uint32_t TotalReadSpeed; // Total io speed (bytes/second)
+    uint32_t SlowestFrameTime; // Slowest single frame time (ms)
+    uint32_t Slowest2FrameTime; // Second slowest single frame time (ms)
+    uint32_t SlowestFrameNum; // Slowest single frame number
+    uint32_t Slowest2FrameNum; // Second slowest single frame number
+    uint32_t AverageDataRate; // Average data rate of the movie
+    uint32_t AverageFrameSize; // Average size of the frame
+    uint32_t HighestMemAmount; // Highest amount of memory allocated
+    uint32_t TotalIOMemory; // Total extra memory allocated
+    uint32_t HighestIOUsed; // Highest extra memory actually used
+    uint32_t Highest1SecRate; // Highest 1 second rate
+    uint32_t Highest1SecFrame; // Highest 1 second start frame
 } BINKSUMMARY;
 
 typedef struct BINKREALTIME
 {
     // TODO: marked these as volatile to get matches in radcb
 
-    u32 FrameNum; // Current frame number
-    volatile u32 FrameRate; // frame rate
-    u32 FrameRateDiv; // frame rate divisor
-    u32 Frames; // frames in this sample period
-    volatile u32 FramesTime; // time is ms for these frames
-    u32 FramesVideoDecompTime; // time decompressing these frames
-    u32 FramesAudioDecompTime; // time decompressing these frames
-    u32 FramesReadTime; // time reading these frames
-    u32 FramesIdleReadTime; // time reading these frames at idle
-    u32 FramesThreadReadTime; // time reading these frames in background
-    u32 FramesBlitTime; // time blitting these frames
-    u32 ReadBufferSize; // size of read buffer
-    u32 ReadBufferUsed; // amount of read buffer currently used
-    u32 FramesDataRate; // data rate for these frames
+    uint32_t FrameNum; // Current frame number
+    volatile uint32_t FrameRate; // frame rate
+    uint32_t FrameRateDiv; // frame rate divisor
+    uint32_t Frames; // frames in this sample period
+    volatile uint32_t FramesTime; // time is ms for these frames
+    uint32_t FramesVideoDecompTime; // time decompressing these frames
+    uint32_t FramesAudioDecompTime; // time decompressing these frames
+    uint32_t FramesReadTime; // time reading these frames
+    uint32_t FramesIdleReadTime; // time reading these frames at idle
+    uint32_t FramesThreadReadTime; // time reading these frames in background
+    uint32_t FramesBlitTime; // time blitting these frames
+    uint32_t ReadBufferSize; // size of read buffer
+    uint32_t ReadBufferUsed; // amount of read buffer currently used
+    uint32_t FramesDataRate; // data rate for these frames
     // last offset it 0x34
 } BINKREALTIME;
 
@@ -334,19 +337,19 @@ typedef struct BINKREALTIME
 
 typedef struct BINKHDR
 {
-    u32 Marker; // Bink marker
-    u32 Size; // size of the file-8
-    u32 Frames; // Number of frames (1 based, 100 = 100 frames)
-    u32 LargestFrameSize; // Size in bytes of largest frame
-    u32 InternalFrames; // Number of internal frames
+    uint32_t Marker; // Bink marker
+    uint32_t Size; // size of the file-8
+    uint32_t Frames; // Number of frames (1 based, 100 = 100 frames)
+    uint32_t LargestFrameSize; // Size in bytes of largest frame
+    uint32_t InternalFrames; // Number of internal frames
 
-    u32 Width; // Width (1 based, 640 for example)
-    u32 Height; // Height (1 based, 480 for example)
-    u32 FrameRate; // frame rate
-    u32 FrameRateDiv; // frame rate divisor (framerate/frameratediv=fps)
+    uint32_t Width; // Width (1 based, 640 for example)
+    uint32_t Height; // Height (1 based, 480 for example)
+    uint32_t FrameRate; // frame rate
+    uint32_t FrameRateDiv; // frame rate divisor (framerate/frameratediv=fps)
 
-    u32 Flags; // height compression options
-    u32 NumTracks; // number of tracks
+    uint32_t Flags; // height compression options
+    uint32_t NumTracks; // number of tracks
 } BINKHDR;
 
 //=======================================================================
@@ -419,8 +422,8 @@ typedef struct BINKHDR
 #define BinkLoadConverter(val) BinkLoadUnloadConverter(val, 1)
 #define BinkUnloadConverter(val) BinkLoadUnloadConverter(val, 0)
 
-RADEXPFUNC void RADEXPLINK BinkLoadUnload(s32 inout);
-RADEXPFUNC void RADEXPLINK BinkLoadUnloadConverter(u32 surfaces, s32 inout);
+RADEXPFUNC void RADEXPLINK BinkLoadUnload(int32_t inout);
+RADEXPFUNC void RADEXPLINK BinkLoadUnloadConverter(uint32_t surfaces, int32_t inout);
 
 #endif
 
@@ -437,7 +440,7 @@ RADEXPFUNC void RADEXPLINK BinkLoadUnloadConverter(u32 surfaces, s32 inout);
 #ifdef __RADMAC__
 #pragma export on
 
-RADEXPFUNC HBINK RADEXPLINK BinkMacOpen(void /*FSSpec*/* fsp, u32 flags);
+RADEXPFUNC HBINK RADEXPLINK BinkMacOpen(void /*FSSpec*/* fsp, uint32_t flags);
 #endif
 
 RADEXPFUNC void PTR4* RADEXPLINK BinkLogoAddress(void);
@@ -445,99 +448,99 @@ RADEXPFUNC void PTR4* RADEXPLINK BinkLogoAddress(void);
 RADEXPFUNC void RADEXPLINK BinkSetError(const char PTR4* err);
 RADEXPFUNC char PTR4* RADEXPLINK BinkGetError(void);
 
-RADEXPFUNC HBINK RADEXPLINK BinkOpen(const char PTR4* name, u32 flags);
+RADEXPFUNC HBINK RADEXPLINK BinkOpen(const char PTR4* name, uint32_t flags);
 
-RADEXPFUNC s32 RADEXPLINK BinkDoFrame(HBINK bnk);
+RADEXPFUNC int32_t RADEXPLINK BinkDoFrame(HBINK bnk);
 RADEXPFUNC void RADEXPLINK BinkNextFrame(HBINK bnk);
-RADEXPFUNC s32 RADEXPLINK BinkWait(HBINK bnk);
+RADEXPFUNC int32_t RADEXPLINK BinkWait(HBINK bnk);
 RADEXPFUNC void RADEXPLINK BinkClose(HBINK bnk);
-RADEXPFUNC s32 RADEXPLINK BinkPause(HBINK bnk, s32 pause);
-RADEXPFUNC s32 RADEXPLINK BinkCopyToBuffer(HBINK bnk, void* dest, s32 destpitch, u32 destheight,
-                                           u32 destx, u32 desty, u32 flags);
-RADEXPFUNC s32 RADEXPLINK BinkCopyToBufferRect(HBINK bnk, void* dest, s32 destpitch, u32 destheight,
-                                               u32 destx, u32 desty, u32 srcx, u32 srcy, u32 srcw,
-                                               u32 srch, u32 flags);
-RADEXPFUNC s32 RADEXPLINK BinkGetRects(HBINK bnk, u32 flags);
-RADEXPFUNC void RADEXPLINK BinkGoto(HBINK bnk, u32 frame, s32 flags); // use 1 for the first frame
-RADEXPFUNC u32 RADEXPLINK BinkGetKeyFrame(HBINK bnk, u32 frame, s32 flags);
+RADEXPFUNC int32_t RADEXPLINK BinkPause(HBINK bnk, int32_t pause);
+RADEXPFUNC int32_t RADEXPLINK BinkCopyToBuffer(HBINK bnk, void* dest, int32_t destpitch, uint32_t destheight,
+                                           uint32_t destx, uint32_t desty, uint32_t flags);
+RADEXPFUNC int32_t RADEXPLINK BinkCopyToBufferRect(HBINK bnk, void* dest, int32_t destpitch, uint32_t destheight,
+                                               uint32_t destx, uint32_t desty, uint32_t srcx, uint32_t srcy, uint32_t srcw,
+                                               uint32_t srch, uint32_t flags);
+RADEXPFUNC int32_t RADEXPLINK BinkGetRects(HBINK bnk, uint32_t flags);
+RADEXPFUNC void RADEXPLINK BinkGoto(HBINK bnk, uint32_t frame, int32_t flags); // use 1 for the first frame
+RADEXPFUNC uint32_t RADEXPLINK BinkGetKeyFrame(HBINK bnk, uint32_t frame, int32_t flags);
 
-RADEXPFUNC s32 RADEXPLINK BinkSetVideoOnOff(HBINK bnk, s32 onoff);
-RADEXPFUNC s32 RADEXPLINK BinkSetSoundOnOff(HBINK bnk, s32 onoff);
+RADEXPFUNC int32_t RADEXPLINK BinkSetVideoOnOff(HBINK bnk, int32_t onoff);
+RADEXPFUNC int32_t RADEXPLINK BinkSetSoundOnOff(HBINK bnk, int32_t onoff);
 RADEXPFUNC void RADEXPLINK BinkFreeGlocalMemory(void);
-RADEXPFUNC void RADEXPLINK BinkSetVolume(HBINK bnk, u32 trackid, s32 volume);
-RADEXPFUNC void RADEXPLINK BinkSetPan(HBINK bnk, u32 trackid, s32 pan);
-RADEXPFUNC void RADEXPLINK BinkSetMixBins(HBINK bnk, u32 trackid, u32 PTR4* mix_bins, u32 total);
-RADEXPFUNC void RADEXPLINK BinkSetMixBinVolumes(HBINK bnk, u32 trackid, u32 PTR4* vol_mix_bins,
-                                                s32 PTR4* volumes, u32 total);
+RADEXPFUNC void RADEXPLINK BinkSetVolume(HBINK bnk, uint32_t trackid, int32_t volume);
+RADEXPFUNC void RADEXPLINK BinkSetPan(HBINK bnk, uint32_t trackid, int32_t pan);
+RADEXPFUNC void RADEXPLINK BinkSetMixBins(HBINK bnk, uint32_t trackid, uint32_t PTR4* mix_bins, uint32_t total);
+RADEXPFUNC void RADEXPLINK BinkSetMixBinVolumes(HBINK bnk, uint32_t trackid, uint32_t PTR4* vol_mix_bins,
+                                                int32_t PTR4* volumes, uint32_t total);
 RADEXPFUNC void RADEXPLINK BinkService(HBINK bink);
 
 typedef struct BINKTRACK PTR4* HBINKTRACK;
 
 typedef struct BINKTRACK
 {
-    u32 Frequency;
-    u32 Bits;
-    u32 Channels;
-    u32 MaxSize;
+    uint32_t Frequency;
+    uint32_t Bits;
+    uint32_t Channels;
+    uint32_t MaxSize;
 
     HBINK bink;
-    u32 sndcomp;
-    s32 trackindex;
+    uint32_t sndcomp;
+    int32_t trackindex;
 } BINKTRACK;
 
-RADEXPFUNC HBINKTRACK RADEXPLINK BinkOpenTrack(HBINK bnk, u32 trackindex);
+RADEXPFUNC HBINKTRACK RADEXPLINK BinkOpenTrack(HBINK bnk, uint32_t trackindex);
 RADEXPFUNC void RADEXPLINK BinkCloseTrack(HBINKTRACK bnkt);
-RADEXPFUNC u32 RADEXPLINK BinkGetTrackData(HBINKTRACK bnkt, void PTR4* dest);
+RADEXPFUNC uint32_t RADEXPLINK BinkGetTrackData(HBINKTRACK bnkt, void PTR4* dest);
 
-RADEXPFUNC u32 RADEXPLINK BinkGetTrackType(HBINK bnk, u32 trackindex);
-RADEXPFUNC u32 RADEXPLINK BinkGetTrackMaxSize(HBINK bnk, u32 trackindex);
-RADEXPFUNC u32 RADEXPLINK BinkGetTrackID(HBINK bnk, u32 trackindex);
+RADEXPFUNC uint32_t RADEXPLINK BinkGetTrackType(HBINK bnk, uint32_t trackindex);
+RADEXPFUNC uint32_t RADEXPLINK BinkGetTrackMaxSize(HBINK bnk, uint32_t trackindex);
+RADEXPFUNC uint32_t RADEXPLINK BinkGetTrackID(HBINK bnk, uint32_t trackindex);
 
 RADEXPFUNC void RADEXPLINK BinkGetSummary(HBINK bnk, BINKSUMMARY PTR4* sum);
-RADEXPFUNC void RADEXPLINK BinkGetRealtime(HBINK bink, BINKREALTIME PTR4* run, u32 frames);
+RADEXPFUNC void RADEXPLINK BinkGetRealtime(HBINK bink, BINKREALTIME PTR4* run, uint32_t frames);
 
-RADEXPFUNC void RADEXPLINK BinkSetSoundTrack(u32 total_tracks, u32 PTR4* tracks);
+RADEXPFUNC void RADEXPLINK BinkSetSoundTrack(uint32_t total_tracks, uint32_t PTR4* tracks);
 RADEXPFUNC void RADEXPLINK BinkSetIO(BINKIOOPEN io);
-RADEXPFUNC void RADEXPLINK BinkSetFrameRate(u32 forcerate, u32 forceratediv);
-RADEXPFUNC void RADEXPLINK BinkSetSimulate(u32 sim);
-RADEXPFUNC void RADEXPLINK BinkSetIOSize(u32 iosize);
+RADEXPFUNC void RADEXPLINK BinkSetFrameRate(uint32_t forcerate, uint32_t forceratediv);
+RADEXPFUNC void RADEXPLINK BinkSetSimulate(uint32_t sim);
+RADEXPFUNC void RADEXPLINK BinkSetIOSize(uint32_t iosize);
 
-RADEXPFUNC s32 RADEXPLINK BinkSetSoundSystem(BINKSNDSYSOPEN open, u32 param);
+RADEXPFUNC int32_t RADEXPLINK BinkSetSoundSystem(BINKSNDSYSOPEN open, uint32_t param);
 
 #ifdef __RADWIN__
 
-RADEXPFUNC BINKSNDOPEN RADEXPLINK BinkOpenDirectSound(u32 param); // don't call directly
-#define BinkSoundUseDirectSound(lpDS) BinkSetSoundSystem(BinkOpenDirectSound, (u32)lpDS)
+RADEXPFUNC BINKSNDOPEN RADEXPLINK BinkOpenDirectSound(uint32_t param); // don't call directly
+#define BinkSoundUseDirectSound(lpDS) BinkSetSoundSystem(BinkOpenDirectSound, (uint32_t)lpDS)
 
-RADEXPFUNC BINKSNDOPEN RADEXPLINK BinkOpenWaveOut(u32 param); // don't call directly
+RADEXPFUNC BINKSNDOPEN RADEXPLINK BinkOpenWaveOut(uint32_t param); // don't call directly
 #define BinkSoundUseWaveOut() BinkSetSoundSystem(BinkOpenWaveOut, 0)
 
 #endif
 
 #ifndef __RADMAC__
 
-RADEXPFUNC BINKSNDOPEN RADEXPLINK BinkOpenMiles(u32 param); // don't call directly
-#define BinkSoundUseMiles(hdigdriver) BinkSetSoundSystem(BinkOpenMiles, (u32)hdigdriver)
+RADEXPFUNC BINKSNDOPEN RADEXPLINK BinkOpenMiles(uint32_t param); // don't call directly
+#define BinkSoundUseMiles(hdigdriver) BinkSetSoundSystem(BinkOpenMiles, (uint32_t)hdigdriver)
 
 #endif
 
 #ifdef __RADMAC__
 
-RADEXPFUNC BINKSNDOPEN RADEXPLINK BinkOpenSoundManager(u32 param); // don't call directly
+RADEXPFUNC BINKSNDOPEN RADEXPLINK BinkOpenSoundManager(uint32_t param); // don't call directly
 #define BinkSoundUseSoundManager() BinkSetSoundSystem(BinkOpenSoundManager, 0)
 
 #endif
 
 #ifdef __RADLINUX__
 
-RADEXPFUNC BINKSNDOPEN RADEXPLINK BinkOpenSDLMixer(u32 param); // don't call directly
+RADEXPFUNC BINKSNDOPEN RADEXPLINK BinkOpenSDLMixer(uint32_t param); // don't call directly
 #define BinkSoundUseSDLMixer() BinkSetSoundSystem(BinkOpenSDLMixer, 0)
 
 #endif
 
 #ifdef __RADNGC__
 
-typedef void PTR4*(RADLINK PTR4* RADARAMALLOC)(u32 num_bytes);
+typedef void PTR4*(RADLINK PTR4* RADARAMALLOC)(uint32_t num_bytes);
 typedef void(RADLINK PTR4* RADARAMFREE)(void PTR4* ptr);
 
 typedef struct RADARAMCALLBACKS
@@ -546,24 +549,24 @@ typedef struct RADARAMCALLBACKS
     RADARAMFREE aram_free;
 } RADARAMCALLBACKS;
 
-RADEXPFUNC BINKSNDOPEN RADEXPLINK BinkOpenAX(u32 param); // don't call directly
+RADEXPFUNC BINKSNDOPEN RADEXPLINK BinkOpenAX(uint32_t param); // don't call directly
 #define BinkSoundUseAX(functions)                                                                  \
-    BinkSetSoundSystem(BinkOpenAX, (u32)functions) // takes a pointer to RADARAMCALLBACKS
+    BinkSetSoundSystem(BinkOpenAX, (uint32_t)functions) // takes a pointer to RADARAMCALLBACKS
 
-RADEXPFUNC BINKSNDOPEN RADEXPLINK BinkOpenMusyXSound(u32 param); // don't call directly
+RADEXPFUNC BINKSNDOPEN RADEXPLINK BinkOpenMusyXSound(uint32_t param); // don't call directly
 #define BinkSoundUseMusyX() BinkSetSoundSystem(BinkOpenMusyXSound, 0)
 
 #endif
 
 #if defined(__RADXBOX__) || defined(__RADWIN__)
 
-RADEXPFUNC s32 RADEXPLINK BinkDX8SurfaceType(void* lpD3Ds);
+RADEXPFUNC int32_t RADEXPLINK BinkDX8SurfaceType(void* lpD3Ds);
 
 #endif
 
 #if defined(__RADWIN__)
 
-RADEXPFUNC s32 RADEXPLINK BinkDX9SurfaceType(void* lpD3Ds);
+RADEXPFUNC int32_t RADEXPLINK BinkDX9SurfaceType(void* lpD3Ds);
 
 #endif
 
@@ -592,26 +595,26 @@ typedef struct BINKBUFFER* HBINKBUFFER;
 
 typedef struct BINKBUFFER
 {
-    u32 Width;
-    u32 Height;
-    u32 WindowWidth;
-    u32 WindowHeight;
-    u32 SurfaceType;
+    uint32_t Width;
+    uint32_t Height;
+    uint32_t WindowWidth;
+    uint32_t WindowHeight;
+    uint32_t SurfaceType;
     void* Buffer;
-    s32 BufferPitch;
-    u32 ScreenWidth;
-    u32 ScreenHeight;
-    u32 ScreenDepth;
-    u32 ScaleFlags;
+    int32_t BufferPitch;
+    uint32_t ScreenWidth;
+    uint32_t ScreenHeight;
+    uint32_t ScreenDepth;
+    uint32_t ScaleFlags;
 
-    s32 destx, desty;
-    s32 wndx, wndy;
-    u32 wnd;
+    int32_t destx, desty;
+    int32_t wndx, wndy;
+    uint32_t wnd;
 
-    s32 noclipping;
-    u32 type;
-    s32 issoftcur;
-    u32 cursorcount;
+    int32_t noclipping;
+    uint32_t type;
+    int32_t issoftcur;
+    uint32_t cursorcount;
 
 } BINKBUFFER;
 
@@ -620,60 +623,60 @@ typedef struct BINKBUFFER
 #define BINKBUFFERGWORLD 2
 #define BINKBUFFERTYPEMASK 31
 
-RADEXPFUNC HBINKBUFFER RADEXPLINK BinkBufferOpen(void* /*WindowPtr*/ wnd, u32 width, u32 height,
-                                                 u32 bufferflags);
-RADEXPFUNC s32 RADEXPLINK BinkGDSurfaceType(void* /*GDHandle*/ gd);
-RADEXPFUNC s32 RADEXPLINK BinkIsSoftwareCursor(void* /*GDHandle*/ gd);
-RADEXPFUNC s32 RADEXPLINK BinkCheckCursor(void* /*WindowPtr*/ wp, s32 x, s32 y, s32 w, s32 h);
+RADEXPFUNC HBINKBUFFER RADEXPLINK BinkBufferOpen(void* /*WindowPtr*/ wnd, uint32_t width, uint32_t height,
+                                                 uint32_t bufferflags);
+RADEXPFUNC int32_t RADEXPLINK BinkGDSurfaceType(void* /*GDHandle*/ gd);
+RADEXPFUNC int32_t RADEXPLINK BinkIsSoftwareCursor(void* /*GDHandle*/ gd);
+RADEXPFUNC int32_t RADEXPLINK BinkCheckCursor(void* /*WindowPtr*/ wp, int32_t x, int32_t y, int32_t w, int32_t h);
 
 #else
 
 typedef struct BINKBUFFER
 {
-    u32 Width;
-    u32 Height;
-    u32 WindowWidth;
-    u32 WindowHeight;
-    u32 SurfaceType;
+    uint32_t Width;
+    uint32_t Height;
+    uint32_t WindowWidth;
+    uint32_t WindowHeight;
+    uint32_t SurfaceType;
     void* Buffer;
-    s32 BufferPitch;
-    s32 ClientOffsetX;
-    s32 ClientOffsetY;
-    u32 ScreenWidth;
-    u32 ScreenHeight;
-    u32 ScreenDepth;
-    u32 ExtraWindowWidth;
-    u32 ExtraWindowHeight;
-    u32 ScaleFlags;
-    u32 StretchWidth;
-    u32 StretchHeight;
+    int32_t BufferPitch;
+    int32_t ClientOffsetX;
+    int32_t ClientOffsetY;
+    uint32_t ScreenWidth;
+    uint32_t ScreenHeight;
+    uint32_t ScreenDepth;
+    uint32_t ExtraWindowWidth;
+    uint32_t ExtraWindowHeight;
+    uint32_t ScaleFlags;
+    uint32_t StretchWidth;
+    uint32_t StretchHeight;
 
-    s32 surface;
+    int32_t surface;
     void* ddsurface;
     void* ddclipper;
-    s32 destx, desty;
-    s32 wndx, wndy;
-    u32 wnd;
-    s32 minimized;
-    s32 ddoverlay;
-    s32 ddoffscreen;
-    s32 lastovershow;
+    int32_t destx, desty;
+    int32_t wndx, wndy;
+    uint32_t wnd;
+    int32_t minimized;
+    int32_t ddoverlay;
+    int32_t ddoffscreen;
+    int32_t lastovershow;
 
-    s32 issoftcur;
-    u32 cursorcount;
+    int32_t issoftcur;
+    uint32_t cursorcount;
     void* buffertop;
-    u32 type;
-    s32 noclipping;
+    uint32_t type;
+    int32_t noclipping;
 
-    s32 loadeddd;
-    s32 loadedwin;
+    int32_t loadeddd;
+    int32_t loadedwin;
 
     void* dibh;
     void* dibbuffer;
-    s32 dibpitch;
+    int32_t dibpitch;
     void* dibinfo;
-    u32 dibdc;
-    u32 diboldbitmap;
+    uint32_t dibdc;
+    uint32_t diboldbitmap;
 
 } BINKBUFFER;
 
@@ -691,33 +694,33 @@ typedef struct BINKBUFFER
 #define BINKBUFFERLAST 10
 #define BINKBUFFERTYPEMASK 31
 
-RADEXPFUNC HBINKBUFFER RADEXPLINK BinkBufferOpen(void* /*HWND*/ wnd, u32 width, u32 height,
-                                                 u32 bufferflags);
-RADEXPFUNC s32 RADEXPLINK BinkBufferSetHWND(HBINKBUFFER buf, void* /*HWND*/ newwnd);
-RADEXPFUNC s32 RADEXPLINK BinkDDSurfaceType(void PTR4* lpDDS);
-RADEXPFUNC s32 RADEXPLINK BinkIsSoftwareCursor(void PTR4* lpDDSP, void* /*HCURSOR*/ cur);
-RADEXPFUNC s32 RADEXPLINK BinkCheckCursor(void* /*HWND*/ wnd, s32 x, s32 y, s32 w, s32 h);
-RADEXPFUNC s32 RADEXPLINK BinkBufferSetDirectDraw(void PTR4* lpDirectDraw, void PTR4* lpPrimary);
+RADEXPFUNC HBINKBUFFER RADEXPLINK BinkBufferOpen(void* /*HWND*/ wnd, uint32_t width, uint32_t height,
+                                                 uint32_t bufferflags);
+RADEXPFUNC int32_t RADEXPLINK BinkBufferSetHWND(HBINKBUFFER buf, void* /*HWND*/ newwnd);
+RADEXPFUNC int32_t RADEXPLINK BinkDDSurfaceType(void PTR4* lpDDS);
+RADEXPFUNC int32_t RADEXPLINK BinkIsSoftwareCursor(void PTR4* lpDDSP, void* /*HCURSOR*/ cur);
+RADEXPFUNC int32_t RADEXPLINK BinkCheckCursor(void* /*HWND*/ wnd, int32_t x, int32_t y, int32_t w, int32_t h);
+RADEXPFUNC int32_t RADEXPLINK BinkBufferSetDirectDraw(void PTR4* lpDirectDraw, void PTR4* lpPrimary);
 
 #endif
 
 RADEXPFUNC void RADEXPLINK BinkBufferClose(HBINKBUFFER buf);
-RADEXPFUNC s32 RADEXPLINK BinkBufferLock(HBINKBUFFER buf);
-RADEXPFUNC s32 RADEXPLINK BinkBufferUnlock(HBINKBUFFER buf);
-RADEXPFUNC void RADEXPLINK BinkBufferSetResolution(s32 w, s32 h, s32 bits);
-RADEXPFUNC void RADEXPLINK BinkBufferCheckWinPos(HBINKBUFFER buf, s32 PTR4* NewWindowX,
-                                                 s32 PTR4* NewWindowY);
-RADEXPFUNC s32 RADEXPLINK BinkBufferSetOffset(HBINKBUFFER buf, s32 destx, s32 desty);
-RADEXPFUNC void RADEXPLINK BinkBufferBlit(HBINKBUFFER buf, BINKRECT PTR4* rects, u32 numrects);
-RADEXPFUNC s32 RADEXPLINK BinkBufferSetScale(HBINKBUFFER buf, u32 w, u32 h);
+RADEXPFUNC int32_t RADEXPLINK BinkBufferLock(HBINKBUFFER buf);
+RADEXPFUNC int32_t RADEXPLINK BinkBufferUnlock(HBINKBUFFER buf);
+RADEXPFUNC void RADEXPLINK BinkBufferSetResolution(int32_t w, int32_t h, int32_t bits);
+RADEXPFUNC void RADEXPLINK BinkBufferCheckWinPos(HBINKBUFFER buf, int32_t PTR4* NewWindowX,
+                                                 int32_t PTR4* NewWindowY);
+RADEXPFUNC int32_t RADEXPLINK BinkBufferSetOffset(HBINKBUFFER buf, int32_t destx, int32_t desty);
+RADEXPFUNC void RADEXPLINK BinkBufferBlit(HBINKBUFFER buf, BINKRECT PTR4* rects, uint32_t numrects);
+RADEXPFUNC int32_t RADEXPLINK BinkBufferSetScale(HBINKBUFFER buf, uint32_t w, uint32_t h);
 RADEXPFUNC char PTR4* RADEXPLINK BinkBufferGetDescription(HBINKBUFFER buf);
 RADEXPFUNC char PTR4* RADEXPLINK BinkBufferGetError();
-RADEXPFUNC void RADEXPLINK BinkRestoreCursor(s32 checkcount);
-RADEXPFUNC s32 RADEXPLINK BinkBufferClear(HBINKBUFFER buf, u32 RGB);
+RADEXPFUNC void RADEXPLINK BinkRestoreCursor(int32_t checkcount);
+RADEXPFUNC int32_t RADEXPLINK BinkBufferClear(HBINKBUFFER buf, uint32_t RGB);
 
 #endif
 
-typedef void PTR4*(RADLINK PTR4* BINKMEMALLOC)(u32 bytes);
+typedef void PTR4*(RADLINK PTR4* BINKMEMALLOC)(uint32_t bytes);
 typedef void(RADLINK PTR4* BINKMEMFREE)(void PTR4* ptr);
 
 RADEXPFUNC void RADEXPLINK BinkSetMemory(BINKMEMALLOC a, BINKMEMFREE f);

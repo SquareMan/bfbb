@@ -1,6 +1,8 @@
 #ifndef XTRC_H
 #define XTRC_H
 
+#include <types.h>
+
 #include "iTRC.h"
 
 enum _tagTRCState
@@ -27,8 +29,8 @@ struct _tagTRCPadInfo : _tagiTRCPadInfo
     _tagTRCState state;
 };
 
-_tagTRCPadInfo gTrcPad[];
-_tagTRCState gTrcDisk[];
+extern _tagTRCPadInfo gTrcPad[];
+extern _tagTRCState gTrcDisk[];
 
 void xTRCInit();
 void xTRCPad(S32 pad_id, _tagTRCState state);

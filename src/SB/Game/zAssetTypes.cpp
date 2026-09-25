@@ -1,5 +1,6 @@
 #include "zAssetTypes.h"
 
+#include "rwplcore.h"
 #include "xAnim.h"
 #include "xCurveAsset.h"
 #include "xstransvc.h"
@@ -158,7 +159,10 @@ static void* Model_Read(void* param_1, U32 param_2, void* indata, U32 insize, U3
             tmpModel->boundingSphere.center.y = 0.0f;
             tmpModel->boundingSphere.center.z = 0.0f;
 
+#ifndef WITH_LIBRW
+            // rw::Atomic does not support interpolator.
             tmpModel->interpolator.flags &= ~2;
+#endif
         }
         break;
     }
@@ -168,8 +172,7 @@ static void* Model_Read(void* param_1, U32 param_2, void* indata, U32 insize, U3
 static void* Curve_Read(void* param_1, U32 param_2, void* indata, U32 insize, U32* outsize)
 {
     *outsize = insize;
-
-    void* __dest = RWSRCGLOBAL(memoryFuncs.rwmalloc(insize));
+    void* __dest = RwMalloc(insize);
     memcpy(__dest, indata, insize);
 
     // The baked point array is packed directly after the header, so points
@@ -221,12 +224,12 @@ static void BSP_Unload(void*, U32)
     xEnvFree(globals.sceneCur->env);
 }
 
-static char* jsp_shadow_hack_textures[] = {
+static const char* jsp_shadow_hack_textures[] = {
     "beach_towel",  "wood_board_Nails_singleV2", "wood_board_Nails_singleV3",
     "glass_broken", "ground_path_alpha",
 };
 
-static char** jsp_shadow_hack_end_textures = &jsp_shadow_hack_textures[5];
+static const char** jsp_shadow_hack_end_textures = &jsp_shadow_hack_textures[5];
 
 struct AnimTableList animTable[33] = {
     { "ZNPC_AnimTable_Test", ZNPC_AnimTable_Test, 0 },
@@ -280,11 +283,11 @@ inline bool jsp_shadow_hack_match(RpAtomic* atomic)
     RpGeometry* geom = RpAtomicGetGeometry(atomic);
     S32 numMaterials = geom->matList.numMaterials;
 
-    char** hack = &jsp_shadow_hack_textures[0];
-    char** hack_end = jsp_shadow_hack_end_textures;
+    const char** hack = &jsp_shadow_hack_textures[0];
+    const char** hack_end = jsp_shadow_hack_end_textures;
     for (; hack != hack_end; ++hack)
     {
-        char* name = *hack;
+        const char* name = *hack;
         for (S32 i = 0; i < numMaterials; ++i)
         {
             RwTexture* texture = geom->matList.materials[i]->texture;
@@ -783,7 +786,7 @@ static void MovePoint_Unload(void* userdata, U32 b)
 
 static void* SndInfoRead(void* param_1, U32 param_2, void* indata, U32 insize, U32* outsize)
 {
-    void* __dest = RWSRCGLOBAL(memoryFuncs.rwmalloc(insize));
+    void* __dest = RwMalloc(insize);
 
     if (__dest == NULL)
     {
@@ -794,7 +797,7 @@ static void* SndInfoRead(void* param_1, U32 param_2, void* indata, U32 insize, U
 
     if (iSndLoadSounds(__dest) == 0)
     {
-        RWSRCGLOBAL(memoryFuncs.rwfree(__dest));
+        RwFree(__dest);
         return NULL;
     }
     else

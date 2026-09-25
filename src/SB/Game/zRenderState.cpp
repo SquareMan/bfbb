@@ -1,6 +1,6 @@
 #include "zRenderState.h"
 
-#include "rwsdk/rwplcore.h"
+#include <rwplcore.h>
 
 #include "iCamera.h"
 
@@ -29,7 +29,7 @@ void zRenderState(_SDRenderState newState)
     RwRenderStateSet(rwRENDERSTATETEXTUREFILTER, (void*)rwFILTERLINEAR);
     iCameraSetFogRenderStates();
     RwRenderStateSet(rwRENDERSTATEVERTEXALPHAENABLE, (void*)1);
-    RwRenderStateSet(rwRENDERSTATECULLMODE, (void*)1);
+    RwRenderStateSet(rwRENDERSTATECULLMODE, (void*)rwCULLMODECULLNONE);
     RwRenderStateSet(rwRENDERSTATETEXTUREADDRESS, (void*)rwTEXTUREADDRESSWRAP);
     RwRenderStateSet(rwRENDERSTATESRCBLEND, (void*)rwBLENDSRCALPHA);
     RwRenderStateSet(rwRENDERSTATEDESTBLEND, (void*)rwBLENDINVSRCALPHA);
@@ -43,18 +43,18 @@ void zRenderState(_SDRenderState newState)
     case SDRS_Particles:
         RwRenderStateSet(rwRENDERSTATEZWRITEENABLE, 0);
         RwRenderStateSet(rwRENDERSTATEFOGENABLE, 0);
-        RwRenderStateSet(rwRENDERSTATESHADEMODE, (void*)1);
+        RwRenderStateSet(rwRENDERSTATESHADEMODE, (void*)rwSHADEMODEFLAT);
         break;
     case SDRS_OpaqueModels:
         RwRenderStateSet(rwRENDERSTATEVERTEXALPHAENABLE, 0);
         break;
     case SDRS_Environment:
         RwRenderStateSet(rwRENDERSTATEVERTEXALPHAENABLE, 0);
-        RwRenderStateSet(rwRENDERSTATECULLMODE, (void*)2);
+        RwRenderStateSet(rwRENDERSTATECULLMODE, (void*)rwCULLMODECULLBACK);
         break;
     case SDRS_Lightning:
         RwRenderStateSet(rwRENDERSTATEZWRITEENABLE, 0);
-        RwRenderStateSet(rwRENDERSTATEDESTBLEND, (void*)2);
+        RwRenderStateSet(rwRENDERSTATEDESTBLEND, (void*)rwBLENDONE);
         break;
     case SDRS_Streak:
         RwRenderStateSet(rwRENDERSTATEZWRITEENABLE, 0);
@@ -66,15 +66,15 @@ void zRenderState(_SDRenderState newState)
         RwRenderStateSet(rwRENDERSTATEZWRITEENABLE, 0);
         RwRenderStateSet(rwRENDERSTATEZTESTENABLE, 0);
         RwRenderStateSet(rwRENDERSTATEFOGENABLE, 0);
-        RwRenderStateSet(rwRENDERSTATEDESTBLEND, (void*)2);
+        RwRenderStateSet(rwRENDERSTATEDESTBLEND, (void*)rwBLENDONE);
         break;
     case SDRS_Font:
         RwRenderStateSet(rwRENDERSTATEZWRITEENABLE, 0);
         RwRenderStateSet(rwRENDERSTATEZTESTENABLE, 0);
         RwRenderStateSet(rwRENDERSTATEFOGENABLE, 0);
         RwRenderStateSet(rwRENDERSTATEVERTEXALPHAENABLE, 0);
-        RwRenderStateSet(rwRENDERSTATESRCBLEND, (void*)2);
-        RwRenderStateSet(rwRENDERSTATEDESTBLEND, (void*)1);
+        RwRenderStateSet(rwRENDERSTATESRCBLEND, (void*)rwBLENDONE);
+        RwRenderStateSet(rwRENDERSTATEDESTBLEND, (void*)rwBLENDZERO);
         break;
     case SDRS_HUD:
         RwRenderStateSet(rwRENDERSTATEFOGENABLE, 0);
@@ -82,7 +82,7 @@ void zRenderState(_SDRenderState newState)
     case SDRS_Bubble:
         RwRenderStateSet(rwRENDERSTATEFOGENABLE, 0);
         RwRenderStateSet(rwRENDERSTATEVERTEXALPHAENABLE, 0);
-        RwRenderStateSet(rwRENDERSTATECULLMODE, (void*)2);
+        RwRenderStateSet(rwRENDERSTATECULLMODE, (void*)rwCULLMODECULLBACK);
         break;
     case SDRS_SkyBack:
         RwRenderStateSet(rwRENDERSTATEZWRITEENABLE, 0);
@@ -94,39 +94,39 @@ void zRenderState(_SDRenderState newState)
         RwRenderStateSet(rwRENDERSTATEZTESTENABLE, 0);
         RwRenderStateSet(rwRENDERSTATEFOGENABLE, 0);
         RwRenderStateSet(rwRENDERSTATEVERTEXALPHAENABLE, 0);
-        RwRenderStateSet(rwRENDERSTATESRCBLEND, (void*)2);
-        RwRenderStateSet(rwRENDERSTATEDESTBLEND, (void*)1);
-        RwRenderStateSet(rwRENDERSTATESHADEMODE, (void*)1);
+        RwRenderStateSet(rwRENDERSTATESRCBLEND, (void*)rwBLENDONE);
+        RwRenderStateSet(rwRENDERSTATEDESTBLEND, (void*)rwBLENDZERO);
+        RwRenderStateSet(rwRENDERSTATESHADEMODE, (void*)rwSHADEMODEFLAT);
         break;
     case SDRS_OOBFade:
         RwRenderStateSet(rwRENDERSTATEZTESTENABLE, 0);
         RwRenderStateSet(rwRENDERSTATEFOGENABLE, 0);
-        RwRenderStateSet(rwRENDERSTATESHADEMODE, (void*)1);
+        RwRenderStateSet(rwRENDERSTATESHADEMODE, (void*)rwSHADEMODEFLAT);
         break;
     case SDRS_OOBPlayerZ:
         RwRenderStateSet(rwRENDERSTATEVERTEXALPHAENABLE, 0);
-        RwRenderStateSet(rwRENDERSTATESHADEMODE, (void*)1);
-        RwRenderStateSet(rwRENDERSTATESRCBLEND, (void*)2);
-        RwRenderStateSet(rwRENDERSTATEDESTBLEND, (void*)1);
+        RwRenderStateSet(rwRENDERSTATESHADEMODE, (void*)rwSHADEMODEFLAT);
+        RwRenderStateSet(rwRENDERSTATESRCBLEND, (void*)rwBLENDONE);
+        RwRenderStateSet(rwRENDERSTATEDESTBLEND, (void*)rwBLENDZERO);
         break;
     case SDRS_OOBPlayerAlpha:
         RwRenderStateSet(rwRENDERSTATEVERTEXALPHAENABLE, 0);
-        RwRenderStateSet(rwRENDERSTATEDESTBLEND, (void*)2);
+        RwRenderStateSet(rwRENDERSTATEDESTBLEND, (void*)rwBLENDONE);
         break;
     case SDRS_OOBHand:
         RwRenderStateSet(rwRENDERSTATEZWRITEENABLE, 0);
         RwRenderStateSet(rwRENDERSTATEZTESTENABLE, 0);
         RwRenderStateSet(rwRENDERSTATEFOGENABLE, 0);
         RwRenderStateSet(rwRENDERSTATEVERTEXALPHAENABLE, 0);
-        RwRenderStateSet(rwRENDERSTATESRCBLEND, (void*)2);
-        RwRenderStateSet(rwRENDERSTATEDESTBLEND, (void*)1);
+        RwRenderStateSet(rwRENDERSTATESRCBLEND, (void*)rwBLENDONE);
+        RwRenderStateSet(rwRENDERSTATEDESTBLEND, (void*)rwBLENDZERO);
         break;
     case SDRS_Newsfish:
         RwRenderStateSet(rwRENDERSTATEZTESTENABLE, 0);
         RwRenderStateSet(rwRENDERSTATEFOGENABLE, 0);
         RwRenderStateSet(rwRENDERSTATEVERTEXALPHAENABLE, 0);
-        RwRenderStateSet(rwRENDERSTATESRCBLEND, (void*)2);
-        RwRenderStateSet(rwRENDERSTATEDESTBLEND, (void*)1);
+        RwRenderStateSet(rwRENDERSTATESRCBLEND, (void*)rwBLENDONE);
+        RwRenderStateSet(rwRENDERSTATEDESTBLEND, (void*)rwBLENDZERO);
         break;
 
     case SDRS_CruiseHUD:
@@ -138,13 +138,14 @@ void zRenderState(_SDRenderState newState)
     case SDRS_DiscoFloorGlow:
         RwRenderStateSet(rwRENDERSTATEZWRITEENABLE, 0);
         RwRenderStateSet(rwRENDERSTATEFOGENABLE, 0);
-        RwRenderStateSet(rwRENDERSTATEDESTBLEND, (void*)2);
+        RwRenderStateSet(rwRENDERSTATEDESTBLEND, (void*)rwBLENDONE);
         break;
 
     case SDRS_Unknown:
     case SDRS_Default:
     case SDRS_AlphaModels:
     case SDRS_Projectile:
+    default:
         break;
     }
 }

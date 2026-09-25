@@ -14,7 +14,7 @@
 
 #include <string.h>
 #include <stdio.h>
-#include <PowerPC_EABI_Support\MSL_C\MSL_Common\strtoul.h>
+#include <cstdlib>
 
 /* xtextbox flags */
 
@@ -38,6 +38,156 @@
 
 static const basic_rect<F32> screen_bounds = { 0, 0, 1, 1 };
 
+// SLOP: Needs to be in header
+template<>
+basic_rect<F32>& basic_rect<F32>::scale(F32 x, F32 y, F32 w, F32 h)
+{
+    this->x *= x;
+    this->y *= y;
+    this->w *= w;
+    this->h *= h;
+    return *this;
+}
+
+template<>
+basic_rect<F32>& basic_rect<F32>::scale(F32 x, F32 y)
+{
+    return scale(x, y, x, y);
+}
+
+template<>
+basic_rect<F32>& basic_rect<F32>::assign(F32 x, F32 y, F32 w, F32 h)
+{
+    this->x = x;
+    this->y = y;
+    this->w = w;
+    this->h = h;
+    return *this;
+}
+
+template<>
+bool basic_rect<F32>::empty() const
+{
+    return (w <= 0.0f || h <= 0.0f);
+}
+
+template<>
+void basic_rect<F32>::clip(basic_rect<F32>& a, basic_rect<F32>& b) const
+{
+    F32 bwaw = b.w / a.w;
+    F32 bwah = b.h / a.h;
+
+    if (a.x < x)
+    {
+        F32 xax = x - a.x;
+        F32 bwawxax = bwaw * xax;
+        a.x = x;
+        a.w -= xax;
+        b.x += bwawxax;
+        b.w -= bwawxax;
+    }
+
+    if (a.y < y)
+    {
+        F32 yay = y - a.y;
+        F32 bwahyay = bwah * yay;
+        a.y = y;
+        a.h -= yay;
+        b.y += bwahyay;
+        b.h -= bwahyay;
+    }
+
+    F32 axaw = a.x + a.w;
+    F32 xw = x + w;
+
+    if (axaw > xw)
+    {
+        F32 bwawaxawxw = bwaw * (axaw - xw);
+        b.w -= bwawaxawxw;
+        a.w = x + w - a.x;
+    }
+
+    F32 ayah = a.y + a.h;
+    F32 yh = y + h;
+
+    if (ayah > yh)
+    {
+        F32 bwahayahyh = bwah * (ayah - yh);
+        b.h -= bwahayahyh;
+        a.h = y + h - a.y;
+    }
+}
+
+template<>
+void basic_rect<F32>::set_bounds(F32 x1, F32 y1, F32 x2, F32 y2)
+{
+    x = x1;
+    w = x2 - x1;
+    y = y1;
+    h = y2 - y1;
+}
+
+template<>
+void basic_rect<F32>::get_bounds(F32& x1, F32& y1, F32& x2, F32& y2) const
+{
+    F32 tx = x;
+    F32 ty = y;
+    F32 bx = tx + w;
+    F32 by = ty + h;
+
+    x1 = tx;
+    x2 = bx;
+    y1 = ty;
+    y2 = by;
+}
+
+
+template<>
+basic_rect<F32>& basic_rect<F32>::operator|=(const basic_rect<F32>& other)
+{
+    F32 x1, y1, x2, y2;
+    F32 _x1, _y1, _x2, _y2;
+
+    this->get_bounds(x1, y1, x2, y2);
+    other.get_bounds(_x1, _y1, _x2, _y2);
+
+    if (x1 > _x1)
+    {
+        x1 = _x1;
+    }
+
+    if (y1 > _y1)
+    {
+        y1 = _y1;
+    }
+
+    if (x2 < _x2)
+    {
+        x2 = _x2;
+    }
+
+    if (y2 < _y2)
+    {
+        y2 = _y2;
+    }
+
+    set_bounds(x1, y1, x2, y2);
+
+    return *this;
+}
+template<>
+basic_rect<F32>& basic_rect<F32>::move(F32 x, F32 y)
+{
+    this->x += x;
+    this->y += y;
+    return *this;
+}
+
+template<>
+basic_rect<F32>& basic_rect<F32>::scale(F32 s)
+{
+    return scale(s, s, s, s);
+}
 substr substr::create(const char* text, size_t size)
 {
     substr s = { text, size };
@@ -107,8 +257,8 @@ namespace
             'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X',
             'Y', 'Z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '?', '!',
             '.', ',', '-', ':', '_', '"', '\'', '&', '(', ')', '<', '>', '/', '%',
-            '\xFC', '\xFB', '\xF9', '\xE2', '\xE4', '\xE0', '\xEA', '\xE8', '\xE9',
-            '\xEE', '\xF6', '\xF4', '\xE7', '\xDF', '\x2B'
+            0xFC, 0xFB, 0xF9, 0xE2, 0xE4, 0xE0, 0xEA, 0xE8, 0xE9,
+            0xEE, 0xF6, 0xF4, 0xE7, 0xDF, 0x2B
         },
         {},
 
@@ -121,10 +271,10 @@ namespace
             'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '0', '1', '2', '3',
             '4', '5', '6', '7', '8', '9', '?', '!', '.', ',', ';', ':', '+', '-',
             '=', '/', '&', '(', ')', '%', '"', '\'', '_', '<', '>', '*', '[', ']',
-            '\xDC', '\xDB', '\xD9', '\xC2', '\xC4', '\xC0', '\xCA', '\xC8', '\xC9',
-            '\xCE', '\xD6', '\xD4', '\xC7', '\xDF', '\xFC', '\xFB', '\xF9', '\xE2',
-            '\xE4', '\xE0', '\xEA', '\xE8', '\xE9', '\xEE', '\xF6', '\xF4', '\xE7',
-            '~', '\xA9', '\xAE', '\x99', '@', '\x7C'
+            0xDC, 0xDB, 0xD9, 0xC2, 0xC4, 0xC0, 0xCA, 0xC8, 0xC9,
+            0xCE, 0xD6, 0xD4, 0xC7, 0xDF, 0xFC, 0xFB, 0xF9, 0xE2,
+            0xE4, 0xE0, 0xEA, 0xE8, 0xE9, 0xEE, 0xF6, 0xF4, 0xE7,
+            '~', 0xA9, 0xAE, 0x99, '@', 0x7C
         },
         {},
 
@@ -324,7 +474,8 @@ namespace
         font_asset& a = *fd.asset;
         S32 height;
         U8 i;
-        char c;
+        // Must be unsigned or we will negative index fd.char_index and be very sad
+        U8 c;
         U32 tail_index;
 
         fd.texture = (RwTexture*)xSTFindAsset(a.tex_id, NULL);
@@ -1270,10 +1421,11 @@ namespace
 
 #ifdef GAMECUBE
 #define TL_CACHE_COUNT 1
-#else
-#ifdef PS2
+#elif defined(PS2)
 #define TL_CACHE_COUNT 3
-#endif
+#else
+// FIXME: readdress this for PC
+#define TL_CACHE_COUNT 1
 #endif
 
     tl_cache_entry tl_cache[TL_CACHE_COUNT];
@@ -1281,7 +1433,7 @@ namespace
 
 xtextbox::layout& xtextbox::temp_layout(bool cache) const
 {
-    iTime max_time = (iTime)(F32)(GET_BUS_FREQUENCY() / 4);
+    iTime max_time = (iTime)(F32)(ITIME_FROM_SECS(1));
     iTime cur_time = iTimeGet();
     bool refresh = false;
     U32 index = 0;
@@ -1842,7 +1994,7 @@ void xtextbox::layout::calc(const xtextbox& ctb, size_t start_text)
 
             if (a.context == &context_buffer[context_buffer_size])
             {
-                context_buffer_size += ALIGN(a.context_size, 4);
+                context_buffer_size += ALIGN_NEXT(a.context_size, 4);
             }
 
             _jots_size++;
@@ -3680,145 +3832,6 @@ namespace
     }
 } // namespace
 
-basic_rect<F32>& basic_rect<F32>::scale(F32 x, F32 y)
-{
-    return scale(x, y, x, y);
-}
-
-basic_rect<F32>& basic_rect<F32>::scale(F32 x, F32 y, F32 w, F32 h)
-{
-    this->x *= x;
-    this->y *= y;
-    this->w *= w;
-    this->h *= h;
-    return *this;
-}
-
-basic_rect<F32>& basic_rect<F32>::assign(F32 x, F32 y, F32 w, F32 h)
-{
-    this->x = x;
-    this->y = y;
-    this->w = w;
-    this->h = h;
-    return *this;
-}
-
-bool basic_rect<F32>::empty() const
-{
-    return (w <= 0.0f || h <= 0.0f);
-}
-
-void basic_rect<F32>::clip(basic_rect<F32>& a, basic_rect<F32>& b) const
-{
-    F32 bwaw = b.w / a.w;
-    F32 bwah = b.h / a.h;
-
-    if (a.x < x)
-    {
-        F32 xax = x - a.x;
-        F32 bwawxax = bwaw * xax;
-        a.x = x;
-        a.w -= xax;
-        b.x += bwawxax;
-        b.w -= bwawxax;
-    }
-
-    if (a.y < y)
-    {
-        F32 yay = y - a.y;
-        F32 bwahyay = bwah * yay;
-        a.y = y;
-        a.h -= yay;
-        b.y += bwahyay;
-        b.h -= bwahyay;
-    }
-
-    F32 axaw = a.x + a.w;
-    F32 xw = x + w;
-
-    if (axaw > xw)
-    {
-        F32 bwawaxawxw = bwaw * (axaw - xw);
-        b.w -= bwawaxawxw;
-        a.w = x + w - a.x;
-    }
-
-    F32 ayah = a.y + a.h;
-    F32 yh = y + h;
-
-    if (ayah > yh)
-    {
-        F32 bwahayahyh = bwah * (ayah - yh);
-        b.h -= bwahayahyh;
-        a.h = y + h - a.y;
-    }
-}
-
-basic_rect<F32>& basic_rect<F32>::operator|=(const basic_rect<F32>& other)
-{
-    F32 x1, y1, x2, y2;
-    F32 _x1, _y1, _x2, _y2;
-
-    this->get_bounds(x1, y1, x2, y2);
-    other.get_bounds(_x1, _y1, _x2, _y2);
-
-    if (x1 > _x1)
-    {
-        x1 = _x1;
-    }
-
-    if (y1 > _y1)
-    {
-        y1 = _y1;
-    }
-
-    if (x2 < _x2)
-    {
-        x2 = _x2;
-    }
-
-    if (y2 < _y2)
-    {
-        y2 = _y2;
-    }
-
-    set_bounds(x1, y1, x2, y2);
-
-    return *this;
-}
-
-void basic_rect<F32>::set_bounds(F32 x1, F32 y1, F32 x2, F32 y2)
-{
-    x = x1;
-    w = x2 - x1;
-    y = y1;
-    h = y2 - y1;
-}
-
-void basic_rect<F32>::get_bounds(F32& x1, F32& y1, F32& x2, F32& y2) const
-{
-    F32 tx = x;
-    F32 ty = y;
-    F32 bx = tx + w;
-    F32 by = ty + h;
-
-    x1 = tx;
-    x2 = bx;
-    y1 = ty;
-    y2 = by;
-}
-
-basic_rect<F32>& basic_rect<F32>::move(F32 x, F32 y)
-{
-    this->x += x;
-    this->y += y;
-    return *this;
-}
-
-basic_rect<F32>& basic_rect<F32>::scale(F32 s)
-{
-    return scale(s, s, s, s);
-}
 
 xVec2& xVec2::assign(F32 x, F32 y)
 {

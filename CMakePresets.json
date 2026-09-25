@@ -1,0 +1,63 @@
+{
+    "version": 10,
+    "cmakeMinimumRequired": {
+        "major": 3,
+        "minor": 25,
+        "patch": 0
+    },
+    "configurePresets": [
+        {
+          "name": "Clang",
+          "hidden": true,
+          "generator": "Ninja",
+          "cacheVariables": {
+            "CMAKE_C_COMPILER": "clang",
+            "CMAKE_CXX_COMPILER": "clang++",
+            "CMAKE_EXPORT_COMPILE_COMMANDS": "on"
+          },
+          "environment": {},
+          "binaryDir": "build-pc",
+          "vendor": {}
+        },
+        {
+            "name": "Debug",
+            "inherits": ["Clang"],
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Debug"
+            }
+        },
+        {
+            "name": "RelWithDebInfo",
+            "inherits": ["Clang"],
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "RelWithDebInfo"
+            }
+        },
+        {
+            "name": "Release",
+            "inherits": ["Clang"],
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release"
+            }
+        }
+    ], 
+    "workflowPresets": [],
+    "include": [],
+    "testPresets": [],
+    "packagePresets": [],
+    "vendor": {},
+    "buildPresets": [
+        {
+            "name": "Debug",
+            "configurePreset": "Debug"
+        },
+        {
+            "name": "RelWithDebInfo",
+            "configurePreset": "RelWithDebInfo"
+        },
+        {
+            "name": "Release",
+            "configurePreset": "Release"
+        }
+    ]
+}

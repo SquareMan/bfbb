@@ -3,7 +3,7 @@
 #include "xMemMgr.h"
 
 #include <rpptank.h>
-#include <PowerPC_EABI_Support\MSL_C\MSL_Common\stdlib.h>
+#include <stdlib.h>
 #include <string.h>
 #include <types.h>
 
@@ -19,7 +19,7 @@ namespace
     struct ptank_context
     {
         ptank_context* next;
-        class RpAtomic* ptank;
+        RpAtomic* ptank;
         U32 flags;
         U32 src_blend;
         U32 dst_blend;

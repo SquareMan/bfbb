@@ -7,6 +7,7 @@
 #include "xMath.h"
 #include "xstransvc.h"
 #include "xString.h"
+#include "xSnd.h"
 
 #include <types.h>
 

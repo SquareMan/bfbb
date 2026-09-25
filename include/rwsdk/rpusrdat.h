@@ -30,7 +30,7 @@ struct RpUserDataArray
 extern "C" {
 #endif
 
-extern RwInt32 RpGeometryAddUserDataArray(RpGeometry* geometry, RwChar* name,
+extern RwInt32 RpGeometryAddUserDataArray(RpGeometry* geometry, const RwChar* name,
                                           RpUserDataFormat format, RwInt32 numElements);
 extern RwInt32 RpGeometryGetUserDataArrayCount(const RpGeometry* geometry);
 extern RpUserDataArray* RpGeometryGetUserDataArray(const RpGeometry* geometry, RwInt32 data);

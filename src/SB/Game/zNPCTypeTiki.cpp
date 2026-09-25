@@ -30,8 +30,8 @@ static S32 numTikisOnScreen;
 static zParEmitter* cloudEmitter;
 static RwRaster* sHelmetRast;
 // .sdata
-extern U32 g_hash_tikianim[ANIM_COUNT] = { 0, 0 };
-extern const char* g_strz_tikianim[ANIM_COUNT] = { "Unknown", "Idle01" };
+U32 g_hash_tikianim[ANIM_COUNT] = { 0, 0 };
+const char* g_strz_tikianim[ANIM_COUNT] = { "Unknown", "Idle01" };
 static S32 whichTikiToAnimate = -1;
 static F32 sLoveyIconDist = 4.5f;
 static F32 sLoveyIconOffset = -1.375f;
@@ -221,7 +221,7 @@ static void zNPCTiki_PickTikisToAnimate()
     {
         if ((coll->flags & 1) != 0 && coll->optr != NULL)
         {
-            npc = (xNPCBasic*)coll->optr;
+            npc = XCOLLIDE_DOWNCAST_OPTR(xNPCBasic*, coll->optr);
             if (npc->baseType == '+' && (npc->SelfType() & ~0xFF) == 'NTT\0')
             {
                 ((zNPCTiki*)npc)->tikiFlag &= ~0xC0;
@@ -564,6 +564,8 @@ S32 zNPCTiki::SetCarryState(en_NPC_CARRY_STATE cs)
         return 0;
 
     case zNPCCARRY_THROW:
+        break;
+    default:
         break;
     }
 

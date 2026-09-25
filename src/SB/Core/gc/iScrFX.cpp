@@ -38,7 +38,7 @@ void iScrFxEnd()
 void iScrFxDrawBox(F32 x1, F32 y1, F32 x2, F32 y2, U8 red, U8 green, U8 blue, U8 alpha)
 {
     U16 indices[4] = { 0, 1, 2, 3 };
-    rwGameCube2DVertex v[4];
+    RwIm2DVertex v[4];
     F32 nearZ = RwIm2DGetNearScreenZ();
 
     RwIm2DVertexSetScreenX(&v[0], x1);

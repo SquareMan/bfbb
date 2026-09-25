@@ -15,14 +15,8 @@
 #include <types.h>
 #include <rwplcore.h>
 
-// MSL's <cmath> is not reachable from here; the target calls floorf__3stdFf.
-namespace std
-{
-    float floorf(float x);
-}
-
 U32 xShadowReceiveShadowSetup(xEnt* ent);
-void xShadowReceiveShadow(xEnt* ent, F32 factor, S32 flags, RwMatrixTag* mat, RwRaster* rast);
+void xShadowReceiveShadow(xEnt* ent, F32 factor, S32 flags, RwMatrix* mat, RwRaster* rast);
 
 static const NPARParmOilBub g_parm_oilbub[4] = {
     {
@@ -487,6 +481,8 @@ void NPCC_MakeLightningInfo(en_npclyt style, _tagLightningAdd* info)
             info->move_degrees *= -1.0f;
         }
         break;
+    default:
+        break;
     }
 }
 
@@ -587,6 +583,8 @@ void NPCC_MakeStreakInfo(en_npcstreak styp, StreakInfo* info)
         info->rgba_left.b = 0xf0;
         info->rgba_left.a = 0xf0;
         info->freq = 0.025f;
+        break;
+    default:
         break;
     }
 }
@@ -753,7 +751,7 @@ void NPCC_RenderProjTexture(RwRaster* rast, F32 factor, xMat4x3* mat, F32 radius
     }
 
     gShadowObjectRadius = radius;
-    xShadowVertical_DrawCache(cache, factor, 0.0f, 1, (RwMatrixTag*)mat, rast);
+    xShadowVertical_DrawCache(cache, factor, 0.0f, 1, (RwMatrix*)mat, rast);
 
     for (U32 i = 0; i < cache->entCount; i++)
     {
@@ -761,7 +759,7 @@ void NPCC_RenderProjTexture(RwRaster* rast, F32 factor, xMat4x3* mat, F32 radius
 
         if (ep != ent && ep->baseType != eBaseTypeNPC && xShadowReceiveShadowSetup(ep))
         {
-            xShadowReceiveShadow(ep, factor, 1, (RwMatrixTag*)mat, rast);
+            xShadowReceiveShadow(ep, factor, 1, (RwMatrix*)mat, rast);
         }
     }
 }
@@ -792,7 +790,7 @@ void NPCC_RenderProjTextureFaceCamera(RwRaster* rast, F32 factor, xVec3* pos, F3
     xVec3Init(&matrix.at, 0.0f, -1.0f, 0.0f);
     xVec3Init(&matrix.up, -matrix.right.z, 0.0f, matrix.right.x);
 
-    RwMatrixUpdate((RwMatrixTag*)&matrix);
+    RwMatrixUpdate((RwMatrix*)&matrix);
 
     NPCC_RenderProjTexture(rast, factor, &matrix, radius, height, cache, fillCache, ent);
 }

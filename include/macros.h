@@ -1,11 +1,15 @@
 #ifndef MACROS_H
 #define MACROS_H
 
-#define MAX(x, y) ((x) > (y) ? (x) : (y))
-#define MIN(x, y) ((x) < (y) ? (x) : (y))
+#if defined(__BYTE_ORDER__) && __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+#define BFBB_BIG_ENDIAN
+#elif defined(GAMECUBE)
+#define BFBB_BIG_ENDIAN
+#endif
 
-#define CLAMP(low, high, x) \
-    ((x) > (high) ? (high) : ((x) < (low) ? (low) : (x)))
+#define MAX(a, b) (((a) > (b)) ? (a) : (b))
+#define MIN(a, b) (((a) < (b)) ? (a) : (b))
+#define CLAMP(x, a, b) (MAX((a), MIN((x), (b))))
 
 #define ROUND_UP(x, align) (((x) + (align)-1) & (-(align)))
 #define ROUND_UP_PTR(x, align) \

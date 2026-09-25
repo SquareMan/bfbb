@@ -84,13 +84,14 @@ struct xFXRibbon
 
     bool debug_need_update() const;
 
-    void clear()
-    {
-        joints.clear();
-    }
+    void clear();
 
     void init(const char*, const char*);
-    void init(S32, const char*);
+    void init(S32, const char* name)
+    {
+        init(name, NULL);
+    }
+
     void set_texture(const char* name);
     void set_texture(U32);
     void set_texture(RwTexture* texture);
@@ -100,7 +101,7 @@ struct xFXRibbon
     void get_normal(xVec3&, const xVec3&, F32);
     void refresh_joint(joint_data&, const tier_queue<joint_data>::iterator&);
     void eval_joint(const joint_data&, iColor_tag&, F32&);
-    void render_strip(RxObjSpace3DVertex*, tier_queue<joint_data>::iterator, u32);
+    void render_strip(RwIm3DVertex*, tier_queue<joint_data>::iterator, u32);
     void refresh_config();
     void set_default_config();
     void update_curve_tweaks();

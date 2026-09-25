@@ -3,6 +3,8 @@
 
 #include <types.h>
 
+extern bool menu_fmv_played;
+
 S32 zMenuRunning();
 U32 zMenuUpdateMode();
 U32 zMenuIsPaused();

@@ -29,7 +29,7 @@
 #include "xScrFx.h"
 #include "xSkyDome.h"
 #include "xTRC.h"
-#include "xUtil.h"
+#include "xutil.h"
 
 #include <types.h>
 
@@ -75,10 +75,12 @@ void xCameraFXBegin(xCamera* cam);
 void xCameraFXUpdate(xCamera* cam, F32 dt);
 void xCameraFXEnd(xCamera* cam);
 
+#ifdef GAMECUBE
 extern "C"
 {
     void RwGameCubeSetMinRetraceCount(RwUInt8 count);
 }
+#endif
 
 // The target's .sdata opens gPendingPlayer, startPressed, black, clear,
 // soaklevels, soaktime - so all four of these are declared ahead of
@@ -90,7 +92,7 @@ U32 startPressed = -1;
 iColor_tag black = { 0x00, 0x00, 0x00, 0xFF };
 iColor_tag clear = { 0x00, 0x00, 0x00, 0x00 };
 
-char* soaklevels_gameorder[] =
+const char* soaklevels_gameorder[] =
 {
 	"HB02",
     "HB01",
@@ -151,112 +153,9 @@ char* soaklevels_gameorder[] =
 	NULL
 };
 
-char** soaklevels = soaklevels_gameorder;
+const char** soaklevels = soaklevels_gameorder;
 
 F32 soaktime = 4.0f;
-
-// Taken from zGame.s
-// Defining these here makes the stringBase0 offsets match in the later functions.
-static char* str52 = "techbutton6_click";
-static char* str53 = "SAVING GAME ICON UI";
-static char* str54 = "MNU4 AUTO SAVE FAILED";
-static char* str55 = "MNU4 SAVE COMPLETED";
-static char* str56 = "{font=0}{i:MNU4 AUTO SAVE TXT}";
-static char* str57 = "fx_boomball_smoke.RW3";
-static char* str58 = "ui_savinggame";
-static char* str59 = "ui_savinggame.RW3";
-static char* str60 = "GAME OVER (%f secs)\n";
-static char* str61 = "Loading... %3.2f\n";
-static char* str62 = "   ";
-static char* str63 = ".  ";
-static char* str64 = ".. ";
-static char* str65 = "...";
-static char* str66 = "loading screen bg";
-static char* str67 = "eGameWhere_NA";
-static char* str68 = "eGameWhere_InitStart";
-static char* str69 = "eGameWhere_InitScene";
-static char* str70 = "eGameWhere_InitCamera";
-static char* str71 = "eGameWhere_InitMusic";
-static char* str72 = "eGameWhere_InitOther";
-static char* str73 = "eGameWhere_InitEnd";
-static char* str74 = "eGameWhere_ExitStart";
-static char* str75 = "eGameWhere_ExitRumble";
-static char* str76 = "eGameWhere_ExitHUD";
-static char* str77 = "eGameWhere_ExitSound";
-static char* str78 = "eGameWhere_ExitCamera";
-static char* str79 = "eGameWhere_ExitScene";
-static char* str80 = "eGameWhere_ExitEnd";
-static char* str81 = "eGameWhere_SetupScene";
-static char* str82 = "eGameWhere_SetupZFX";
-static char* str83 = "eGameWhere_SetupPlayer";
-static char* str84 = "eGameWhere_SetupCamera";
-static char* str85 = "eGameWhere_SetupScrFX";
-static char* str86 = "eGameWhere_SetupSceneLoad";
-static char* str87 = "eGameWhere_SetupMusicNotify";
-static char* str88 = "eGameWhere_SetupHudSetup";
-static char* str89 = "eGameWhere_SetupSkydome";
-static char* str90 = "eGameWhere_SetupSceneEvents";
-static char* str91 = "eGameWhere_SetupUpdateCull";
-static char* str92 = "eGameWhere_SetupLOD";
-static char* str93 = "eGameWhere_SetupExtras";
-static char* str94 = "eGameWhere_SetupEnd";
-static char* str95 = "eGameWhere_LoopStart";
-static char* str96 = "eGameWhere_CutsceneFinish";
-static char* str97 = "eGameWhere_LoopDo";
-static char* str98 = "eGameWhere_LoopCalcTime";
-static char* str99 = "eGameWhere_LoopPadUpdate";
-static char* str100 = "eGameWhere_LoopTRCCheck";
-static char* str101 = "eGameWhere_LoopCheats";
-static char* str102 = "eGameWhere_LoopSceneUpdate";
-static char* str103 = "eGameWhere_LoopPlayerUpdate";
-static char* str104 = "eGameWhere_LoopSoundUpdate";
-static char* str105 = "eGameWhere_LoopSFXWidgets";
-static char* str106 = "eGameWhere_LoopHUDUpdate";
-static char* str107 = "eGameWhere_LoopCameraUpdate";
-static char* str108 = "eGameWhere_LoopCameraFXUpdate";
-static char* str109 = "eGameWhere_LoopFlyToInterface";
-static char* str110 = "eGameWhere_LoopCameraBegin";
-static char* str111 = "eGameWhere_LoopSceneRender";
-static char* str112 = "eGameWhere_LoopCameraEnd";
-static char* str113 = "eGameWhere_LoopCameraShowRaster";
-static char* str114 = "eGameWhere_LoopCameraFXEnd";
-static char* str115 = "eGameWhere_LoopMusicUpdate";
-static char* str116 = "eGameWhere_LoopUpdateMode";
-static char* str117 = "eGameWhere_LoopContinue";
-static char* str118 = "eGameWhere_LoopEndGameLoop";
-static char* str119 = "eGameWhere_SaveLoop";
-static char* str120 = "eGameWhere_ModeSceneSwitch";
-static char* str121 = "eGameWhere_ModeCutsceneFinish";
-static char* str122 = "eGameWhere_ModeGameExit";
-static char* str123 = "eGameWhere_ModeGameInit";
-static char* str124 = "eGameWhere_ModeGameSetup";
-static char* str125 = "eGameWhere_ModeSwitchAutoSave";
-static char* str126 = "eGameWhere_ModeSwitchCutsceneFinish";
-static char* str127 = "eGameWhere_ModeStoreCheckpoint";
-static char* str128 = "eGameWhere_LoseChanceReset";
-static char* str129 = "eGameWhere_LoseChanceResetDone";
-static char* str130 = "eGameWhere_TransitionBubbles";
-static char* str131 = "eGameWhere_TransitionBegin";
-static char* str132 = "eGameWhere_TransitionSnapShot";
-static char* str133 = "eGameWhere_TransitionUpdate";
-static char* str134 = "eGameWhere_TransitionPadUpdate";
-static char* str135 = "eGameWhere_TransitionTRCCheck";
-static char* str136 = "eGameWhere_TransitionCameraClear";
-static char* str137 = "eGameWhere_TransitionCameraBegin";
-static char* str138 = "eGameWhere_TransitionRenderBackground";
-static char* str139 = "eGameWhere_TransitionSpawnBubbles";
-static char* str140 = "eGameWhere_TransitionDrawEnd";
-static char* str141 = "eGameWhere_TransitionUpdateBubbles";
-static char* str142 = "eGameWhere_TransitionCameraEnd";
-static char* str143 = "eGameWhere_TransitionCameraShowRaster";
-static char* str144 = "eGameWhere_TransitionUpdateEnd";
-static char* str145 = "eGameWhere_TransitionUIRender";
-static char* str146 = "eGameWhere_TransitionUIRenderEnd";
-static char* str147 = "eGameWhere_TransitionEnd";
-static char* str148 = "eGameWhere_TransitionEnded";
-static char* str149 = "eGameWhere_SetupPlayerInit";
-static char* str150 = "eGameWhere_SetupPlayerCamera";
-static char* str151 = "eGameWhere_SetupPlayerEnd";
 
 static U32 PickNextSoak()
 {
@@ -276,7 +175,7 @@ static U32 PickNextSoak()
     } soakdir = SOAK_FOR;
 
     static S32 justwrap = 0;
-    char* name = NULL;
+    const char* name = NULL;
 
     if (soakcnt <= 0)
     {
@@ -499,7 +398,8 @@ void zGameLoop()
     gGameWhereAmI = eGameWhere_LoopStart;
     zGameStateSwitch(eGameState_Play);
 
-    iTime bus = (iTime)((GET_BUS_FREQUENCY() / 4) / 60.0f);
+    // iTime bus = (iTime)((GET_BUS_FREQUENCY() / 4) / 60.0f);
+    iTime bus = (iTime)(ITIME_FROM_SECS(1) / 60.0f);
     sTimeLast = iTimeGet() - bus;
 
     gGameWhereAmI = eGameWhere_CutsceneFinish;
@@ -515,6 +415,7 @@ void zGameLoop()
     {
         gGameWhereAmI = eGameWhere_LoopCalcTime;
 
+        iSystemPaceFrame();
         sTimeCurrent = iTimeGet();
         sTimeElapsed = iTimeDiffSec(sTimeLast, sTimeCurrent);
 
@@ -694,7 +595,9 @@ void zGameLoop()
         gGameWhereAmI = eGameWhere_LoopCameraEnd;
         xCameraEnd(&globals.camera, sTimeElapsed, 1);
         iEnvEndRenderFX(NULL);
+#ifdef GAMECUBE
         RwGameCubeSetMinRetraceCount(globals.minVSyncCnt);
+#endif
 
         gGameWhereAmI = eGameWhere_LoopCameraShowRaster;
         xCameraShowRaster(&globals.camera);
@@ -837,55 +740,26 @@ void zGameStall()
     }
 }
 
-// 95.165%, pure scheduling: the target writes the quad's fields in strictly
-// ascending offset order, our compiler fills the load-use gap after each
-// `lfs` of a pool literal with the next vertex's `.x` store.  Same instruction
-// multiset.  Writing the u/v pairs as a chained assignment was measured and is
-// worse (95.154%) - it reverses the u/v store order.
 static void zGame_HackDrawCard(F32 x, F32 y, F32 w, F32 h, RwRaster* rast)
 {
     RwIm2DVertex quad[4];
     F32 screenZ = RwIm2DGetNearScreenZ();
 
-    quad[0].x = x;
-    quad[0].y = y;
-    quad[0].z = screenZ;
-    quad[0].emissiveColor.red = 255;
-    quad[0].emissiveColor.green = 255;
-    quad[0].emissiveColor.blue = 255;
-    quad[0].emissiveColor.alpha = 255;
-    quad[0].u = 0.0f;
-    quad[0].v = 0.0f;
+    RwIm2DVertexSetPos(&quad[0], x, y, screenZ);
+    RwIm2DVertexSetRGBA(&quad[0], 255, 255, 255, 255);
+    RwIm2DVertexSetUV(&quad[0], 0.0f, 0.0f);
 
-    quad[1].x = x;
-    quad[1].y = y + h;
-    quad[1].z = screenZ;
-    quad[1].emissiveColor.red = 255;
-    quad[1].emissiveColor.green = 255;
-    quad[1].emissiveColor.blue = 255;
-    quad[1].emissiveColor.alpha = 255;
-    quad[1].u = 0.0f;
-    quad[1].v = 1.0f;
+    RwIm2DVertexSetPos(&quad[1], x, y + h, screenZ);
+    RwIm2DVertexSetRGBA(&quad[1], 255, 255, 255, 255);
+    RwIm2DVertexSetUV(&quad[1], 0.0f, 1.0f);
 
-    quad[2].x = x + w;
-    quad[2].y = y;
-    quad[2].z = screenZ;
-    quad[2].emissiveColor.red = 255;
-    quad[2].emissiveColor.green = 255;
-    quad[2].emissiveColor.blue = 255;
-    quad[2].emissiveColor.alpha = 255;
-    quad[2].u = 1.0f;
-    quad[2].v = 0.0f;
+    RwIm2DVertexSetPos(&quad[2], x + w, y, screenZ);
+    RwIm2DVertexSetRGBA(&quad[2], 255, 255, 255, 255);
+    RwIm2DVertexSetUV(&quad[2], 1.0f, 0.0f);
 
-    quad[3].x = x + w;
-    quad[3].y = y + h;
-    quad[3].z = screenZ;
-    quad[3].emissiveColor.red = 255;
-    quad[3].emissiveColor.green = 255;
-    quad[3].emissiveColor.blue = 255;
-    quad[3].emissiveColor.alpha = 255;
-    quad[3].u = 1.0f;
-    quad[3].v = 1.0f;
+    RwIm2DVertexSetPos(&quad[3], x + w, y + h, screenZ);
+    RwIm2DVertexSetRGBA(&quad[3], 255, 255, 255, 255);
+    RwIm2DVertexSetUV(&quad[3], 1.0f, 1.0f);
 
     RwRenderStateSet(rwRENDERSTATESHADEMODE, (void*)rwSHADEMODEFLAT);
     RwRenderStateSet(rwRENDERSTATESRCBLEND, (void*)rwBLENDSRCALPHA);
@@ -907,7 +781,7 @@ static void zGame_HackPostPortalAutoSaveDraw()
     RwTexture* tex; 
     RwRGBA bg = {};
 	
-    cam = (RwCamera*)RwEngineInstance->curCamera;
+    cam = RwCameraGetCurrentCamera();
     if (cam != NULL)
     {
         RwCameraEndUpdate(cam);
@@ -1026,7 +900,7 @@ static void zGameUpdateMode()
     if (gGameState == eGameState_Play)
     {
         iTimeGameAdvance(sTimeElapsed);
-        if (globals.pad0->pressed & 1)
+        if (globals.pad0->pressed & XPAD_BUTTON_START)
         {
             switch (zGameOkToPause())
             {
@@ -1169,7 +1043,7 @@ static void zGameUpdateMode()
             gPendingPlayer = eCurrentPlayerCount;
         }
 
-        iTime bus = (iTime)((GET_BUS_FREQUENCY() / 4) / 60.0f);
+        iTime bus = (iTime)((ITIME_FROM_SECS(1)) / 60.0f);
         sTimeLast = iTimeGet() - bus;
 
         zGameStateSwitch(eGameState_Play);
@@ -1259,7 +1133,7 @@ void zGameScreenTransitionBegin()
     sGameScreenTransCam = iCameraCreate(640, 480, 0);
     if (sGameScreenTransCam != NULL)
     {
-        DirectionalLight = RpLightCreate(1);
+        DirectionalLight = RpLightCreate(rpLIGHTDIRECTIONAL);
         if (DirectionalLight != NULL)
         {
             RwRGBAReal col;
@@ -1267,7 +1141,7 @@ void zGameScreenTransitionBegin()
 			col.alpha = 0.0f;
             RpLightSetColor(DirectionalLight, &col);
             RwFrame* frame = RwFrameCreate();
-            _rwObjectHasFrameSetFrame(DirectionalLight, frame);
+            RpLightSetFrame(DirectionalLight, frame);
             RwBBox box;
 			box.sup.z = box.sup.y = box.sup.x =  10000.0f;
 			box.inf.z = box.inf.y = box.inf.x = -10000.0f;
@@ -1279,7 +1153,7 @@ void zGameScreenTransitionBegin()
     }
 }
 
-void zGameScreenTransitionUpdate(F32 percentComplete, char* msg)
+void zGameScreenTransitionUpdate(F32 percentComplete, CChar* msg)
 {
     if (!zMenuIsFirstBoot())
     {
@@ -1303,11 +1177,11 @@ eGameWhereAmI gGameWhereAmI;
 // load-use gap, while our compiler interleaves the next vertex's stores between
 // each `lbz`/`stb` and `lfs`/`stfs` pair.  Same instruction multiset - SCHED,
 // same family as zGame_HackDrawCard.
-void zGameScreenTransitionUpdate(F32 percentComplete, char* msg, U8* rgba)
+void zGameScreenTransitionUpdate(F32 percentComplete, CChar* msg, U8* rgba)
 {
     RwTexture* tex;
     RwRaster* ras;
-    rwGameCube2DVertex vx[4];
+    RwIm2DVertex vx[4];
 
     gGameWhereAmI = eGameWhere_TransitionUpdate;
 
@@ -1356,45 +1230,21 @@ void zGameScreenTransitionUpdate(F32 percentComplete, char* msg, U8* rgba)
 
             F32 z = RwIm2DGetFarScreenZ();
 
-            vx[0].x = 0.0f;
-            vx[0].y = 0.0f;
-            vx[0].z = z;
-            vx[0].emissiveColor.red   = bgr;
-            vx[0].emissiveColor.green = bgb;
-            vx[0].emissiveColor.blue  = bgg;
-            vx[0].emissiveColor.alpha = bga;
-            vx[0].u = bgu1;
-            vx[0].v = bgv1;
+            RwIm2DVertexSetPos(&vx[0], 0.0f, 0.0f, z);
+            RwIm2DVertexSetRGBA(&vx[0], bgr, bgg, bgb, bga);
+            RwIm2DVertexSetUV(&vx[0], bgu1, bgv1);
 
-            vx[1].x = 0.0f;
-            vx[1].y = 480.0f;
-            vx[1].z = z;
-            vx[1].emissiveColor.red   = bgr;
-            vx[1].emissiveColor.green = bgb;
-            vx[1].emissiveColor.blue  = bgg;
-            vx[1].emissiveColor.alpha = bga;
-            vx[1].u = bgu1;
-            vx[1].v = bgv2;
+            RwIm2DVertexSetPos(&vx[1], 0.0f, 480.0f, z);
+            RwIm2DVertexSetRGBA(&vx[1], bgr, bgg, bgb, bga);
+            RwIm2DVertexSetUV(&vx[1], bgu1, bgv2);
 
-            vx[2].x = 640.0f;
-            vx[2].y = 0.0f;
-            vx[2].z = z;
-            vx[2].emissiveColor.red   = bgr;
-            vx[2].emissiveColor.green = bgb;
-            vx[2].emissiveColor.blue  = bgg;
-            vx[2].emissiveColor.alpha = bga;
-            vx[2].u = bgu2;
-            vx[2].v = bgv1;
+            RwIm2DVertexSetPos(&vx[2], 640.0f, 0.0f, z);
+            RwIm2DVertexSetRGBA(&vx[2], bgr, bgg, bgb, bga);
+            RwIm2DVertexSetUV(&vx[2], bgu2, bgv1);
 
-            vx[3].x = 640.0f;
-            vx[3].y = 480.0f;
-            vx[3].z = z;
-            vx[3].emissiveColor.red   = bgr;
-            vx[3].emissiveColor.green = bgb;
-            vx[3].emissiveColor.blue  = bgg;
-            vx[3].emissiveColor.alpha = bga;
-            vx[3].u = bgu2;
-            vx[3].v = bgv2;
+            RwIm2DVertexSetPos(&vx[3], 640.0f, 480.0f, z);
+            RwIm2DVertexSetRGBA(&vx[3], bgr, bgg, bgb, bga);
+            RwIm2DVertexSetUV(&vx[3], bgu2, bgv2);
 
             RwIm2DRenderPrimitive(rwPRIMTYPETRISTRIP, &vx[0], 4);
             RwRenderStateSet(rwRENDERSTATEZTESTENABLE, (void*)1);
@@ -1458,7 +1308,7 @@ void zGameScreenTransitionEnd()
 {
     RwFrame* frame;
     gGameWhereAmI = eGameWhere_TransitionEnd;
-    _rwFrameSyncDirty();
+    RwFrameSyncDirty();
     if (DirectionalLight != NULL)
     {
         frame = (RwFrame*)(DirectionalLight->object).object.parent;

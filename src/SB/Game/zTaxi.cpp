@@ -42,8 +42,8 @@ void zTaxi_Init(zTaxi* taxi, taxi_asset* asset)
     if (assetPosition != NULL && size == sizeof(xVec3))
     {
         xVec3Copy(&taxi->pos, assetPosition);
-        taxi->prevState = 0;
-        taxi->currState = 0;
+        taxi->prevState = TAXI_STATE_IDLE;
+        taxi->currState = TAXI_STATE_IDLE;
         taxi->radius = 1.3f;
     }
 }
@@ -63,6 +63,8 @@ void zTaxi_Setup(zTaxi* taxi)
     taxi->baseFlags |= (U16)2;
 }
 
+
+
 // Nonmatch due to regalloc, scheduling. https://decomp.me/scratch/1o3TG
 void zTaxi_Update(xBase* to, xScene*, F32 dt)
 {
@@ -76,43 +78,43 @@ void zTaxi_Update(xBase* to, xScene*, F32 dt)
     iCylinderIsectVec(&cylinder, (xVec3*)&globals.player.ent.model->Mat->pos, &isect);
     if (isect.penned == -1.0f && xBaseIsEnabled((xBase*)taxi))
     {
-        if (taxi->currState == 0)
+        if (taxi->currState == TAXI_STATE_IDLE)
         {
             sAnswer = ztalkbox::ANSWER_3;
-            taxi->currState = 1;
+            taxi->currState = TAXI_STATE_PLAYER_ENTERED;
             taxi->radius = 2.5f;
         }
     }
     else
     {
-        taxi->currState = 0;
+        taxi->currState = TAXI_STATE_IDLE;
         taxi->radius = 1.3f;
     }
 
     switch (taxi->currState)
     {
-    case 0:
+    case TAXI_STATE_IDLE:
         break;
-    case 1:
+    case TAXI_STATE_PLAYER_ENTERED:
         if (gCurrentPlayer == NULL && globals.player.JumpState == 0)
         {
             if (sAnswer == 1)
             {
-                taxi->currState = 3;
+                taxi->currState = TAXI_STATE_CONFIRMED;
                 zEntPlayer_SNDPlay(ePlayerSnd_Taxi, 0.0f);
                 zEntPlayer_SNDPlay(ePlayerSnd_Bus, 0.2f);
             }
             if (sAnswer == 2)
             {
-                taxi->currState = 2;
+                taxi->currState = TAXI_STATE_CANCELLED;
             }
         }
         break;
-    case 2:
+    case TAXI_STATE_CANCELLED:
         zEntPlayerControlOn(CONTROL_OWNER_TAXI);
         break;
-    case 3:
-    case 5:
+    case TAXI_STATE_CONFIRMED:
+    case TAXI_STATE_FINISHED:
         break;
     }
 
@@ -120,10 +122,10 @@ void zTaxi_Update(xBase* to, xScene*, F32 dt)
     {
         switch (taxi->currState)
         {
-        case 0:
+        case TAXI_STATE_IDLE:
             zEntEvent(taxi->basset->talkBoxID, eEventEndConversation);
             break;
-        case 1:
+        case TAXI_STATE_PLAYER_ENTERED:
         {
             ztalkbox* talkbox = (ztalkbox*)zSceneFindObject(taxi->basset->talkBoxID);
             talkbox->start_talk(taxi->basset->textID, tCB, NULL);
@@ -140,10 +142,10 @@ void zTaxi_Update(xBase* to, xScene*, F32 dt)
             }
             break;
         }
-        case 2:
+        case TAXI_STATE_CANCELLED:
             zEntEvent(taxi->basset->talkBoxID, eEventEndConversation);
             break;
-        case 3:
+        case TAXI_STATE_CONFIRMED:
             zEntEvent(taxi->basset->talkBoxID, eEventEndConversation);
             zEntEvent(taxi->basset->cameraID, eEventStartConversation);
             zEntEvent(taxi->basset->cameraID, eEventSwitch, 0.5f, 0.0f, 0.0f, 0.0f);
@@ -152,10 +154,10 @@ void zTaxi_Update(xBase* to, xScene*, F32 dt)
             taxi->invTimer = taxi->basset->invDelay;
             taxi->portalTimer = taxi->basset->portalDelay;
             break;
-        case 4:
+        case TAXI_STATE_HIDE_PLAYER:
             xEntHide(&globals.player.ent);
             break;
-        case 5:
+        case TAXI_STATE_FINISHED:
             zEntEvent(taxi->basset->portalID, eEventTeleportPlayer);
             break;
         }
@@ -163,14 +165,14 @@ void zTaxi_Update(xBase* to, xScene*, F32 dt)
 
     taxi->prevState = taxi->currState;
 
-    if (0.0f == taxi->invTimer && taxi->currState == 3)
+    if (0.0f == taxi->invTimer && taxi->currState == TAXI_STATE_CONFIRMED)
     {
-        taxi->currState = 4;
+        taxi->currState = TAXI_STATE_HIDE_PLAYER;
     }
 
     if (0.0f == taxi->portalTimer)
     {
-        taxi->currState = 5;
+        taxi->currState = TAXI_STATE_FINISHED;
     }
 
     if (taxi->portalTimer > 0.0f)

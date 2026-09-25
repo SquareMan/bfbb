@@ -10,12 +10,14 @@
 #include "rpusrdat.h"
 
 #include "xDebug.h"
+#include "xPad.h"
 #include "xSnd.h"
 #include "xFX.h"
 #include "xShadow.h"
 #include "xstransvc.h"
 
 #include "iMemMgr.h"
+#include "iPad.h"
 #include "iSystem.h"
 #include "iFMV.h"
 #include "iTRC.h"
@@ -914,10 +916,10 @@ S32 iGetMonth()
     return td.mon + 1;
 }
 
-char* months[] = { "January ", "February ", "March ",     "April ",   "May ",      "June ",
+const char* months[] = { "January ", "February ", "March ",     "April ",   "May ",      "June ",
                    "July ",    "August ",   "September ", "October ", "November ", "December " };
 
-char* dotw[] = {
+const char* dotw[] = {
     "Sunday ", "Monday ", "Tuesday ", "Wednesday ", "Thursday ", "Friday ", "Saturday "
 };
 

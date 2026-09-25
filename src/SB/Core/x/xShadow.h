@@ -47,14 +47,14 @@ extern F32 gShadowObjectRadius;
 // Retail returns U32 here: the call sites compare with cmplwi.
 U32 xShadowReceiveShadowSetup(xEnt* ent);
 void xShadowReceiveShadow(xEnt* ent, F32 shadowFactor, S32 shadowMode,
-                          RwMatrixTag* shadowMat, RwRaster* shadowRast);
+                          RwMatrix* shadowMat, RwRaster* shadowRast);
 void xShadowVertical_FillCache(xShadowCache* cache, xVec3* pos, F32 r, F32 depth,
                                F32 minNormY);
 // Defined in xShadow.cpp; xCM.cpp draws the fade quad with it too.
 int Im2DRenderQuad(float x1, float y1, float x2, float y2, float z, float recipCamZ,
                    float uvOffset);
 void xShadowVertical_DrawCache(xShadowCache* cache, F32 shadowFactor, F32 fadeDist,
-                               S32 shadowMode, RwMatrixTag* shadowMat,
+                               S32 shadowMode, RwMatrix* shadowMat,
                                RwRaster* shadowRast);
 
 #endif

@@ -1,8 +1,8 @@
 #ifndef _NEW_H
 #define _NEW_H
 
-#include <PowerPC_EABI_Support\MSL_C\MSL_Common\size_t.h>
-#include <exception.h>
+#include <size_t.h>
+#include "exception.h"
 
 namespace std
 {
@@ -23,7 +23,10 @@ namespace std
 
 void* operator new(size_t size) throw(std::bad_alloc);
 void* operator new(size_t size, const std::nothrow_t&) throw();
-void* operator new(size_t, void* ptr) throw();
+inline void* operator new(size_t, void* ptr) throw()
+{
+    return ptr;
+}
 
 void operator delete(void* ptr) throw();
 void operator delete(void* ptr, const std::nothrow_t&) throw();

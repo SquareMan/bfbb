@@ -231,7 +231,10 @@ struct xEntShadow
 
 extern S32 xent_entent;
 
-xMat4x3* xEntGetFrame(const xEnt* ent);
+inline xMat4x3* xEntGetFrame(const xEnt* ent)
+{
+    return xModelGetFrame(ent->model);
+}
 void xEntEnable(xEnt* ent);
 xVec3* xEntGetCenter(const xEnt* ent);
 xVec3* xEntGetPos(const xEnt* ent);

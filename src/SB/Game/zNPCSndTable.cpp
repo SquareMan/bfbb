@@ -10,7 +10,7 @@
 
 static U32 g_hash_sndgroup[SND_COUNT];
 static F32 g_tmrz_sndplay[SND_COUNT] = {};
-static char* g_strz_sndgroup[SND_COUNT] = {
+static const char* g_strz_sndgroup[SND_COUNT] = {
     "ListEnd",     "Encounter",   "Clanking", "Exclaim",    "Ouch",       "Cheering", "Respawn",
     "Alert",       "Dizzy",       "Dance",    "Laugh",      "Attack",     "Punch",    "WepLaunch",
     "Lightning",   "WarnBang",    "Death",    "DeathJelly", "Bonked",     "Unbonked", "TikiStack",

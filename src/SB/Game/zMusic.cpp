@@ -30,7 +30,7 @@ static zMusicSituation sMusicInfo[8] = {
 static U32 sMusicPaused;
 static zMusicSituation* sMusicQueueData[TRACK_COUNT];
 
-static S32 sMusicLastEnum[TRACK_COUNT] = { 0.0f, 0.0f };
+static S32 sMusicLastEnum[TRACK_COUNT] = { 0, 0 };
 static F32 sMusicTimer[TRACK_COUNT] = { 0.0f, 0.0f };
 
 extern eGameMode gGameMode;

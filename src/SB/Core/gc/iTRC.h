@@ -12,8 +12,20 @@
 #include <dolphin/dvd.h>
 #include <dolphin/pad.h>
 
-#include "xPad.h"
-
+enum _tagPadInit
+{
+    ePadInit_Open1,
+    ePadInit_WaitStable2,
+    ePadInit_EnableAnalog3,
+    ePadInit_EnableAnalog3LetsAllPissOffChris,
+    ePadInit_EnableRumble4,
+    ePadInit_EnableRumbleTest5,
+    ePadInit_PressureS6,
+    ePadInit_PressureSTest7,
+    ePadInit_Complete8a,
+    ePadInit_Complete8b,
+    ePadInit_Finished9
+};
 struct _tagiTRCPadInfo
 {
     _tagPadInit pad_init;
@@ -37,7 +49,7 @@ namespace ROMFont
     void DrawCell(S32 x, S32 y, S32 u, S32 v);
     void LoadSheet(void* image_ptr);
     S32 DrawString(S32 param_1, S32 param_2, char* string);
-    S32 GetWidth(char* string);
+    S32 GetWidth(CChar* string);
     void DrawTextBox(S32 param_1, S32 param_2, S32 param_3, S32 param_4, char* str);
 } // namespace ROMFont
 

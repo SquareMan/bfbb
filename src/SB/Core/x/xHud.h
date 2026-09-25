@@ -6,8 +6,8 @@
 #include "xDynAsset.h"
 #include "xModel.h"
 
-typedef struct asset;
-typedef struct widget;
+struct asset;
+struct widget;
 
 namespace xhud
 {

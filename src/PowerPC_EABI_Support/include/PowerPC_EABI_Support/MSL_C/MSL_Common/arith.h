@@ -14,6 +14,7 @@ typedef struct
 } div_t;
 
 long abs(long __x);
+double atof(const char* nptr);
 long labs(long __x);
 div_t div(s32 __numer, s32 __denom);
 

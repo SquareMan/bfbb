@@ -3,9 +3,10 @@
 
 #include <types.h>
 
+#include <rpptank.h>
+
 struct xVec3;
 
-struct RpAtomic;
 struct zParPTank;
 typedef void (*zParPTankUpdateCallback)(zParPTank*, float);
 

@@ -12,8 +12,8 @@
 #define ANIM_Shiver01 3
 #define ANIM_Hurt01 4
 
-extern U32 g_hash_dupoanim[5] = {};
-extern char* g_strz_dupoanim[5] = { "Unknown", "Idle01", "Spawn01", "Shiver01", "Hurt01" };
+U32 g_hash_dupoanim[5] = {};
+static CChar* g_strz_dupoanim[5] = { "Unknown", "Idle01", "Spawn01", "Shiver01", "Hurt01" };
 static zParEmitter* g_pemit_smoky;
 static zParEmitter* g_pemit_steam;
 static zParEmitter* g_pemit_overheat;
@@ -25,7 +25,7 @@ static xParEmitterCustomSettings g_parf_overheat;
 void __deadstripped_zNPCTypeDuplotron()
 {
     // Also exists in NPCBlinker::Render
-    static RxObjSpace3DVertex blink_vtxbuf[2][14];
+    static RwIm3DVertex blink_vtxbuf[2][14];
 }
 
 void ZNPC_Duplotron_Startup()

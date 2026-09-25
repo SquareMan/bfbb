@@ -5,23 +5,6 @@
 
 namespace std
 {
-    // TODO: fix inline function ordering
-
-#ifndef INLINE
-    float atan2f(float y, float x);
-    float atan(float x);
-    float sinf(float x);
-    float cosf(float x);
-    float tanf(float x);
-    float ceilf(float x);
-    float asinf(float x);
-    float acosf(float x);
-    float expf(float x);
-    float floorf(float x);
-    float logf(float x);
-    float sqrtf(float x);
-    float powf(float x, float y);
-#else
     inline float atan2f(float y, float x)
     {
         return (float)atan2((double)y, (double)x);
@@ -71,7 +54,46 @@ namespace std
     {
         return (float)floor((double)x);
     }
-#endif
+    
+    inline float fmodf(float x, float y)
+    {
+        return (float)::fmod(x, y);
+    }
+
+    inline float powf(float x, float y)
+    {
+        return ::powf(x, y);
+    }
+    
+    inline float sqrtf(float x)
+    {
+        volatile F32 y;
+
+        if (x > 0.0f)
+        {
+            F64 guess = __frsqrte(x);
+            guess = 0.5 * guess * -(guess * guess * x - 3);
+            guess = 0.5 * guess * -(guess * guess * x - 3);
+            guess = 0.5 * guess * -(guess * guess * x - 3);
+            y = x * guess;
+            return y;
+        }
+        else
+        {
+            return x;
+        }
+    }
+    
+    inline float logf(float x)
+    {
+        return (float)::log(x);
+    }
+
+    inline float fabsf(float x)
+    {
+        return (float)fabs(x);
+    }
+
 } // namespace std
 
 #endif

@@ -28,7 +28,7 @@ static S32 g_firstFrameUpdateAllNPC;
 
 struct NPCBrainTableEntry
 {
-    char* name;
+    const char* name;
     en_NPCTYPES type;
     U32 id;
 } g_brainTable[63] =
@@ -101,7 +101,7 @@ struct NPCBrainTableEntry
 static struct NPCMTypeTable
 {
     en_NPCTYPES useNPCType;
-    char* modelName;
+    const char* modelName;
     U32 hashOfName;
 } g_tbltype[250] =
 {
@@ -690,7 +690,7 @@ en_NPCTYPES zNPCMgr::NPCTypeForModel(U32 brainID, U32 mdl_hash)
 S32 zNPCMgr_OrdTest_npcid(const void* vkey, void* vitem)
 {
     S32 rc;
-    void* key = *(void**)(vitem);
+    void* key = (void*)((zNPCCommon*)vitem)->id;
 
     if (vkey < key)
     {
@@ -714,8 +714,8 @@ S32 zNPCMgr_OrdComp_npcid(void* vkey, void* vitem)
     U32 item;
     U32 key;
 
-    key = *(U32*)vkey;
-    item = *(U32*)vitem;
+    key = ((zNPCCommon*)vkey)->id;
+    item = ((zNPCCommon*)vitem)->id;
     if (key < item)
     {
         rc = -1;

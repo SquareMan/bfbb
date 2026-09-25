@@ -68,7 +68,7 @@ struct XCSNNosey
     {
     }
 
-    virtual void UpdatedAnimated(RpAtomic*, RwMatrixTag*, U32, U32)
+    virtual void UpdatedAnimated(RpAtomic*, RwMatrix*, U32, U32)
     {
     }
 
@@ -116,7 +116,7 @@ struct xCutscene
 struct CutsceneShadowModel
 {
     RpAtomic* model;
-    RwMatrixTag* animMat;
+    RwMatrix* animMat;
     U32 shadowBits;
 };
 

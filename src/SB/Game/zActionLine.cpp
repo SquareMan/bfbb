@@ -48,7 +48,7 @@ void zActionLineUpdate(F32 seconds)
 
 static void RenderActionLine(_tagActionLine* l)
 {
-    static volatile RxObjSpace3DVertex sStripVert[4];
+    static RwIm3DVertex sStripVert[4];
 
     for (S32 i = 0; i < 4; i++)
     {
@@ -61,7 +61,10 @@ static void RenderActionLine(_tagActionLine* l)
         RwIm3DVertexSetRGBA(&sStripVert[i], 0xFF, 0xFF, 0xFF, 0x80);
     }
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-volatile"
     sStripVert[3].v = sStripVert[3].u = sStripVert[2].u = 1.0f;
+#pragma clang diagnostic pop
 
     if (RwIm3DTransform((RwIm3DVertex*)sStripVert, 4, NULL, 0x19) != NULL)
     {

@@ -8,7 +8,7 @@
 #include "zGlobals.h"
 #include "xMathInlines.h"
 #include "zNPCTypeRobot.h"
-#include "xUtil.h"
+#include "xutil.h"
 
 static SMDepot g_smdepot = {};
 static S32 g_drawSpawnBounds;
@@ -172,6 +172,8 @@ void zNPCSpawner::Timestep(F32 dt)
             break;
         case SM_WAVE_CONTINUOUS:
             UpdateContinuous(dt);
+            break;
+        default:
             break;
         }
     }
@@ -458,6 +460,8 @@ void zNPCSpawner::Notify(en_SM_NOTICES note, void* data)
         ClearPending();
         flg_spawner |= 0x2;
         flg_spawner |= 0x10;
+    default:
+        break;
     }
 }
 

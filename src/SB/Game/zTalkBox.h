@@ -20,7 +20,7 @@ struct ztalkbox : xBase
         bool trap : 8;
         bool pause : 8;
         bool allow_quit : 8;
-        bool trigger_pads : 8;
+        U8 trigger_pads : 8;
         bool page : 8;
         bool show : 8;
         bool hide : 8;

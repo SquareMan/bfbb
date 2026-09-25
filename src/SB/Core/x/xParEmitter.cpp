@@ -1,16 +1,17 @@
 #include "xParEmitter.h"
 
 #include <types.h>
-#include <zScene.h>
-#include <iModel.h>
-#include <xMathInlines.h>
-#include <xMath.h>
-#include <xGroup.h>
-#include <xMovePoint.h>
-#include <zGlobals.h>
-#include <xDebug.h>
-#include <xEvent.h>
-#include <PowerPC_EABI_Support\MSL_C\MSL_Common\cmath>
+#include "zScene.h"
+#include "iModel.h"
+#include "xMathInlines.h"
+#include "xMath.h"
+#include "xGroup.h"
+#include "xMovePoint.h"
+#include "zGlobals.h"
+#include "xDebug.h"
+#include "xEvent.h"
+
+#include <cmath>
 
 static xParEmitterAsset sSaveEmmiterSettings;
 static xParEmitterPropsAsset sSaveEmmiterPropSettings;
@@ -811,18 +812,4 @@ inline void xParInterp::order()
         this->val[1] = f2;
         this->val[0] = f1;
     }
-}
-
-inline xPar* xParEmitterEmit(xParEmitter* pe, F32 dt)
-{
-    return xParEmitterEmit(pe, dt, dt);
-}
-
-inline void xParInterp::operator=(const xParInterp& p)
-{
-    this->interp = p.interp;
-    this->val[0] = p.val[0];
-    this->val[1] = p.val[1];
-    this->freq = p.freq;
-    this->oofreq = p.oofreq;
 }

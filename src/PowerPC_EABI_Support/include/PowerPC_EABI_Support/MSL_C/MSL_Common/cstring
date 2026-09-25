@@ -5,7 +5,7 @@
 
 namespace std
 {
-    inline static char* strstr(char* haystack, const char* needle)
+    inline static char* strstr(const char* haystack, const char* needle)
     {
         return ::strstr(haystack, needle);
     }

@@ -12,9 +12,8 @@
 #include <types.h>
 #include <string.h>
 #include <stdlib.h>
-#include <PowerPC_EABI_Support\MSL_C\MSL_Common\cmath>
+#include <cmath>
 
-#include <dolphin.h>
 #include <stdio.h>
 
 static xMemPool sxAnimTempTranPool;
@@ -164,6 +163,7 @@ static U8 _xCheckAnimNameInner(const char* name, const char* pattern, S32 patter
             patternCurrent++;
             break;
         case '}':
+        {
             S32 length = &name[nameCurrent] - startExtra;
             if (extra != NULL)
             {
@@ -175,7 +175,9 @@ static U8 _xCheckAnimNameInner(const char* name, const char* pattern, S32 patter
             startExtra = NULL;
             patternCurrent++;
             break;
+        }
         case '(':
+        {
             patternCurrent++;
             U8 done = 0;
             const char* groupStart = &pattern[patternCurrent];
@@ -254,6 +256,7 @@ static U8 _xCheckAnimNameInner(const char* name, const char* pattern, S32 patter
                 return 0;
             }
             break;
+        }
         case '<':
         {
             patternCurrent++;
@@ -360,16 +363,6 @@ void xAnimTempTransitionInit(U32 count)
     xMemPoolSetup(&sxAnimTempTranPool, xMemAllocSize(count * sizeof(xAnimTransition)), 0, 0, NULL,
                   sizeof(xAnimTransition), count, count / 2);
 }
-
-#ifndef INLINE
-namespace std
-{
-    extern inline float atan2f(float y, float x)
-    {
-        return (float)atan2((double)y, (double)x);
-    }
-} // namespace std
-#endif
 
 F32 xatan2(F32 y, F32 x)
 {
@@ -682,16 +675,6 @@ void xAnimFileEval(xAnimFile* data, F32 time, F32* bilinear, U32 flags, xVec3* t
         iAnimEval(data->RawData[0], time, flags, tran, quat);
     }
 }
-
-#ifndef INLINE
-namespace std
-{
-    extern inline float floorf(float x)
-    {
-        return (float)floor((double)x);
-    }
-} // namespace std
-#endif
 
 xAnimEffect* xAnimStateNewEffect(xAnimState* state, U32 flags, F32 startTime, F32 endTime,
                                  xAnimEffectCallback callback, U32 userDataSize)
@@ -2072,10 +2055,10 @@ void xAnimPoolInit(xMemPool* pool, U32 count, U32 singles, U32 blendFlags, U32 e
 
     U32 size =
         (effectMax * sizeof(xAnimActiveEffect) + sizeof(xAnimSingle)) *
-            (ADD_4_BITS((blendFlags & 0xffff) & ((int)(1 << singles) - 1 >> 0x0)) +
-             ADD_4_BITS((blendFlags & 0xffff) & ((int)(1 << singles) - 1 >> 0x4)) +
-             ADD_4_BITS((blendFlags & 0xffff) & ((int)(1 << singles) - 1 >> 0x8)) +
-             ADD_4_BITS((blendFlags & 0xffff) & ((int)(1 << singles) - 1 >> 0xC)) + singles) +
+            (ADD_4_BITS((blendFlags & 0xffff) & (((int)(1 << singles) - 1) >> 0x0)) +
+             ADD_4_BITS((blendFlags & 0xffff) & (((int)(1 << singles) - 1) >> 0x4)) +
+             ADD_4_BITS((blendFlags & 0xffff) & (((int)(1 << singles) - 1) >> 0x8)) +
+             ADD_4_BITS((blendFlags & 0xffff) & (((int)(1 << singles) - 1) >> 0xC)) + singles) +
         sizeof(xAnimPlay);
 
     U32 i;

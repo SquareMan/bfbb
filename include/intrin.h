@@ -1,6 +1,7 @@
 #ifndef _INTRIN_H
 #define _INTRIN_H
 
+#ifdef GAMECUBE
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -43,6 +44,7 @@ double __frsqrte(double);
 
 #ifdef __cplusplus
 }
+#endif
 #endif
 
 #endif

@@ -15,9 +15,10 @@
 
 #include "xMathInlines.h"
 #include "xMath3.h"
-#include "xUtil.h"
+#include "xutil.h"
 #include "xQuickCull.h"
 #include "xCollide.h"
+#include "xSnd.h"
 
 // These structs were used in deadstripped functions.
 // This function is here to force the symbols to be linked.
@@ -45,7 +46,7 @@ void __deadstripped_zNPCSupport_head()
 
 static NPCWidget g_npc_widgets[1];
 static U32 g_hash_uiwidgets[1] = { 0 };
-static char* g_strz_uiwidgets[1] = { "MNU4 NPCTALK" };
+static const char* g_strz_uiwidgets[1] = { "MNU4 NPCTALK" };
 
 static U32 sNPCSndFx[eNPCSnd_Total] = {};
 static U32 sNPCSndID[eNPCSnd_Total] = {};
@@ -409,6 +410,8 @@ S32 NPCTarget::IsDead()
         }
         break;
     case NPC_TGT_BASE:
+        break;
+    default:
         break;
     }
 
@@ -799,6 +802,8 @@ void Firework::Update(F32 dt)
         break;
     case FW_STAT_DONE:
         break;
+    default:
+        break;
     }
 
     this->tmr_remain = MAX(-1.0f, this->tmr_remain - dt);
@@ -995,7 +1000,7 @@ void Firework_SceneReset(int param_1)
         {
             Firework_Release(fw);
         }
-        fw->fwstate = 0;
+        fw->fwstate = FW_STAT_UNUSED;
         fw++;
     }
 }
@@ -1227,6 +1232,8 @@ void NPCTarget::PosGet(xVec3* pos)
         break;
     case NPC_TGT_MVPT:
         xVec3Copy(pos, zMovePointGetPos(nav_target));
+        break;
+    default:
         break;
     }
 }

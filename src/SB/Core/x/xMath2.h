@@ -3,6 +3,8 @@
 
 #include <types.h>
 
+#include "xMathInlines.h"
+
 template <class T> struct basic_rect
 {
     T x;
@@ -14,12 +16,18 @@ template <class T> struct basic_rect
     const static basic_rect m_Unit;
 
     basic_rect& assign(T x, T y, T w, T h);
-    basic_rect& contract(T s);
+    basic_rect& contract(T s)
+    {
+        return expand(-s);
+    }
     basic_rect& contract(T x, T y, T w, T h)
     {
         return expand(-x, -y, -w, -h);
     }
-    basic_rect& expand(T s);
+    basic_rect& expand(T s)
+    {
+        return expand(s, s, s, s);
+    }
     basic_rect& expand(T x, T y, T w, T h)
     {
         this->x -= x;
@@ -43,6 +51,12 @@ template <class T> struct basic_rect
     basic_rect& operator|=(const basic_rect& other);
 };
 
+#ifndef __MWERKS__
+// metrowerks doesn't support forward declaring these specializations
+template<> const basic_rect<F32> basic_rect<F32>::m_Null;
+template<> const basic_rect<F32> basic_rect<F32>::m_Unit;
+#endif
+
 struct xVec2
 {
     F32 x;
@@ -53,7 +67,11 @@ struct xVec2
         return assign(xy, xy);
     }
     xVec2& assign(F32 x, F32 y);
-    F32 length() const;
+    F32 length() const
+    {
+        return xsqrt(length2());
+    }
+
     F32 length2() const;
     xVec2 normal() const
     {

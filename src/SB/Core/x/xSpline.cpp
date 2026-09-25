@@ -1,17 +1,13 @@
 #include "xSpline.h"
 
+#include "xVec3.h"
 #include <types.h>
 #include <rwplcore.h>
 #include <xMathInlines.h>
 #include <xMemMgr.h>
-#include <mem.h>
 #include <xVec3.h>
 
-// MSL's <cmath> is not reachable from here; the target calls floorf__3stdFf.
-namespace std
-{
-    float floorf(float x);
-}
+#include <string.h>
 
 static F32 sBasisUniformBspline[4][4];
 static F32 sBasisBezier[4][4] = { { -1.0f, 3.0f, -3.0f, 1.0f },
@@ -186,6 +182,7 @@ F32 ArcLength3(xCoef3* coef, F64 ustart, F64 uend)
            3.0;
 }
 
+#ifdef GAMECUBE
 // We don't have the implementation provided
 double sqrt(double x)
 {
@@ -213,6 +210,7 @@ double sqrt(double x)
         return INFINITY;
     }
 }
+#endif
 
 void EvalCoef3(xCoef3* coef, F32 u, U32 deriv, xVec3* o)
 {
@@ -657,8 +655,8 @@ xSpline3* AllocSpline3(xVec3* points, F32* time, U32 numpoints, U32 numalloc, U3
         numalloc = numpoints;
     }
 
-    spl->type = (ushort)type;
-    spl->flags = (ushort)flags;
+    spl->type = (U16)type;
+    spl->flags = (U16)flags;
     spl->N = numpoints - 1;
     spl->allocN = numalloc - 1;
     spl->p12 = (xVec3*)0x0;
@@ -667,12 +665,12 @@ xSpline3* AllocSpline3(xVec3* points, F32* time, U32 numpoints, U32 numalloc, U3
     spl->coef = (xCoef3*)0x0;
     spl->arcSample = 0;
     spl->arcLength = (float*)0x0;
-    spl->points = (xVec3*)xMemAlloc(gActiveHeap, (spl->allocN + 1) * 0xc, 0);
+    spl->points = (xVec3*)xMemAllocSize((spl->allocN + 1) * sizeof(xVec3));
     memcpy(spl->points, points, (spl->N + 1) * 0xc);
 
     if (time != (F32*)0x0)
     {
-        spl->time = (F32*)xMemAlloc(gActiveHeap, (spl->allocN + 1) * 4, 0);
+        spl->time = (F32*)xMemAllocSize((spl->allocN + 1) * sizeof(F32));
         memcpy(spl->time, time, (spl->N + 1) * 4);
     }
     else

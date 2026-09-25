@@ -58,14 +58,10 @@ struct xMemArea_tag
 struct xMemInfo_tag
 {
     xMemArea_tag system;
-
-    // Offset: 0xC
+#ifdef GAMECUBE
     xMemArea_tag stack;
-
-    // Offset: 0x18
+#endif
     xMemArea_tag DRAM;
-
-    // Offset: 0x24
     xMemArea_tag SRAM;
 };
 

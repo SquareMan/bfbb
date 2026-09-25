@@ -1,12 +1,12 @@
 #include "zLight.h"
 #include "zLightEffect.h"
 #include "zGlobals.h"
-#include "../rwsdk/rwplcore.h"
 #include "xShadow.h"
 #include "xPartition.h"
 #include "xString.h"
 #include "xPartition.h"
 
+#include <rwplcore.h>
 #include <types.h>
 #include <string.h>
 
@@ -279,7 +279,10 @@ void zLightAddLocalEnv()
             gLightWorld->directionalLightList.link.prev = &light->hw->inWorld;
 
             gTemporaryLights[gNumTemporaryLights] = zlight;
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-volatile"
             gNumTemporaryLights++;
+#pragma clang diagnostic pop
         }
     }
 }

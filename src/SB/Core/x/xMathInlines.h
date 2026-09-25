@@ -1,15 +1,25 @@
 #ifndef XMATHINLINES_H
 #define XMATHINLINES_H
 
+#include <cmath>
 #include <types.h>
 
 F32 xsqrt(F32 x);
-F32 xfmod(F32 a, F32 b);
+
+inline F32 xfmod(F32 a, F32 b)
+{
+    return std::fmodf(a, b);
+}
+
 F32 xatan2(F32 y, F32 x);
 F32 xasin(F32 x);
 F32 xacos(F32 x);
 F32 xexp(F32 x);
-F32 xpow(F32 x, F32 y);
+
+inline F32 xpow(F32 x, F32 y)
+{
+    return std::powf(x, y);
+}
 
 F32 SQ(F32 x);
 

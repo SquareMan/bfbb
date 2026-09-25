@@ -22,7 +22,7 @@ F32 xVec3LengthFast(const xVec3* vec);
 void xVec3AddScaled(xVec3* o, const xVec3* v, F32 s);
 
 #define xVec3NormalizeMacro(o, v, len)                                                             \
-    MACRO_START                                                                                    \
+    do                                                                                    \
     {                                                                                              \
         F32 len2 = SQR((v)->x) + SQR((v)->y) + SQR((v)->z);                                        \
         if (xeq(len2, 1.0f, 1e-5f))                                                                \
@@ -47,11 +47,11 @@ void xVec3AddScaled(xVec3* o, const xVec3* v, F32 s);
             (o)->y = (v)->y * len_inv;                                                             \
             (o)->z = (v)->z * len_inv;                                                             \
         }                                                                                          \
-    }                                                                                              \
-    MACRO_STOP
+    }                                                                                             \
+    while(0)
 
 #define xVec3NormalizeDistXZMacro(o, a, b, dist)                                                   \
-    MACRO_START                                                                                    \
+    do                                                                                    \
     {                                                                                              \
         F32 dx__ = (b)->x - (a)->x;                                                                \
         F32 dz__ = (b)->z - (a)->z;                                                                \
@@ -76,7 +76,7 @@ void xVec3AddScaled(xVec3* o, const xVec3* v, F32 s);
             (o)->z = dz__ * dist_inv;                                                              \
         }                                                                                          \
     }                                                                                              \
-    MACRO_STOP
+    while(0)
 
 inline void xVec3SMulBy(xVec3* v, F32 s)
 {

@@ -27,6 +27,7 @@
 #include "zGameExtras.h"
 #include "zNPCSupplement.h"
 #include "zParPTank.h"
+#include "xSnd.h"
 #include <stdlib.h>
 
 enum en_copcntr
@@ -57,7 +58,7 @@ struct RoboCopMap
 };
 
 void NPCC_DrawPlayerPredict(S32, F32, F32);
-S32 NPCC_LineHitsBound(xVec3* a, xVec3* b, xBound* bnd, xCollis* callers_colrec);
+U32 NPCC_LineHitsBound(xVec3* a, xVec3* b, xBound* bnd, xCollis* callers_colrec);
 S32 NPCC_chk_hitEnt(xEnt* tgt, xBound* bnd, xCollis* collide);
 void zEntPlayer_LassoNotify(en_LASSO_EVENT event);
 void NPCC_rotHPB(xMat3x3* mat, F32 heading, F32 pitch, F32 bank);
@@ -637,6 +638,8 @@ S32 zNPCGoalAlertFodder::Process(en_trantype* trantype, F32 dt, void* updCtxt, x
 
         break;
     }
+    default:
+        break;
     }
 
     if (this->alertfod != old_alertfod)
@@ -937,11 +940,15 @@ S32 zNPCGoalAlertFodBomb::Process(en_trantype* trantype, F32 dt, void* updCtxt, 
         }
         break;
     case FODBOMB_ALERT_TERMINAL:
+    {
         Detonate();
         zNPCGoalAfterlife* wanna = (zNPCGoalAfterlife*)(psyche->FindGoal(NPC_GOAL_AFTERLIFE));
         wanna->DieWithAWhimper();
         *trantype = GOAL_TRAN_SET;
         nextgoal = NPC_GOAL_AFTERLIFE;
+        break;
+    }
+    default:
         break;
     }
     if (alertbomb != old_alertbomb)
@@ -1055,7 +1062,10 @@ void zNPCGoalAlertFodBomb::SonarHoming(F32 dt)
 
 S32 zNPCGoalAlertFodBzzt::Enter(F32 dt, void* updCtxt)
 {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-volatile"
     zNPCFodBzzt::cnt_alerthokey++;
+#pragma clang diagnostic pop
     this->flg_alert = 0;
     this->flg_alert |= -(S32)(xrand() >> 0x17 & 1) + 2;
     this->alertbzzt = FODBZZT_ALERT_NOTICE;
@@ -1071,7 +1081,10 @@ S32 zNPCGoalAlertFodBzzt::Enter(F32 dt, void* updCtxt)
 
 S32 zNPCGoalAlertFodBzzt::Exit(F32 dt, void* updCtxt)
 {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-volatile"
     zNPCFodBzzt::cnt_alerthokey--;
+#pragma clang diagnostic pop
     S32 cnt = zNPCFodBzzt::cnt_alerthokey;
     zNPCFodBzzt::cnt_alerthokey = cnt & ~(cnt >> 31);
 
@@ -1175,6 +1188,8 @@ S32 zNPCGoalAlertFodBzzt::Process(en_trantype* trantype, F32 dt, void* updCtxt, 
         }
         OrbitPlayer(dt);
         DeathRayUpdate(dt);
+        break;
+    default:
         break;
     }
     if (alertbzzt != old_alertbzzt)
@@ -1578,6 +1593,8 @@ S32 zNPCGoalAlertChomper::Process(en_trantype* trantype, F32 dt, void* updCtxt, 
             alertchomp = CHOMPER_ALERT_CHASE;
         }
         break;
+    default:
+        break;
     }
     if (alertchomp != old_alertchomp)
     {
@@ -1887,6 +1904,8 @@ S32 zNPCGoalAlertHammer::Process(en_trantype* trantype, F32 dt, void* updCtxt, x
             }
         }
         break;
+    default:
+        break;
     }
     if (alertham != old_alertham)
     {
@@ -1916,7 +1935,7 @@ S32 zNPCGoalAlertHammer::PlayerInSpot(F32 dt)
     plyrInSpot = 0;
     zNPCRobot* npc = (zNPCRobot*)(psyche->clt_owner);
     dst_plyr = xsqrt(npc->XZDstSqToPlayer(&dir_plyr, &dy));
-    dy = __fabs(dy);
+    dy = xabs(dy);
     if (dst_plyr < 2.25f)
     {
         return 1;
@@ -1945,7 +1964,7 @@ S32 zNPCGoalAlertHammer::PlayerInSpot(F32 dt)
             spd_mover = MAX(npc->spd_throttle, 12.0f);
             zEntPlayer_PredictPos(&pos_plyr, MIN((dst_guess / spd_mover) + 0.5f, 2.0f), 1.0f, 0);
             xVec3Sub(&vec, &pos_plyr, &pos_zone);
-            if ((F32)__fabs(vec.y) < 2.5f)
+            if (xabs(vec.y) < 2.5f)
             {
                 vec.y = 0.0f;
                 if (xVec3Length2(&vec) < 1.25f)
@@ -2192,6 +2211,8 @@ S32 zNPCGoalAlertTarTar::Process(en_trantype* trantype, F32 dt, void* updCtxt, x
             return nextgoal;
         }
         break;
+    default:
+        break;
     }
     if (alerttart != old_alerttart)
     {
@@ -2313,6 +2334,8 @@ S32 zNPCGoalAlertTarTar::HoppyUpdate(en_trantype* trantype, F32 dt)
         tmr_reload = tym_reload * (0.25f * (xurand() - 0.5f)) + tym_reload;
         *trantype = GOAL_TRAN_PUSH;
         nextgoal = NPC_GOAL_ATTACKTARTAR;
+        break;
+    default:
         break;
     }
 
@@ -2785,7 +2808,7 @@ S32 zNPCGoalAlertGlove::CollReview(void*)
 
         xVec3AddTo(&vec_depen, &colrec->depen);
         hitstuff++;
-        zNPCCommon* tgt = (zNPCCommon*)colrec->optr;
+        zNPCCommon* tgt = XCOLLIDE_DOWNCAST_OPTR(zNPCCommon*, colrec->optr);
 
         xVec3Normalize(&pump, &colrec->tohit);
         xVec3SMulBy(&pump, spd);
@@ -2940,6 +2963,8 @@ S32 zNPCGoalAlertMonsoon::Process(en_trantype* trantype, F32 dt, void* updCtxt, 
         nextgoal = NPC_GOAL_ATTACKMONSOON;
         *trantype = GOAL_TRAN_PUSH;
         break;
+    default:
+        break;
     }
     if (alertmony != old_alertmony)
     {
@@ -3064,11 +3089,15 @@ S32 zNPCGoalAlertSleepy::Process(en_trantype* trantype, F32 dt, void* updCtxt, x
         }
         break;
     case SLEEP_ATAK_LAUGH:
+    {
         sleepattack = SLEEP_ATAK_REACT;
         nextgoal = NPC_GOAL_TAUNT;
         *trantype = GOAL_TRAN_PUSH;
         zNPCGoalTaunt* taunt = (zNPCGoalTaunt*)(psyche->FindGoal(NPC_GOAL_TAUNT));
         taunt->LoopCountSet(1000);
+        break;
+    }
+    default:
         break;
     }
 
@@ -3230,6 +3259,8 @@ S32 zNPCGoalAlertArf::Process(en_trantype* trantype, F32 dt, void* updCtxt, xSce
         nextgoal = NPC_GOAL_TELEPORT;
         alertarf = ARF_ALERT_READY;
         break;
+    default:
+        break;
     }
 
     if (alertarf != old_alertarf)
@@ -3355,10 +3386,14 @@ S32 zNPCGoalAlertPuppy::Process(en_trantype* trantype, F32 dt, void* updCtxt, xS
         *trantype = GOAL_TRAN_PUSH;
         break;
     case PUPPY_ALERT_DISAPPEAR:
+    {
         zNPCGoalAfterlife* wanna = (zNPCGoalAfterlife*)(psyche->FindGoal(NPC_GOAL_AFTERLIFE));
         wanna->DieWithAWhimper();
         *trantype = GOAL_TRAN_SET;
         nextgoal = NPC_GOAL_AFTERLIFE;
+        break;
+    }
+    default:
         break;
     }
     if (alertpup != old_alertpup)
@@ -3566,6 +3601,8 @@ S32 zNPCGoalAlertChuck::Process(en_trantype* trantype, F32 dt, void* updCtxt, xS
         tmr_hover = 0.0f;
         alertchuk = CHUCK_ALERT_READY;
         break;
+    default:
+        break;
     }
 
     if (alertchuk != old_alertchuk)
@@ -3641,7 +3678,7 @@ S32 zNPCGoalAlertChuck::ZoomMove(F32 dt)
         xVec3SMulBy(&dir, (1.0f / dist));
         npc->ThrottleApply(dt, &dir, 0);
         dst_zoom =
-            -((dt * npc->spd_throttle) * ((F32)__fabs(dir.x) + (F32)__fabs(dir.z)) - dst_zoom);
+            -((dt * npc->spd_throttle) * (xabs(dir.x) + xabs(dir.z)) - dst_zoom);
     }
     if (dst_zoom < 0.0f)
     {
@@ -3802,14 +3839,14 @@ void zNPCGoalAlertTubelet::PeteAttackParSys(F32 dt, S32 param_2)
     zNPCTubelet* iVar2 = (zNPCTubelet*)(psyche->clt_owner);
     iVar1 = (iVar2->frame);
     F32 dVar3 = (iVar1->drot.angle);
-    if ((F32)__fabs(dVar3) > 0.09599312f)
+    if (xabs(dVar3) > 0.09599312f)
     {
         iVar1->drot.angle *= 0.8f;
         iVar2->frame->mode |= 0x20;
     }
     else
     {
-        if ((F32)__fabs(dVar3) < 0.08726647f)
+        if (xabs(dVar3) < 0.08726647f)
         {
             iVar1->drot.angle = -(dt * 0.0872664675116539f - dVar3);
             iVar2->frame->mode |= 0x20;
@@ -4002,6 +4039,8 @@ S32 zNPCGoalAlertSlick::Process(en_trantype* trantype, F32 dt, void* updCtxt, xS
             npc->FacePlayer(dt, 3 * PI);
             MoveCorner(dt);
         }
+        break;
+    default:
         break;
     }
     if (alertslik != old_alertslik)
@@ -4270,6 +4309,8 @@ S32 zNPCGoalAttackFodder::CattleNotify::Notify(en_haznote hazNote, NPCHazard* ha
         break;
     case HAZ_NOTE_HITPLAYER:
         goal->flg_attack |= 3;
+        break;
+    default:
         break;
     }
     return 0;
@@ -5698,7 +5739,11 @@ S32 zNPCGoalTeleport::NPCMessage(NPCMsg* msg)
     switch (msg->msgid)
     {
     case NPC_MID_DAMAGE:
+    {
         return 1;
+    }
+    default:
+        break;
     }
     return 0;
 }
@@ -5845,11 +5890,15 @@ S32 zNPCGoalEvilPat::NPCMessage(NPCMsg* mail)
     switch (mail->msgid)
     {
     case NPC_MID_STUN:
+    {
         F32 stuntime = mail->stundata.tym_stuntime;
         F32 blah = (xurand() - 0.5f);
         blah = 0.25f * blah;
         npc->tmr_stunned = stuntime + (stuntime * blah);
         return 1;
+    }
+    default:
+        break;
     }
     return 0;
 }
@@ -6293,7 +6342,7 @@ S32 zNPCGoalLassoThrow::CollReview(void*)
         colrec = &npccol->colls[i];
 
         xVec3AddTo(&vec_depen, &colrec->depen);
-        zNPCCommon* tgt = (zNPCCommon*)colrec->optr;
+        zNPCCommon* tgt = XCOLLIDE_DOWNCAST_OPTR(zNPCCommon*, colrec->optr);
         hitstuff++;
 
         if (tgt != NULL)
@@ -6457,11 +6506,13 @@ S32 zNPCGoalDamage::InputInfo(NPCDamageInfo* info)
     case DMGTYP_HITBYTOSS:
     case DMGTYP_BOULDER:
     case DMGTYP_BUBBOWL:
+    {
         flg_howtodie = 2;
         npc->InflictPain(-1, 0);
         zNPCGoalKnock* knock = (zNPCGoalKnock*)(psyche->FindGoal(NPC_GOAL_KNOCK));
         knock->InputInfo(info);
         break;
+    }
     default:
         flg_howtodie = 1;
         npc->InflictPain(-1, 0);
@@ -6659,7 +6710,7 @@ S32 zNPCGoalWound::CollReview(void*)
 
         xVec3AddTo(&vec_depen, &colrec->depen);
         hitstuff++;
-        zNPCCommon* tgt = (zNPCCommon*)colrec->optr;
+        zNPCCommon* tgt = XCOLLIDE_DOWNCAST_OPTR(zNPCCommon*, colrec->optr);
 
         xVec3Normalize(&pump, &colrec->tohit);
         xVec3SMulBy(&pump, spd);
@@ -6700,6 +6751,8 @@ S32 zNPCGoalWound::NPCMessage(NPCMsg* msg)
     {
     case NPC_MID_DAMAGE:
         return 1;
+    default:
+        break;
     }
     return 0;
 }
@@ -6903,7 +6956,7 @@ S32 zNPCGoalKnock::CollReview(void*)
         colrec = &npccol->colls[i];
 
         xVec3AddTo(&vec_depen, &colrec->depen);
-        zNPCCommon* tgt = (zNPCCommon*)colrec->optr;
+        zNPCCommon* tgt = XCOLLIDE_DOWNCAST_OPTR(zNPCCommon*, colrec->optr);
         hitstuff++;
 
         if (tgt != NULL)
@@ -6986,6 +7039,7 @@ S32 zNPCGoalAfterlife::NPCMessage(NPCMsg* mail)
     switch (mail->msgid)
     {
     case NPC_MID_RESPAWN:
+    {
         if ((psy->GIDInStack(NPC_GOAL_RESPAWN) != NULL) ||
             (psy->GIDOfPending() == NPC_GOAL_RESPAWN))
         {
@@ -7000,6 +7054,7 @@ S32 zNPCGoalAfterlife::NPCMessage(NPCMsg* mail)
         psy->GoalPush(NPC_GOAL_RESPAWN, 0);
         mail->spawning.spawnSuccess = 1;
         break;
+    }
     default:
         snarfed = 1;
         break;
@@ -7390,6 +7445,8 @@ void zNPCGoalTubePal::ChkPrelimTran(en_trantype* trantype, int* nextgoal)
         *nextgoal = NPC_GOAL_TUBEDEAD;
         *trantype = GOAL_TRAN_SET;
         return;
+    default:
+        break;
     }
 }
 
@@ -7484,6 +7541,8 @@ void zNPCGoalTubeDuckling::ChkPrelimTran(en_trantype* trantype, int* nextgoal)
         break;
     case TUBE_STAT_DUCKLING:
         break;
+    default:
+        break;
     }
 
     if (npc->hitpoints == 0)
@@ -7538,6 +7597,8 @@ void zNPCGoalTubeDuckling::MoveFrolic(F32 dt)
         dst_horz = MIN(2.5f, npc->cfg_npc->spd_moveMax);
         interval = 5.0f;
         vertDampen = -1.0f;
+        break;
+    default:
         break;
     }
 
@@ -7706,6 +7767,8 @@ void zNPCGoalTubeAttack::ChkPrelimTran(en_trantype* trantype, int* nextgoal)
         *nextgoal = NPC_GOAL_TUBEDYING;
         *trantype = GOAL_TRAN_SET;
         break;
+    default:
+        break;
     }
 
     if (*trantype != 0)
@@ -7759,6 +7822,8 @@ void zNPCGoalTubeAttack::MaryAttack(F32 dt, xScene* xscn)
         {
             mary.marystat = TUBE_MARY_WAIT;
         }
+        break;
+    default:
         break;
     }
 }
@@ -7893,6 +7958,8 @@ void zNPCGoalTubeLasso::ChkPrelimTran(en_trantype* trantype, int* nextgoal)
         *nextgoal = NPC_GOAL_TUBEDYING;
         *trantype = GOAL_TRAN_SET;
         break;
+    default:
+        break;
     }
 
     // ?????
@@ -8004,6 +8071,8 @@ void zNPCGoalTubeBirth::ChkPrelimTran(en_trantype* trantype, int* nextgoal)
         *trantype = GOAL_TRAN_SET;
         break;
     case TUBE_STAT_BORN:
+        break;
+    default:
         break;
     }
 
@@ -8136,6 +8205,8 @@ void zNPCGoalTubeBonked::CheckForTran(en_trantype* trantype, S32* nextgoal)
         *nextgoal = NPC_GOAL_TUBEDYING;
         *trantype = GOAL_TRAN_SET;
         break;
+    default:
+        break;
     }
 }
 
@@ -8178,6 +8249,8 @@ void zNPCGoalTubeDead::ChkPrelimTran(en_trantype* trantype, int* nextgoal)
         *nextgoal = NPC_GOAL_TUBELASSO;
         *trantype = GOAL_TRAN_SET;
         return;
+    default:
+        break;
     }
     return;
 }
@@ -8655,18 +8728,6 @@ zMovePoint* zNPCArfArf::GetTelepoint(S32 unk)
 xVec3& xVec3::assign(float dt)
 {
     return assign(dt, dt, dt);
-}
-
-// .text (18)
-
-inline void NPCHazard::SetNPCOwner(zNPCCommon* owner)
-{
-    this->npc_owner = owner;
-}
-
-inline void NPCHazard::NotifyCBSet(HAZNotify* noter)
-{
-    this->cb_notify = noter;
 }
 
 inline S32 HAZNotify::Notify(en_haznote note, NPCHazard* haz)

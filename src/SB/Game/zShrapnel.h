@@ -12,8 +12,8 @@
 #include <rwcore.h>
 #include <rpworld.h>
 
-typedef struct zFrag;
-typedef struct zShrapnelAsset;
+struct zFrag;
+struct zShrapnelAsset;
 
 enum zFragLocType
 {
@@ -216,7 +216,7 @@ struct zShrapnelAsset
 
 struct zShrapnelInitTable
 {
-    char* name;
+    CChar* name;
     void (*initCB)(zShrapnelAsset*, xModelInstance*, xVec3*, void(*)(zFrag*, zFragAsset*));
     U32 ID;
 };
@@ -238,7 +238,7 @@ void zShrapnel_SetShrapnelAssetInitCB(zShrapnelAsset* sasset);
 void zShrapnel_Update(F32 dt);
 void zShrapnel_Reset();
 void zShrapnel_Render();
-void zShrapnel_CinematicInit(zShrapnelAsset* shrap, RpAtomic* cinModel, RwMatrixTag* animMat, xVec3* initVel, void(*cb)(zFrag*, zFragAsset*));
+void zShrapnel_CinematicInit(zShrapnelAsset* shrap, RpAtomic* cinModel, RwMatrix* animMat, xVec3* initVel, void(*cb)(zFrag*, zFragAsset*));
 void zFragLoc_Setup(zFragLocation* loc, xModelInstance* parent);
 void zFragLoc_InitDir(zFragLocation* loc, xVec3* vec, xModelInstance* parent);
 void zFrag_DefaultInit(zFrag* frag, zFragAsset* fasset);

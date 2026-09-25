@@ -1,0 +1,576 @@
+cmake_minimum_required(VERSION 3.23)
+project(bfbb-pc)
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
+
+# 32-bit only for now
+# TODO: after getting the port off the ground, make it 64 bit compatible
+set(CMAKE_CXX_FLAGS -m32)
+set(CMAKE_C_FLAGS -m32)
+
+# set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-everything")
+
+# ------------------ librw --------------------------------
+set(LIBRW_TOOLS OFF CACHE BOOL "" FORCE)
+set(LIBRW_INSTALL OFF CACHE BOOL "" FORCE)
+set(LIBRW_PLATFORM "D3D9" CACHE STRING "" FORCE)
+add_subdirectory(third_party/librw)
+
+# suppress librw warnings
+target_compile_options(librw PRIVATE -Wno-everything)
+
+# ------------------ sdl ----------------------------------
+add_subdirectory(third_party/sdl)
+
+# ----------------- librw c-style wrapper ------------------
+add_library(librwc STATIC)
+target_link_libraries(librwc PUBLIC librw)
+target_include_directories(librwc PUBLIC include/)
+target_sources(librwc
+    PUBLIC
+    FILE_SET headers TYPE HEADERS
+    BASE_DIRS src/librwc/include/
+    FILES
+    src/librwc/include/rpcollis.h
+    src/librwc/include/rphanim.h
+    src/librwc/include/rpmatfx.h
+    src/librwc/include/rpskin.h
+    src/librwc/include/rpworld.h
+    src/librwc/include/rtintsec.h
+    src/librwc/include/rwcore.h
+    src/librwc/include/rwplcore.h
+    src/librwc/include/rpcollbsptree.h
+    src/librwc/include/rpptank.h
+    src/librwc/include/rtquat.h
+    src/librwc/include/rtslerp.h
+
+    PRIVATE
+    FILE_SET private_headers TYPE HEADERS
+    BASE_DIRS src/librwc/src/
+    FILES
+    src/librwc/src/collision_support.h
+
+    FILES
+    PRIVATE
+    src/librwc/src/collision_support.cpp
+    src/librwc/src/rintsec.cpp
+    src/librwc/src/rpcollis.cpp
+)
+
+# ----------------- Main Game Executable ------------------
+add_executable(bfbb)
+target_link_libraries(bfbb PUBLIC librwc SDL3::SDL3)
+# FIXME: This should be removable after getting the build fully linking and removing the dependency on gc headers
+# silence warning from RenderWare macros doing cursed enum stuff
+target_compile_options(bfbb PRIVATE -Wno-deprecated-enum-enum-conversion)
+# This is a workaround for what appears to be a lld-link issue. Including <immintrin.h> in multiple TUs causes:
+#       lld-link: error: duplicate symbol: __Avx2WmemEnabledWeakValue
+# lld-link seems to not be treating this symbol as something to be deduplicated.
+# For now we'll force it to allow this, but this is pretty cringe
+target_link_options(bfbb PRIVATE -Wl,/force:multiple)
+target_compile_definitions(bfbb PRIVATE _CRT_SECURE_NO_WARNINGS _CRT_NONSTDC_NO_WARNINGS)
+target_compile_definitions(bfbb PRIVATE WITH_LIBRW)
+
+target_include_directories(bfbb SYSTEM PRIVATE
+    include/
+)
+set(PLATFORM_SOURCES
+    src/SB/core/sdl/iAnim.cpp
+    src/SB/core/sdl/iAnimSKB.cpp
+    src/SB/core/sdl/iCollide.cpp
+    src/SB/core/sdl/iCollideFast.cpp
+    src/SB/core/sdl/iCutscene.cpp
+    src/SB/core/sdl/iDraw.cpp
+    src/SB/core/sdl/iEnv.cpp
+    src/SB/core/sdl/iFile.cpp
+    src/SB/core/sdl/iFMV.cpp
+    src/SB/core/sdl/iFX.cpp
+    src/SB/core/sdl/iLight.cpp
+    src/SB/core/sdl/iMath.cpp
+    src/SB/core/sdl/iMath3.cpp
+    src/SB/core/sdl/iMemMgr.cpp
+    src/SB/core/sdl/iModel.cpp
+    src/SB/core/sdl/iMorph.cpp
+    src/SB/core/sdl/iPad.cpp
+    src/SB/core/sdl/iParMgr.cpp
+    src/SB/core/sdl/isavegame.cpp
+    src/SB/core/sdl/iScrFX.cpp
+    src/SB/core/sdl/iSnd.cpp
+    src/SB/core/sdl/iSystem.cpp
+    src/SB/core/sdl/iTime.cpp
+    src/SB/core/sdl/iTRC.cpp
+    src/SB/core/sdl/ngcrad3d.cpp
+)
+target_sources(bfbb
+    PUBLIC
+    FILE_SET headers TYPE HEADERS
+    BASE_DIRS src/SB/Game/ src/SB/core/x src/SB/core/sdl
+    FILES
+    src/SB/Game/zVolume.h
+    src/SB/Game/zVar.h
+    src/SB/Game/zUIFont.h
+    src/SB/Game/zUI.h
+    src/SB/Game/zThrown.h
+    src/SB/Game/zTextBox.h
+    src/SB/Game/zTaxi.h
+    src/SB/Game/zTaskBox.h
+    src/SB/Game/zTalkBox.h
+    src/SB/Game/zSurface.h
+    src/SB/Game/zShrapnel.h
+    src/SB/Game/zScript.h
+    src/SB/Game/zScene.h
+    src/SB/Game/zSaveLoad.h
+    src/SB/Game/zRumble.h
+    src/SB/Game/zRenderState.h
+    src/SB/Game/zPortal.h
+    src/SB/Game/zPlatform.h
+    src/SB/Game/zPickupTable.h
+    src/SB/Game/zPendulum.h
+    src/SB/Game/zParSys.h
+    src/SB/Game/zParPTank.h
+    src/SB/Game/zParEmitter.h
+    src/SB/Game/zParCmd.h
+    src/SB/Game/zNPCTypeVillager.h
+    src/SB/Game/zNPCTypeTiki.h
+    src/SB/Game/zNPCTypeTest.h
+    src/SB/Game/zNPCTypeSubBoss.h
+    src/SB/Game/zNPCTypes.h
+    src/SB/Game/zNPCTypeRobot.h
+    src/SB/Game/zNPCTypePrawn.h
+    src/SB/Game/zNPCTypeKingJelly.h
+    src/SB/Game/zNPCTypeDutchman.h
+    src/SB/Game/zNPCTypeDuplotron.h
+    src/SB/Game/zNPCTypeCommon.h
+    src/SB/Game/zNPCTypeBossSB2.h
+    src/SB/Game/zNPCTypeBossSB1.h
+    src/SB/Game/zNPCTypeBossSandy.h
+    src/SB/Game/zNPCTypeBossPlankton.h
+    src/SB/Game/zNPCTypeBossPatrick.h
+    src/SB/Game/zNPCTypeBoss.h
+    src/SB/Game/zNPCTypeAmbient.h
+    src/SB/Game/zNPCSupport.h
+    src/SB/Game/zNPCSupplement.h
+    src/SB/Game/zNPCSpawner.h
+    src/SB/Game/zNPCSndTable.h
+    src/SB/Game/zNPCSndLists.h
+    src/SB/Game/zNPCMgr.h
+    src/SB/Game/zNPCMessenger.h
+    src/SB/Game/zNPCHazard.h
+    src/SB/Game/zNPCGoalVillager.h
+    src/SB/Game/zNPCGoalTiki.h
+    src/SB/Game/zNPCGoalSubBoss.h
+    src/SB/Game/zNPCGoalStd.h
+    src/SB/Game/zNPCGoalScript.h
+    src/SB/Game/zNPCGoals.h
+    src/SB/Game/zNPCGoalRobo.h
+    src/SB/Game/zNPCGoalDuplotron.h
+    src/SB/Game/zNPCGoalCommon.h
+    src/SB/Game/zNPCGoalBoss.h
+    src/SB/Game/zNPCGoalAmbient.h
+    src/SB/Game/zNPCGlyph.h
+    src/SB/Game/zNPCFXCinematic.h
+    src/SB/Game/zMusic.h
+    src/SB/Game/zMovePoint.h
+    src/SB/Game/zMenu.h
+    src/SB/Game/zMain.h
+    src/SB/Game/zLOD.h
+    src/SB/Game/zLightning.h
+    src/SB/Game/zLightEffect.h
+    src/SB/Game/zLight.h
+    src/SB/Game/zLasso.h
+    src/SB/Game/zHud.h
+    src/SB/Game/zGust.h
+    src/SB/Game/zGrid.h
+    src/SB/Game/zGoo.h
+    src/SB/Game/zGlobals.h
+    src/SB/Game/zGameState.h
+    src/SB/Game/zGameExtras.h
+    src/SB/Game/zGame.h
+    src/SB/Game/zFX.h
+    src/SB/Game/zFMV.h
+    src/SB/Game/zFeet.h
+    src/SB/Game/zEvent.h
+    src/SB/Game/zEnv.h
+    src/SB/Game/zEntTrigger.h
+    src/SB/Game/zEntTeleportBox.h
+    src/SB/Game/zEntSimpleObj.h
+    src/SB/Game/zEntPlayerOOBState.h
+    src/SB/Game/zEntPlayerBungeeState.h
+    src/SB/Game/zEntPlayerAnimationTables.h
+    src/SB/Game/zEntPlayer.h
+    src/SB/Game/zEntPickup.h
+    src/SB/Game/zEntHangable.h
+    src/SB/Game/zEntDestructObj.h
+    src/SB/Game/zEntCruiseBubble.h
+    src/SB/Game/zEntButton.h
+    src/SB/Game/zEnt.h
+    src/SB/Game/zEGenerator.h
+    src/SB/Game/zDispatcher.h
+    src/SB/Game/zDiscoFloor.h
+    src/SB/Game/zCutsceneMgr.h
+    src/SB/Game/zConditional.h
+    src/SB/Game/zCombo.h
+    src/SB/Game/zCollGeom.h
+    src/SB/Game/zCamMarker.h
+    src/SB/Game/zCameraTweak.h
+    src/SB/Game/zCameraFly.h
+    src/SB/Game/zCamera.h
+    src/SB/Game/zBusStop.h
+    src/SB/Game/zBase.h
+    src/SB/Game/zAssetTypes.h
+    src/SB/Game/zAnimList.h
+    src/SB/Game/zActionLine.h
+
+    src/SB/core/x/containers.h
+    src/SB/core/x/iCamera.h
+    src/SB/core/x/xAnim.h
+    src/SB/core/x/xBase.h
+    src/SB/core/x/xBehaveGoalSimple.h
+    src/SB/core/x/xBehaveMgr.h
+    src/SB/core/x/xBehaviour.h
+    src/SB/core/x/xbinio.h
+    src/SB/core/x/xBound.h
+    src/SB/core/x/xCamera.h
+    src/SB/core/x/xClimate.h
+    src/SB/core/x/xClumpColl.h
+    src/SB/core/x/xCM.h
+    src/SB/core/x/xCollide.h
+    src/SB/core/x/xCollideFast.h
+    src/SB/core/x/xColor.h
+    src/SB/core/x/xCounter.h
+    src/SB/core/x/xCurveAsset.h
+    src/SB/core/x/xCutscene.h
+    src/SB/core/x/xCutsceneMgr.h
+    src/SB/core/x/xDebug.h
+    src/SB/core/x/xDecal.h
+    src/SB/core/x/xDraw.h
+    src/SB/core/x/xDynAsset.h
+    src/SB/core/x/xEnt.h
+    src/SB/core/x/xEntBoulder.h
+    src/SB/core/x/xEntDrive.h
+    src/SB/core/x/xEntMotion.h
+    src/SB/core/x/xEntMotionAsset.h
+    src/SB/core/x/xEnv.h
+    src/SB/core/x/xEvent.h
+    src/SB/core/x/xFactory.h
+    src/SB/core/x/xFColor.h
+    src/SB/core/x/xFFX.h
+    src/SB/core/x/xFile.h
+    src/SB/core/x/xFog.h
+    src/SB/core/x/xFont.h
+    src/SB/core/x/xFX.h
+    src/SB/core/x/xGlobals.h
+    src/SB/core/x/xGrid.h
+    src/SB/core/x/xGroup.h
+    src/SB/core/x/xhipio.h
+    src/SB/core/x/xHud.h
+    src/SB/core/x/xHudFontMeter.h
+    src/SB/core/x/xHudMeter.h
+    src/SB/core/x/xHudModel.h
+    src/SB/core/x/xHudText.h
+    src/SB/core/x/xHudUnitMeter.h
+    src/SB/core/x/xIni.h
+    src/SB/core/x/xIsect.h
+    src/SB/core/x/xJaw.h
+    src/SB/core/x/xJSP.h
+    src/SB/core/x/xLaserBolt.h
+    src/SB/core/x/xLightKit.h
+    src/SB/core/x/xLinkAsset.h
+    src/SB/core/x/xListItem.h
+    src/SB/core/x/xMarkerAsset.h
+    src/SB/core/x/xMath.h
+    src/SB/core/x/xMath2.h
+    src/SB/core/x/xMath3.h
+    src/SB/core/x/xMathInlines.h
+    src/SB/core/x/xMemMgr.h
+    src/SB/core/x/xMgr.h
+    src/SB/core/x/xModel.h
+    src/SB/core/x/xModelBucket.h
+    src/SB/core/x/xMorph.h
+    src/SB/core/x/xMovePoint.h
+    src/SB/core/x/xNPCBasic.h
+    src/SB/core/x/xordarray.h
+    src/SB/core/x/xPad.h
+    src/SB/core/x/xPar.h
+    src/SB/core/x/xParCmd.h
+    src/SB/core/x/xParEmitter.h
+    src/SB/core/x/xParEmitterType.h
+    src/SB/core/x/xParGroup.h
+    src/SB/core/x/xParMgr.h
+    src/SB/core/x/xParSys.h
+    src/SB/core/x/xPartition.h
+    src/SB/core/x/xpkrsvc.h
+    src/SB/core/x/xPtankPool.h
+    src/SB/core/x/xQuickCull.h
+    src/SB/core/x/xRay3.h
+    src/SB/core/x/xRenderState.h
+    src/SB/core/x/xRMemData.h
+    src/SB/core/x/xRumble.h
+    src/SB/core/x/xsavegame.h
+    src/SB/core/x/xScene.h
+    src/SB/core/x/xScrFx.h
+    src/SB/core/x/xserializer.h
+    src/SB/core/x/xSFX.h
+    src/SB/core/x/xShadow.h
+    src/SB/core/x/xShadowSimple.h
+    src/SB/core/x/xSkyDome.h
+    src/SB/core/x/xSnd.h
+    src/SB/core/x/xSpline.h
+    src/SB/core/x/xstransvc.h
+    src/SB/core/x/xString.h
+    src/SB/core/x/xSurface.h
+    src/SB/core/x/xSystem.h
+    src/SB/core/x/xTextAsset.h
+    src/SB/core/x/xTimer.h
+    src/SB/core/x/xTRC.h
+    src/SB/core/x/xUpdateCull.h
+    src/SB/core/x/xutil.h
+    src/SB/core/x/xVec3.h
+    src/SB/core/x/xVec3Inlines.h
+    src/SB/core/x/xVolume.h
+
+    src/SB/core/sdl/iAnim.h
+    src/SB/core/sdl/iAnimSKB.h
+    src/SB/core/sdl/iCollide.h
+    src/SB/core/sdl/iCollideFast.h
+    src/SB/core/sdl/iColor.h
+    src/SB/core/sdl/iCutscene.h
+    src/SB/core/sdl/iDraw.h
+    src/SB/core/sdl/iEnv.h
+    src/SB/core/sdl/iFile.h
+    src/SB/core/sdl/iFMV.h
+    src/SB/core/sdl/iFX.h
+    src/SB/core/sdl/iLight.h
+    src/SB/core/sdl/iMath.h
+    src/SB/core/sdl/iMath3.h
+    src/SB/core/sdl/iMemMgr.h
+    src/SB/core/sdl/iMix.c
+    src/SB/core/sdl/iModel.h
+    src/SB/core/sdl/iMorph.h
+    src/SB/core/sdl/iPad.h
+    src/SB/core/sdl/iParMgr.h
+    src/SB/core/sdl/isavegame.h
+    src/SB/core/sdl/iScrFX.h
+    src/SB/core/sdl/iSnd.h
+    src/SB/core/sdl/iSystem.h
+    src/SB/core/sdl/iTime.h
+    src/SB/core/sdl/iTRC.h
+    src/SB/core/sdl/ngcrad3d.c
+    src/SB/core/sdl/ngcrad3d.h
+
+    PRIVATE
+    src/SB/Game/zActionLine.cpp
+    src/SB/Game/zAnimList.cpp
+    src/SB/Game/zAssetTypes.cpp
+    src/SB/Game/zBusStop.cpp
+    src/SB/Game/zCamera.cpp
+    src/SB/Game/zCameraFly.cpp
+    src/SB/Game/zCameraTweak.cpp
+    src/SB/Game/zCamMarker.cpp
+    src/SB/Game/zCollGeom.cpp
+    src/SB/Game/zCombo.cpp
+    src/SB/Game/zConditional.cpp
+    src/SB/Game/zCutsceneMgr.cpp
+    src/SB/Game/zDiscoFloor.cpp
+    src/SB/Game/zDispatcher.cpp
+    src/SB/Game/zEGenerator.cpp
+    src/SB/Game/zEnt.cpp
+    src/SB/Game/zEntButton.cpp
+    src/SB/Game/zEntCruiseBubble.cpp
+    src/SB/Game/zEntDestructObj.cpp
+    src/SB/Game/zEntHangable.cpp
+    src/SB/Game/zEntPickup.cpp
+    src/SB/Game/zEntPlayer.cpp
+    src/SB/Game/zEntPlayerBungeeState.cpp
+    src/SB/Game/zEntPlayerOOBState.cpp
+    src/SB/Game/zEntSimpleObj.cpp
+    src/SB/Game/zEntTeleportBox.cpp
+    src/SB/Game/zEntTrigger.cpp
+    src/SB/Game/zEnv.cpp
+    src/SB/Game/zEvent.cpp
+    src/SB/Game/zFeet.cpp
+    src/SB/Game/zFMV.cpp
+    src/SB/Game/zFX.cpp
+    src/SB/Game/zGame.cpp
+    src/SB/Game/zGameExtras.cpp
+    src/SB/Game/zGameState.cpp
+    src/SB/Game/zGoo.cpp
+    src/SB/Game/zGrid.cpp
+    src/SB/Game/zGust.cpp
+    src/SB/Game/zHud.cpp
+    src/SB/Game/zLasso.cpp
+    src/SB/Game/zLight.cpp
+    src/SB/Game/zLightEffect.cpp
+    src/SB/Game/zLightning.cpp
+    src/SB/Game/zLOD.cpp
+    src/SB/Game/zMain.cpp
+    src/SB/Game/zMenu.cpp
+    src/SB/Game/zMovePoint.cpp
+    src/SB/Game/zMusic.cpp
+    src/SB/Game/zNPCFXCinematic.cpp
+    src/SB/Game/zNPCGlyph.cpp
+    src/SB/Game/zNPCGoalAmbient.cpp
+    src/SB/Game/zNPCGoalBoss.cpp
+    src/SB/Game/zNPCGoalCommon.cpp
+    src/SB/Game/zNPCGoalDuplotron.cpp
+    src/SB/Game/zNPCGoalRobo.cpp
+    src/SB/Game/zNPCGoals.cpp
+    src/SB/Game/zNPCGoalScript.cpp
+    src/SB/Game/zNPCGoalStd.cpp
+    src/SB/Game/zNPCGoalSubBoss.cpp
+    src/SB/Game/zNPCGoalTiki.cpp
+    src/SB/Game/zNPCGoalVillager.cpp
+    src/SB/Game/zNPCHazard.cpp
+    src/SB/Game/zNPCMessenger.cpp
+    src/SB/Game/zNPCMgr.cpp
+    src/SB/Game/zNPCSndLists.cpp
+    src/SB/Game/zNPCSndTable.cpp
+    src/SB/Game/zNPCSpawner.cpp
+    src/SB/Game/zNPCSupplement.cpp
+    src/SB/Game/zNPCSupport.cpp
+    src/SB/Game/zNPCTypeAmbient.cpp
+    src/SB/Game/zNPCTypeBoss.cpp
+    src/SB/Game/zNPCTypeBossPatrick.cpp
+    src/SB/Game/zNPCTypeBossPlankton.cpp
+    src/SB/Game/zNPCTypeBossSandy.cpp
+    src/SB/Game/zNPCTypeBossSB1.cpp
+    src/SB/Game/zNPCTypeBossSB2.cpp
+    src/SB/Game/zNPCTypeCommon.cpp
+    src/SB/Game/zNPCTypeDuplotron.cpp
+    src/SB/Game/zNPCTypeDutchman.cpp
+    src/SB/Game/zNPCTypeKingJelly.cpp
+    src/SB/Game/zNPCTypePrawn.cpp
+    src/SB/Game/zNPCTypeRobot.cpp
+    src/SB/Game/zNPCTypes.cpp
+    src/SB/Game/zNPCTypeSubBoss.cpp
+    src/SB/Game/zNPCTypeTest.cpp
+    src/SB/Game/zNPCTypeTiki.cpp
+    src/SB/Game/zNPCTypeVillager.cpp
+    src/SB/Game/zParCmd.cpp
+    src/SB/Game/zParEmitter.cpp
+    src/SB/Game/zParPTank.cpp
+    src/SB/Game/zPendulum.cpp
+    src/SB/Game/zPickupTable.cpp
+    src/SB/Game/zPlatform.cpp
+    src/SB/Game/zPortal.cpp
+    src/SB/Game/zRenderState.cpp
+    src/SB/Game/zRumble.cpp
+    src/SB/Game/zSaveLoad.cpp
+    src/SB/Game/zScene.cpp
+    src/SB/Game/zScript.cpp
+    src/SB/Game/zShrapnel.cpp
+    src/SB/Game/zSurface.cpp
+    src/SB/Game/zTalkBox.cpp
+    src/SB/Game/zTaskBox.cpp
+    src/SB/Game/zTaxi.cpp
+    src/SB/Game/zTextBox.cpp
+    src/SB/Game/zThrown.cpp
+    src/SB/Game/zUI.cpp
+    src/SB/Game/zUIFont.cpp
+    src/SB/Game/zVar.cpp
+    src/SB/Game/zVolume.cpp
+
+    src/SB/core/x/iCamera.cpp
+    src/SB/core/x/xAnim.cpp
+    src/SB/core/x/xBase.cpp
+    src/SB/core/x/xBehaveGoalSimple.cpp
+    src/SB/core/x/xBehaveMgr.cpp
+    src/SB/core/x/xBehaviour.cpp
+    src/SB/core/x/xbinio.cpp
+    src/SB/core/x/xBound.cpp
+    src/SB/core/x/xCamera.cpp
+    src/SB/core/x/xClimate.cpp
+    src/SB/core/x/xClumpColl.cpp
+    src/SB/core/x/xCM.cpp
+    src/SB/core/x/xCollide.cpp
+    src/SB/core/x/xCollideFast.cpp
+    src/SB/core/x/xColor.cpp
+    src/SB/core/x/xCounter.cpp
+    src/SB/core/x/xCurveAsset.cpp
+    src/SB/core/x/xCutscene.cpp
+    src/SB/core/x/xDebug.cpp
+    src/SB/core/x/xDecal.cpp
+    src/SB/Core/x/xEnt.cpp
+    src/SB/core/x/xEntBoulder.cpp
+    src/SB/core/x/xEntDrive.cpp
+    src/SB/core/x/xEntMotion.cpp
+    src/SB/core/x/xEnv.cpp
+    src/SB/core/x/xEvent.cpp
+    src/SB/core/x/xFactory.cpp
+    src/SB/core/x/xFFX.cpp
+    src/SB/core/x/xFog.cpp
+    src/SB/core/x/xFont.cpp
+    src/SB/core/x/xFX.cpp
+    src/SB/core/x/xGrid.cpp
+    src/SB/core/x/xGroup.cpp
+    src/SB/core/x/xhipio.cpp
+    src/SB/core/x/xHud.cpp
+    src/SB/core/x/xHudFontMeter.cpp
+    src/SB/core/x/xHudMeter.cpp
+    src/SB/core/x/xHudModel.cpp
+    src/SB/core/x/xHudText.cpp
+    src/SB/core/x/xHudUnitMeter.cpp
+    src/SB/core/x/xIni.cpp
+    src/SB/core/x/xJaw.cpp
+    src/SB/core/x/xJSP.cpp
+    src/SB/core/x/xLaserBolt.cpp
+    src/SB/core/x/xLightKit.cpp
+    src/SB/core/x/xMath.cpp
+    src/SB/core/x/xMath2.cpp
+    src/SB/core/x/xMath3.cpp
+    src/SB/core/x/xMemMgr.cpp
+    src/SB/core/x/xModel.cpp
+    src/SB/core/x/xModelBucket.cpp
+    src/SB/core/x/xMorph.cpp
+    src/SB/core/x/xMovePoint.cpp
+    src/SB/core/x/xNPCBasic.cpp
+    src/SB/core/x/xordarray.cpp
+    src/SB/core/x/xPad.cpp
+    src/SB/core/x/xPar.cpp
+    src/SB/core/x/xParCmd.cpp
+    src/SB/core/x/xParEmitter.cpp
+    src/SB/core/x/xParEmitterType.cpp
+    src/SB/core/x/xParGroup.cpp
+    src/SB/core/x/xParMgr.cpp
+    src/SB/core/x/xParSys.cpp
+    src/SB/core/x/xPartition.cpp
+    src/SB/core/x/xpkrsvc.cpp
+    src/SB/core/x/xPtankPool.cpp
+    src/SB/core/x/xQuickCull.cpp
+    src/SB/core/x/xRenderState.cpp
+    src/SB/core/x/xRMemData.cpp
+    src/SB/core/x/xsavegame.cpp
+    src/SB/core/x/xScene.cpp
+    src/SB/core/x/xScrFx.cpp
+    src/SB/core/x/xserializer.cpp
+    src/SB/core/x/xSFX.cpp
+    src/SB/core/x/xShadow.cpp
+    src/SB/core/x/xShadowSimple.cpp
+    src/SB/core/x/xSkyDome.cpp
+    src/SB/core/x/xSnd.cpp
+    src/SB/core/x/xSpline.cpp
+    src/SB/core/x/xstransvc.cpp
+    src/SB/core/x/xString.cpp
+    src/SB/core/x/xSurface.cpp
+    src/SB/core/x/xTimer.cpp
+    src/SB/core/x/xTRC.cpp
+    src/SB/core/x/xUpdateCull.cpp
+    src/SB/core/x/xutil.cpp
+    src/SB/core/x/xVec3.cpp
+    src/SB/core/x/xVolume.cpp
+
+    ${PLATFORM_SOURCES}
+)
+
+# ------ collision test -------------------
+add_executable(test_collision)
+target_link_libraries(test_collision PRIVATE librwc)
+target_sources(test_collision
+    PRIVATE
+    src/librwc/test/collision.cpp
+)
+
+enable_testing()
+add_test(NAME test_collision COMMAND test_collision)

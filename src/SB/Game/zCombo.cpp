@@ -13,7 +13,7 @@
 struct zComboReward
 {
     S32 reward;
-    char* textName;
+    const char* textName;
     U32 rewardList[10];
     U32 rewardNum;
     xTextAsset* textAsset;

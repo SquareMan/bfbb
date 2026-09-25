@@ -54,7 +54,7 @@ xLightKit* xLightKit_Prepare(void* data)
         if (currlight->type >= 2)
         {
             RwFrame* frame = RwFrameCreate();
-            RwMatrixTag tmpmat;
+            RwMatrix tmpmat;
 
             memset(&tmpmat, 0, 64);
             tmpmat.right.x = -currlight->matrix[0];
@@ -73,7 +73,7 @@ xLightKit* xLightKit_Prepare(void* data)
             RwV3dNormalize(&tmpmat.up, &tmpmat.up);
             RwV3dNormalize(&tmpmat.at, &tmpmat.at);
             RwFrameTransform(frame, &tmpmat, rwCOMBINEREPLACE);
-            _rwObjectHasFrameSetFrame(currlight->platLight, frame);
+            RpLightSetFrame(currlight->platLight, frame);
         }
         if (currlight->type >= 3)
         {
@@ -135,11 +135,11 @@ void xLightKit_Destroy(xLightKit* lkit)
     {
         if (currLight->platLight != NULL)
         {
-            _rwFrameSyncDirty();
+            RwFrameSyncDirty();
             RwFrame* tframe = (RwFrame*)(currLight->platLight->object).object.parent;
             if (tframe != NULL)
             {
-                _rwObjectHasFrameSetFrame(currLight->platLight, 0);
+                RpLightSetFrame(currLight->platLight, 0);
                 RwFrameDestroy(tframe);
             }
             RpLightDestroy(currLight->platLight);

@@ -18,9 +18,10 @@
 #include "xSnd.h"
 #include "xCollide.h"
 #include "zNPCTypes.h"
-#include <PowerPC_EABI_Support\MSL_C\MSL_Common\cstring>
+
 #include <stdio.h>
-#include <PowerPC_EABI_Support\MSL_C\MSL_Common\stdlib.h>
+#include <cstring>
+#include <stdlib.h>
 
 void zEntInit(zEnt* ent, xEntAsset* asset, U32 type)
 {
@@ -410,8 +411,9 @@ void zEntAnimEvent(zEnt* ent, U32 animEvent, const F32* animParam)
     {
         switch (animEvent)
         {
-        case 0xc3:
-        case 0xc4:
+        case eEventAnimPlay:
+        case eEventAnimPlayLoop:
+        {
             if (animParam == NULL)
             {
                 break;
@@ -424,7 +426,7 @@ void zEntAnimEvent(zEnt* ent, U32 animEvent, const F32* animParam)
             }
 
             char name[12];
-            if (animEvent == 0xc4)
+            if (animEvent == eEventAnimPlayLoop)
             {
                 sprintf(name, "loop%d", anum);
             }
@@ -454,7 +456,8 @@ void zEntAnimEvent(zEnt* ent, U32 animEvent, const F32* animParam)
                        0.0f, SND_CAT_GAME, 0.0f);
 
             break;
-        case 0xc5:
+        }
+        case eEventAnimStop:
             if (strcmp(single->State->Name, "idle") == 0)
             {
                 break;
@@ -466,13 +469,13 @@ void zEntAnimEvent(zEnt* ent, U32 animEvent, const F32* animParam)
 
             single->State = xAnimTableGetState(ent->atbl, name2);
             break;
-        case 0xc6:
+        case eEventAnimPause:
             single->CurrentSpeed = 0.0f;
             break;
-        case 199:
+        case eEventAnimResume:
             single->CurrentSpeed = 1.0f;
             break;
-        case 200:
+        case eEventAnimTogglePause:
             if (single->CurrentSpeed)
             {
                 single->CurrentSpeed = 0.0f;
@@ -482,7 +485,8 @@ void zEntAnimEvent(zEnt* ent, U32 animEvent, const F32* animParam)
                 single->CurrentSpeed = 1.0f;
             }
             break;
-        case 0xc9:
+        case eEventAnimPlayRandom:
+        {
             if (animParam == NULL)
             {
                 break;
@@ -513,7 +517,9 @@ void zEntAnimEvent(zEnt* ent, U32 animEvent, const F32* animParam)
             xAnimPlayUpdate(play, 0.0f);
             xAnimPlayEval(play);
             break;
-        case 0xca:
+        }
+        case eEventAnimPlayMaybe:
+        {
             if (animParam == NULL)
             {
                 break;
@@ -544,17 +550,18 @@ void zEntAnimEvent(zEnt* ent, U32 animEvent, const F32* animParam)
             }
             break;
         }
+        }
     }
 }
 
 U32 g_hash_xentanim[5] = { 0 };
-char* g_strz_xentanim[5] = {
+const char* g_strz_xentanim[5] = {
     "Idle01", "Anim02", "Anim03", "Anim04", "Anim05",
 };
 // Thank you floating point memes. Very cool.
 xAnimTable* xEnt_AnimTable_AutoEventSmall()
 {
-    char** names = g_strz_xentanim;
+    const char** names = g_strz_xentanim;
     U32* hash = g_hash_xentanim;
     xAnimTransition* deftran = NULL;
     if (*hash == 0)
@@ -606,6 +613,7 @@ void zEntAnimEvent_AutoAnim(zEnt* ent, U32 animEvent, const F32* animParam)
     {
     case 0xc3:
     case 0xc4:
+    {
         if (animParam == NULL)
         {
             break;
@@ -647,7 +655,9 @@ void zEntAnimEvent_AutoAnim(zEnt* ent, U32 animEvent, const F32* animParam)
         xAnimPlayUpdate(play, 0.0f);
         xAnimPlayEval(play);
         break;
+    }
     case 0xc5:
+    {
         xAnimTable* tab2 = ent->model->Anim->Table;
         if (tab2 == NULL)
         {
@@ -663,6 +673,7 @@ void zEntAnimEvent_AutoAnim(zEnt* ent, U32 animEvent, const F32* animParam)
             xAnimPlayEval(play);
         }
         break;
+    }
     case 0xc6:
         single->CurrentSpeed = 0.0f;
         break;
@@ -680,6 +691,7 @@ void zEntAnimEvent_AutoAnim(zEnt* ent, U32 animEvent, const F32* animParam)
         }
         break;
     case 0xc9:
+    {
         if (animParam == NULL)
         {
             break;
@@ -719,6 +731,7 @@ void zEntAnimEvent_AutoAnim(zEnt* ent, U32 animEvent, const F32* animParam)
         xAnimPlayUpdate(play, 0.0f);
         xAnimPlayEval(play);
         break;
+    }
     case 0xca:
         if (xUtil_yesno(0.01f * animParam[1]) != 0)
         {
@@ -917,24 +930,3 @@ void zEntGetShadowParams(xEnt* ent, xVec3* center, F32* radius, xEntShadow::radi
         }
     }
 }
-
-void xModelAnimCollStop(xModelInstance& m)
-{
-    m.Flags = m.Flags & 0xe7ff;
-}
-
-xMat4x3* xEntGetFrame(const xEnt* ent)
-{
-    return xModelGetFrame(ent->model);
-}
-
-void xSndPlay3D(U32 id, F32 vol, F32 pitch, U32 priority, U32 flags, const xVec3* pos, F32 radius,
-                sound_category category, F32 delay)
-{
-    xSndPlay3D(id, vol, pitch, priority, flags, pos, radius / 4.0f, radius, category, delay);
-}
-
-S32 xNPCBasic::SelfType() const
-{
-    return myNPCType;
-};

@@ -104,7 +104,7 @@ zSaveLoadUI zSaveLoadUITable[62] = { { 0, 0, "ld gameslot group" },
                                      { 60, 0, "ld damaged save game" },
                                      { 0, 0, NULL } };
 
-char* thumbIconMap[15] = { "ThumbIconHB", "ThumbIconJF", "ThumbIconBB", "ThumbIconGL",
+const char* thumbIconMap[15] = { "ThumbIconHB", "ThumbIconJF", "ThumbIconBB", "ThumbIconGL",
                            "ThumbIconB1", "ThumbIconRB", "ThumbIconBC", "ThumbIconSM",
                            "ThumbIconB2", "ThumbIconKF", "ThumbIconGY", "ThumbIconDB",
                            "ThumbIconB3", "ThumbIconHB", "ThumbIconHB" };
@@ -153,7 +153,7 @@ void zUpdateThumbIcon()
 
 void zSaveLoad_Tick()
 {
-    time_current = (1.0f / (GET_BUS_FREQUENCY() / 4)) * (float)iTimeGet();
+    time_current = (1.0f / (U32)(ITIME_FROM_SECS(1))) * (F32)iTimeGet();
 
     time_elapsed = time_current - time_last;
     if (time_elapsed < 0.0f)
@@ -178,7 +178,7 @@ void zSaveLoad_Tick()
     xParMgrUpdate(time_elapsed);
     zSceneUpdate(time_elapsed);
 
-    xMat4x3 playerMat = *xEntGetFrame(&(xEnt)globals.player.ent);
+    xMat4x3 playerMat = *xEntGetFrame(&globals.player.ent);
     playerMat.pos.y += 0.6f;
 
     xSndSetListenerData(SND_LISTENER_CAMERA, &globals.camera.mat);
@@ -362,6 +362,7 @@ S32 format(S32 num, S32 mode)
         }
         break;
     case 1:
+    {
         S32 tgtslot = xSGTgtPhysSlotIdx(data, 0);
         if (tgtslot != num)
         {
@@ -386,6 +387,7 @@ S32 format(S32 num, S32 mode)
             }
         }
         break;
+    }
     case 0:
         rc = 5;
         zSaveLoadSGDone(data);
@@ -753,6 +755,7 @@ S32 zSaveLoad_CardCheckSingle(S32 num)
         xSGDone(ldinst);
         return 1;
     case 1:
+    {
         int tgtslot = xSGTgtPhysSlotIdx(ldinst, 0);
         xSGDone(ldinst);
         wrongDevice = iSGCheckForWrongDevice();
@@ -771,6 +774,7 @@ S32 zSaveLoad_CardCheckSingle(S32 num)
                 return 0;
             }
         }
+    }
     case 0:
         wrongDevice = iSGCheckForWrongDevice();
         if (wrongDevice >= 0)
@@ -809,6 +813,7 @@ S32 zSaveLoad_CardCheckFormattedSingle(S32 num)
         }
         break;
     case 1:
+    {
         S32 tgtslot = xSGTgtPhysSlotIdx(ldinst, 0);
         if (tgtslot != num)
         {
@@ -831,6 +836,7 @@ S32 zSaveLoad_CardCheckFormattedSingle(S32 num)
             }
         }
         break;
+    }
     case 0:
         rc = -1;
         break;
@@ -885,6 +891,7 @@ S32 zSaveLoad_CardCheckSpaceSingle(S32 num)
         }
         break;
     case 1:
+    {
         S32 tgtslot = xSGTgtPhysSlotIdx(ldinst, 0);
         if (tgtslot != num)
         {
@@ -895,6 +902,7 @@ S32 zSaveLoad_CardCheckSpaceSingle(S32 num)
             rc = zSaveLoad_CardCheckSpaceSingle_doCheck(ldinst, 0);
         }
         break;
+    }
     case 0:
         rc = 5;
         break;
@@ -947,6 +955,7 @@ S32 zSaveLoad_CardCheckGamesSingle(S32 num)
         }
         break;
     case 1:
+    {
         S32 tgtslot = xSGTgtPhysSlotIdx(ldinst, 0);
         if (tgtslot != num)
         {
@@ -957,6 +966,7 @@ S32 zSaveLoad_CardCheckGamesSingle(S32 num)
             rc = zSaveLoad_CardCheckGamesSingle_doCheck(ldinst, 0);
         }
         break;
+    }
     case 0:
         rc = 5;
         break;
@@ -1007,6 +1017,7 @@ S32 zSaveLoad_CardCheckSlotEmpty_hasGame(S32 num, S32 game)
         }
         break;
     case 1:
+    {
         S32 tgtslot = xSGTgtPhysSlotIdx(ldinst, 0);
         if (tgtslot != num)
         {
@@ -1017,6 +1028,7 @@ S32 zSaveLoad_CardCheckSlotEmpty_hasGame(S32 num, S32 game)
             rc = zSaveLoad_CardCheckSlotEmpty_hasGame_doCheck(ldinst, 0, game);
         }
         break;
+    }
     case 0:
         rc = -1;
         break;
@@ -1668,7 +1680,13 @@ void zSaveLoadAutoSaveUpdate()
     if (physicalSlot >= 0)
     {
         autoSaveCard = physicalSlot;
+#ifdef GAMECUBE
         switch (CARDProbeEx(physicalSlot, &out1, &out2))
+#else
+        // FIXME: Using this means that the save UI will never detect a failed save
+        // 99% of the time on modern platforms that's probably fine but we probably do want to detect it eventually
+        switch(0)
+#endif
         {
         case 0:
         case -1:
@@ -1775,6 +1793,8 @@ S32 zSaveLoad_DoAutoSave()
                 break;
             case XSG_ASTAT_FAILED:
                 success = false;
+                break;
+            default:
                 break;
             }
         }
@@ -2268,6 +2288,7 @@ void zSaveLoad_DispatchCB(U32 dispatchEvent, const F32* toParam)
         promptSel = 3;
         break;
     case 0xab:
+    {
         currentCard = (int)*toParam;
         en_SAVEGAME_MODE mode = XSG_MODE_LOAD;
         if (gGameMode == eGameMode_Save)
@@ -2278,6 +2299,7 @@ void zSaveLoad_DispatchCB(U32 dispatchEvent, const F32* toParam)
         zSaveLoad_CardCheckSpaceSingle_doCheck(inst, currentCard);
         xSGDone(inst);
         break;
+    }
     case 0xac:
         currentGame = (int)*toParam;
         break;
@@ -2365,9 +2387,8 @@ S32 xSGT_LoadPrefsCB(void* vp, st_XSAVEGAME_DATA* xsgdata, st_XSAVEGAME_READCONT
 
 U32 zSaveLoad_slotIsEmpty(U32 i)
 {
-    // TODO: Fix this hardcoded offset once string generation is correct
     char* label = zSaveLoadGameTable[i].label;
-    return strcmp(label, "ld gameslot group" + 0x49c) == 0 ? 1 : 0;
+    return strcmp(label, "Empty") == 0 ? 1 : 0;
 }
 
 S32 XSGAutoData::LastPhysicalSlot()

@@ -91,7 +91,5 @@ void zAssetStartup();
 void zAssetShutdown();
 void FootstepHackSceneEnter();
 
-U32 xSndPlay3D(U32 id, F32 vol, F32 pitch, U32 priority, U32 flags, xEnt* pos, F32 radius,
-               sound_category category, F32 delay);
 
 #endif

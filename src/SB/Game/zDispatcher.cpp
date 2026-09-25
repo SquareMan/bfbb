@@ -10,6 +10,7 @@
 #include "zHud.h"
 #include "zFMV.h"
 #include "zSaveLoad.h"
+#include "zMenu.h"
 #include "xMemMgr.h"
 #include "xScrFx.h"
 #include "xCM.h"
@@ -29,7 +30,6 @@ S32 g_zdsp_init;
 
 st_ZDISPATCH_DEPOT g_zdsp_depot = { 0 };
 
-extern U8 menu_fmv_played;
 extern char zEventLogBuf[20][256];
 
 void zDispatcher_Startup()
@@ -329,6 +329,8 @@ static S32 ZDSP_doCommand(st_ZDISPATCH_DATA* dspdata, st_ZDISPATCH_CONTEXT* cmdC
     case ZDSP_CMD_SNDVOL_DECR:
     case ZDSP_CHECKPNT_SET:
         break;
+    default:
+        break;
     }
     return 1;
 }
@@ -505,10 +507,12 @@ static S32 ZDSP_elcb_event(xBase*, xBase* xb, U32 toEvent, const F32* toParam, x
         zhud::hide();
         break;
     case eEventDispatcher_FadeOut:
+    {
         iColor_tag black = { 0x00, 0x00, 0x00, 0xFF };
         iColor_tag clear = { 0x00, 0x00, 0x00, 0x00 };
         xScrFxFade(&clear, &black, *toParam, NULL, 1);
         break;
+    }
     case eEventPlayMovie:
         menu_fmv_played = 1;
         zFMVPlay(zFMVFileGetName((eFMVFile)(U32)*toParam), 0x10001, 0.1f, 1, 0);
@@ -536,6 +540,7 @@ static S32 ZDSP_elcb_event(xBase*, xBase* xb, U32 toEvent, const F32* toParam, x
         break;
 
     case eEventDispatcherAssert:
+    {
         char events[512] = { };
         char log[512];
         U32 c;
@@ -557,6 +562,7 @@ static S32 ZDSP_elcb_event(xBase*, xBase* xb, U32 toEvent, const F32* toParam, x
         }
         strncpy(log, events, 0x200);
         break;
+    }
     case eEventStoreOptions:
         zDispatcherStoreOptions();
         break;

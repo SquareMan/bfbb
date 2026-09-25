@@ -256,7 +256,11 @@ struct NPCHazard
     S32 GrabModel(en_hazmodel which);
     void TypData_RotMatStore(xVec3* euler);
     void FreeModel();
-    void SetNPCOwner(zNPCCommon* owner);
+    void SetNPCOwner(zNPCCommon* owner)
+    {
+        this->npc_owner = owner;
+    }
+
     void Start(const xVec3* pos, F32 tym);
     void MarkForRecycle();
     void Kill();
@@ -265,7 +269,11 @@ struct NPCHazard
     void PosSet(const xVec3* pos);
     void Timestep(F32 dt);
     void Render();
-    void NotifyCBSet(HAZNotify* noter);
+    void NotifyCBSet(HAZNotify* noter)
+    {
+        this->cb_notify = noter;
+    }
+
     void SetAlpha(F32 alpha);
     void OrientToDir(const xVec3* vec_path, S32 doTheTwist);
     S32 ColTestSphere(const xBound* bnd_tgt, F32 rad);

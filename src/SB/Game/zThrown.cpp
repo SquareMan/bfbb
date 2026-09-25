@@ -10,6 +10,7 @@
 #include "xEntBoulder.h"
 #include "xMathInlines.h"
 #include "xstransvc.h"
+#include "xSnd.h"
 #include "zEntButton.h"
 #include "zFX.h"
 #include "zGoo.h"

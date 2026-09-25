@@ -254,6 +254,8 @@ void zShrapnel_SceneInit(zScene* sc)
             case eFragLightning:
                 fasset = (zFragAsset*)((zFragLightningAsset*)fasset + 1);
                 break;
+            default:
+                break;
             }
         }
     }
@@ -418,6 +420,8 @@ void zShrapnel_DefaultInit(zShrapnelAsset* shrap, xModelInstance* parent, xVec3*
         case eFragLightning:
             fasset = (zFragAsset*)((zFragLightningAsset*)fasset + 1);
             break;
+        default:
+            break;
         }
 
         curr++;
@@ -443,7 +447,7 @@ static void CinFragCB(zFrag* frag, zFragAsset* asset)
 }
 
 // equivalent
-void zShrapnel_CinematicInit(zShrapnelAsset* shrap, RpAtomic* cinModel, RwMatrixTag* animMat,
+void zShrapnel_CinematicInit(zShrapnelAsset* shrap, RpAtomic* cinModel, RwMatrix* animMat,
                              xVec3* initVel, void (*cb)(zFrag*, zFragAsset*))
 {
     S32 i;
@@ -592,6 +596,7 @@ void zFragLoc_InitDir(zFragLocation* loc, xVec3* vec, xModelInstance* parent)
         xMat3x3RMulVec(vec, (xMat3x3*)parent->Mat, &loc->info.bone.offset);
         break;
     case eFragLocBoneLocal:
+    {
         S32 index = loc->info.bone.index;
         if (index >= parent->BoneCount)
         {
@@ -610,6 +615,7 @@ void zFragLoc_InitDir(zFragLocation* loc, xVec3* vec, xModelInstance* parent)
             xMat3x3RMulVec(vec, (xMat3x3*)&tmpMat, &loc->info.bone.offset);
         }
         break;
+    }
     case eFragLocTag:
         iModelTagEval(parent->Data, &loc->info.tag, parent->Mat, vec);
         break;
@@ -625,6 +631,7 @@ void zFrag_DefaultInit(zFrag* frag, zFragAsset* fasset)
     switch (fasset->type)
     {
     case eFragProjectile:
+    {
         zFragProjectileAsset* passet = (zFragProjectileAsset*)fasset;
 
         frag->info.projectile.fasset = passet;
@@ -661,8 +668,9 @@ void zFrag_DefaultInit(zFrag* frag, zFragAsset* fasset)
             }
         }
         break;
-
+    }
     case eFragLightning:
+    {
         zFragLightningAsset* lasset = (zFragLightningAsset*)fasset;
 
         frag->info.lightning.fasset = lasset;
@@ -674,8 +682,9 @@ void zFrag_DefaultInit(zFrag* frag, zFragAsset* fasset)
             zFragLoc_Setup(&lasset->end, frag->parent[1]);
         }
         break;
-
+    }
     case eFragParticle:
+    {
         zFragParticleAsset* prasset = (zFragParticleAsset*)fasset;
 
         frag->info.particle.fasset = prasset;
@@ -687,8 +696,9 @@ void zFrag_DefaultInit(zFrag* frag, zFragAsset* fasset)
             zFragLoc_Setup(&prasset->vel, frag->parent[0]);
         }
         break;
-
+    }
     case eFragSound:
+    {
         zFragSoundAsset* sasset = (zFragSoundAsset*)fasset;
 
         frag->info.sound.fasset = sasset;
@@ -700,7 +710,10 @@ void zFrag_DefaultInit(zFrag* frag, zFragAsset* fasset)
             zFragLoc_InitVec(&sasset->source, &frag->info.sound.location, frag->parent[0]);
         }
         break;
+    }
     case eFragShockwave:
+        break;
+    default:
         break;
     }
 }
@@ -1653,6 +1666,8 @@ static void zShrapnel_GlobalRobotInit(zShrapnelAsset* shrap, xModelInstance* par
         case eFragLightning:
             fasset = (zFragAsset*)((zFragLightningAsset*)fasset + 1);
             break;
+        default:
+            break;
         }
 
         curr++;
@@ -1748,6 +1763,8 @@ static void zShrapnel_SpongebobInit(zShrapnelAsset* shrap, xModelInstance* paren
             break;
         case eFragLightning:
             fasset = (zFragAsset*)((zFragLightningAsset*)fasset + 1);
+            break;
+        default:
             break;
         }
 

@@ -126,7 +126,10 @@ void zSurfaceRegisterMapper(U32 assetId)
     zMaterialMapAsset* mapper = (zMaterialMapAsset*)xSTFindAsset(assetId, NULL);
     sMapper[sMapperCount] = mapper;
     if (mapper) {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-volatile"
         sMapperCount++;
+#pragma clang diagnostic pop
     }
 }
 

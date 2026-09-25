@@ -622,6 +622,27 @@ extern RwInt32 RpAtomicSetStreamRightsCallBack(RwUInt32 pluginID,
 extern RwInt32 RpAtomicGetPluginOffset(RwUInt32 pluginID);
 extern RpAtomic* RpAtomicSetFrame(RpAtomic* atomic, RwFrame* frame);
 extern RwBool RpAtomicInstance(RpAtomic* atomic);
+
+#define RpGeometryGetTriangles(_geometry) RpGeometryGetTrianglesMacro(_geometry)
+
+#define RpGeometryGetTrianglesMacro(_geometry) ((_geometry)->triangles)
+
+#define RpGeometryGetNumVertices(_geometry) ((_geometry)->numVertices)
+
+#define RpMorphTargetGetVertices(_mt) RpMorphTargetGetVerticesMacro(_mt)
+
+#define RpMorphTargetGetVerticesMacro(_mt) ((_mt)->verts)
+
+#define RpGeometryGetMorphTarget(_geometry, _index) RpGeometryGetMorphTargetMacro(_geometry, _index)
+
+#define RpGeometryGetMorphTargetMacro(_geometry, _index) (&((_geometry)->morphTarget[(_index)]))
+
+#define RpMorphTargetGetVertexNormals(_mt) RpMorphTargetGetVertexNormalsMacro(_mt)
+
+#define RpMorphTargetGetVertexNormalsMacro(_mt) ((_mt)->normals)
+
+#define RpMeshHeaderForAllMeshes(_meshHeader, _fpCallBack, _pData) _rpMeshHeaderForAllMeshes(_meshHeader, _fpCallBack, _pData)
+
 extern RpGeometry* RpGeometryCreateSpace(RwReal radius);
 extern const RpMorphTarget* RpMorphTargetCalcBoundingSphere(const RpMorphTarget* morphTarget,
                                                             RwSphere* boundingSphere);

@@ -3,8 +3,8 @@
 #include <rwplcore.h>
 
 #include <types.h>
-#include <PowerPC_EABI_Support\MSL_C\MSL_Common\cstdlib>
-#include <PowerPC_EABI_Support\MSL_C\MSL_Common\cstring>
+#include <cstdlib>
+#include <cstring>
 
 char* TrimWhitespace(char* string)
 {
@@ -84,7 +84,7 @@ xIniFile* xIniParse(char* buf, S32 len)
         buf[0] = '\0';
     }
 
-    char* ltoken;
+    CChar* ltoken;
     char* line = xStrTok(buf, "\n\r", &ltoken);
     if (line == NULL)
     {
@@ -158,7 +158,7 @@ void xIniDestroy(xIniFile* ini)
     RwFree(ini);
 }
 
-S32 xIniGetIndex(xIniFile* ini, char* tok)
+S32 xIniGetIndex(xIniFile* ini, CChar* tok)
 {
     for (S32 i = 0; i < ini->NumValues; i++)
     {
@@ -171,7 +171,7 @@ S32 xIniGetIndex(xIniFile* ini, char* tok)
     return -1;
 }
 
-S32 xIniGetInt(xIniFile* ini, char* tok, S32 def)
+S32 xIniGetInt(xIniFile* ini, CChar* tok, S32 def)
 {
     S32 index = xIniGetIndex(ini, tok);
     if (index == -1)
@@ -181,7 +181,7 @@ S32 xIniGetInt(xIniFile* ini, char* tok, S32 def)
     return atoi(ini->Values[index].val);
 }
 
-F32 xIniGetFloat(xIniFile* ini, char* tok, F32 def)
+F32 xIniGetFloat(xIniFile* ini, CChar* tok, F32 def)
 {
     S32 index = xIniGetIndex(ini, tok);
     if (index == -1)
@@ -191,7 +191,7 @@ F32 xIniGetFloat(xIniFile* ini, char* tok, F32 def)
     return atof(ini->Values[index].val);
 }
 
-char* xIniGetString(xIniFile* ini, char* tok, char* def)
+CChar* xIniGetString(xIniFile* ini, CChar* tok, CChar* def)
 {
     S32 index = xIniGetIndex(ini, tok);
     if (index == -1)

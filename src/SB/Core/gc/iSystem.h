@@ -5,6 +5,8 @@
 #include <types.h>
 #include <dolphin.h>
 
+#define iSystemPaceFrame()
+
 extern "C" {
 void* malloc(U32 __size);
 void free(void* __ptr);

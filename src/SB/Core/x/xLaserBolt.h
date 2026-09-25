@@ -118,8 +118,8 @@ struct xLaserBoltEmitter
     void attach_effects(fx_when_enum when, effect_data* fx, size_t fxsize);
     void pre_collide(bolt& b);
     void collide_update(bolt& b);
-    RxObjSpace3DVertex* render(bolt& b, RxObjSpace3DVertex* vert);
-    RxObjSpace3DVertex* get_vert_buffer(S32& dat);
+    RwIm3DVertex* render(bolt& b, RwIm3DVertex* vert);
+    RwIm3DVertex* get_vert_buffer(S32& dat);
     void apply_damage(bolt& b);
     void reset_fx(fx_when_enum when);
     void update_fx(bolt& b, F32 prev_dist, F32 dt);
@@ -178,7 +178,7 @@ struct xLaserBoltEmitter
     {
     }
 
-    void flush_verts(RxObjSpace3DVertex* verts, S32 num_verts)
+    void flush_verts(RwIm3DVertex* verts, S32 num_verts)
     {
         RwIm3DTransform(verts, num_verts, NULL, 0x19);
         RwIm3DRenderPrimitive(rwPRIMTYPETRILIST);
@@ -201,14 +201,14 @@ struct xLaserBoltEmitter
     {
     }
 
-    void set_vert(RxObjSpace3DVertex& vert, const xVec3& loc, F32 u, F32 v, U8 alpha)
+    void set_vert(RwIm3DVertex& vert, const xVec3& loc, F32 u, F32 v, U8 alpha)
     {
         RwIm3DVertexSetPos(&vert, loc.x, loc.y, loc.z);
         RwIm3DVertexSetUV(&vert, u, v);
         RwIm3DVertexSetRGBA(&vert, 255, 255, 255, alpha);
     }
 
-    void set_bolt_verts(RxObjSpace3DVertex* vert, const xVec3& pointA, const xVec3& pointB,
+    void set_bolt_verts(RwIm3DVertex* vert, const xVec3& pointA, const xVec3& pointB,
                         U8 alpha, const xVec3& half_right)
     {
         F32 u0 = cfg.bolt_uv[0].x;

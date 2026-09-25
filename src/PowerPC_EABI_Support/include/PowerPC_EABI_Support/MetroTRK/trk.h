@@ -1,9 +1,10 @@
 #ifndef _DOLPHIN_TRK_H
 #define _DOLPHIN_TRK_H
 
-#include "types.h"
 #include "PowerPC_EABI_Support/MetroTRK/trktypes.h"
 #include "PowerPC_EABI_Support/MetroTRK/ppc_reg.h"
+
+#include <stddef.h>
 
 #ifdef __cplusplus
 extern "C" {
