@@ -1191,6 +1191,11 @@ void xCameraSetScene(xCamera* cam, xScene* sc)
     iCameraAssignEnv(cam->lo_cam, sc->env->geom);
 }
 
+static void deadstripped_xBound_as(xBound* b)
+{
+    *b = xBound();
+}
+
 void xCameraSetTargetMatrix(xCamera* cam, xMat4x3* mat)
 {
     cam->tgt_mat = mat;

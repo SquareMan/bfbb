@@ -24,23 +24,6 @@
 #include <rpskin.h>
 #include <cstdlib>
 
-// SLOP: put in header
-template<>
-void tier_queue<xFXRibbon::joint_data>::clear()
-{
-    u32 block = get_block(first);
-    u32 last = wrap_block(block + get_block(_size + alloc->block_size() - 1));
-
-    while (block != last)
-    {
-        alloc->free_block(blocks[block]);
-        block = wrap_block(block + 1);
-    }
-
-    _size = 0;
-    first = 0;
-}
-
 // no clue why this file is so out of order
 
 /* boot.HIP texture IDs */
@@ -3366,11 +3349,6 @@ bool xFXRibbon::need_update() const
 bool xFXRibbon::debug_need_update() const
 {
     return false;
-}
-
-void xFXRibbon::clear()
-{
-    joints.clear();
 }
 
 bool xFXRibbon::visible() const

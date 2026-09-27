@@ -10,9 +10,14 @@ namespace std
         return (float)atan2((double)y, (double)x);
     }
 
+    inline float atanf(float x)
+    {
+        return (float)::atan(x);
+    }
+
     inline float atan(float x)
     {
-        return (float)atan((double)x);
+        return (float)std::atanf(x);
     }
 
     inline float sinf(float x)

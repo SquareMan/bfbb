@@ -62,7 +62,6 @@ zGlobals globals;
 xGlobals* xglobals = &globals;
 
 S32 percentageDone;
-extern _tagxPad* gDebugPad;
 static S32 sShowMenuOnBoot = 1;
 F32 gSkipTimeCutscene = 1.0f;
 F32 gSkipTimeFlythrough = 1.0f;

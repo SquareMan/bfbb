@@ -72,7 +72,11 @@ struct xVec2
         return xsqrt(length2());
     }
 
-    F32 length2() const;
+    F32 length2() const
+    {
+        return x * x + y * y;
+    }
+
     xVec2 normal() const
     {
         xVec2 tmp = *this;
@@ -155,8 +159,19 @@ struct xVec2
         return *this;
     }
 
-    xVec2& operator-=(const xVec2&);
-    xVec2 operator-(const xVec2&) const;
+    xVec2& operator-=(const xVec2& v)
+    {
+        x -= v.x;
+        y -= v.y;
+        return *this;
+    }
+
+    xVec2 operator-(const xVec2& v) const
+    {
+        xVec2 vec = *this;
+        vec -= v;
+        return vec;
+    }
 };
 
 F32 xVec2Dist(F32 x1, F32 y1, F32 x2, F32 y2);
