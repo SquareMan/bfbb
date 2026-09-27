@@ -262,8 +262,23 @@ template <class T> struct tier_queue
         }
     }
 
-    void clear();
+    void clear()
+    {
+        u32 block = get_block(first);
+        u32 last = wrap_block(block + get_block(_size + alloc->block_size() - 1));
+
+        while (block != last)
+        {
+            alloc->free_block(blocks[block]);
+            block = wrap_block(block + 1);
+        }
+
+        _size = 0;
+        first = 0;
+    }
 };
+
+
 
 template <class T> struct static_queue
 {

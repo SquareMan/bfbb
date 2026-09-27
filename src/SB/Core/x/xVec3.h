@@ -3,6 +3,8 @@
 
 #include <types.h>
 
+#include "xMath.h"
+
 struct xVec3
 {
     F32 x;
@@ -40,7 +42,14 @@ struct xVec3
         x = y = z = f;
         return *this;
     }
-    xVec3 operator+(const xVec3&) const;
+
+    xVec3 operator+(const xVec3& v) const
+    {
+        xVec3 vec = *this;
+        vec += v;
+        return vec;
+    }
+
     xVec3 operator+(F32) const;
     xVec3 operator-(const xVec3&) const;
     xVec3 operator-() const
@@ -55,8 +64,22 @@ struct xVec3
     }
     xVec3 operator*(F32) const;
     xVec3 operator*(const xVec3&) const;
-    xVec3 operator/(F32) const;
-    xVec3& operator+=(const xVec3&);
+    xVec3 operator/(F32 f) const
+    {
+        xVec3 vec = *this;
+        vec /= f;
+        return vec;
+    }
+    
+    xVec3& operator+=(const xVec3& v)
+    {
+        x += v.x;
+        y += v.y;
+        z += v.z;
+        return *this;
+    }
+
+
     xVec3& operator+=(F32 f)
     {
         this->x += f;
@@ -109,7 +132,11 @@ struct xVec3
         return inverse.invert();
     }
 
-    F32 dot(const xVec3& c) const;
+    F32 dot(const xVec3& v) const
+    {
+        return x * v.x + y * v.y + z * v.z;
+    }
+
 
     xVec3 cross(const xVec3& c) const
     {
@@ -122,10 +149,27 @@ struct xVec3
         return v;
     }
 
-    xVec3& normalize();
+    xVec3& normalize()
+    {
+        *this /= length();
+        return *this;
+    }
+
     xVec3& assign(F32 val);
-    xVec3 get_abs() const;
-    xVec3& set_abs();
+    xVec3 get_abs() const
+    {
+        xVec3 vec = *this;
+        return vec.set_abs();
+    }
+
+    xVec3& set_abs()
+    {
+        x = xabs(x);
+        y = xabs(y);
+        z = xabs(z);
+        return *this;
+    }
+
 };
 
 F32 xVec3Normalize(xVec3* o, const xVec3* v);

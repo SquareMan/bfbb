@@ -621,6 +621,16 @@ S32 xParabolaHitsEnv(xParabola* p, const xEnv* env, xCollis* colls)
     return 0;
 }
 
+static void deadstripped_RwBBox__as(RwBBox* x)
+{
+    *x = RwBBox();
+}
+
+static void deadstripped_xCollis__as(xCollis* c)
+{
+    *c = xCollis();
+}
+
 U32 xBoxHitsSphere(const xBox* a, const xSphere* b, xCollis* coll)
 {
     U32 uVar1;
@@ -2650,64 +2660,6 @@ bool xModelAnimCollDirty(const xModelInstance& cm)
     return (cm.Flags & 0x1800) == 0x800;
 }
 
-// Make these into inline definitions somewhere appropriate later
-xVec3 xVec3::operator+(const xVec3& v) const
-{
-    xVec3 vec = *this;
-    vec += v;
-    return vec;
-}
-
-xVec3& xVec3::operator+=(const xVec3& v)
-{
-    x += v.x;
-    y += v.y;
-    z += v.z;
-    return *this;
-}
-
-xVec3 xVec3::get_abs() const
-{
-    xVec3 vec = *this;
-    return vec.set_abs();
-}
-
-xVec3& xVec3::set_abs()
-{
-    x = xabs(x);
-    y = xabs(y);
-    z = xabs(z);
-    return *this;
-}
-
-F32 xVec3::dot(const xVec3& v) const
-{
-    return x * v.x + y * v.y + z * v.z;
-}
-
-xVec3& xVec3::normalize()
-{
-    *this /= length();
-    return *this;
-}
-
-xVec3 xVec3::operator/(F32 f) const
-{
-    xVec3 vec = *this;
-    vec /= f;
-    return vec;
-}
-
-void xQuickCullForRay(xQCData* q, const xRay3* r)
-{
-    xQuickCullForRay(&xqc_def_ctrl, q, r);
-}
-
-void xQuickCullForBox(xQCData* q, const xBox* box)
-{
-    xQuickCullForBox(&xqc_def_ctrl, q, box);
-}
-
 bool xSphereHitsCapsule(const xVec3& center, F32 radius, const xVec3& v1, const xVec3& v2,
                         F32 width)
 {
@@ -2729,21 +2681,12 @@ bool xSphereHitsCapsule(const xVec3& center, F32 radius, const xVec3& v1, const 
     return ((r1 >= 0.0f && r1 <= 1.0f) || (r2 >= 0.0f && r2 <= 1.0f));
 }
 
-F32 xVec2::length2() const
+static void deadstripped_xVec3__div_f32(xVec3* v)
 {
-    return x * x + y * y;
+    *v / 2.0f;
 }
 
-xVec2 xVec2::operator-(const xVec2& v) const
+static void deadstripped_xQuickCullForRay(xQCData* d, const xRay3* r)
 {
-    xVec2 vec = *this;
-    vec -= v;
-    return vec;
-}
-
-xVec2& xVec2::operator-=(const xVec2& v)
-{
-    x -= v.x;
-    y -= v.y;
-    return *this;
+    xQuickCullForRay(d, r);
 }

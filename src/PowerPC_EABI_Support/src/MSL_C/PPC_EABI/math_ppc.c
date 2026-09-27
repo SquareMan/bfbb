@@ -2,11 +2,34 @@
 #include "PowerPC_EABI_Support/MSL_C/MSL_Common/math_api.h"
 #include "fdlibm.h"
 
-// Generated via math_api.h
-// int __fpclassifyf(float x);
+__declspec(weak) float powf(float __x, float __y)
+{
+    return pow((double)__x, (double)__y);
+}
 
-// Generated via math_api.h
-// int __fpclassifyd(double x);
+__declspec(weak) float sinf(float __x)
+{
+    return sin((double)__x);
+}
+
+__declspec(weak) float cosf(float __x)
+{
+    return cos((double)__x);
+}
+
+__declspec(weak) float atanf(float __x)
+{
+    return atan((double)__x);
+}
+
+// I think this is hack. We need the fpclassify functions to be defined in the header because it's
+// inlined in s_ldexp but the symbol exists in this TU in the final build. I'm not sure how that ended up
+// happening when it seems to be inlined everywhere else in the stdlib, so I turned off inlning for this TU
+// to force it.
+static int deadstripped_fpclassify(float x)
+{
+	return isfinite(x);
+}
 
 /*double scalbn(double x, int y)
 {

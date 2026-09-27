@@ -37,6 +37,8 @@ inline double fabs(double x)
     return __fabs(x);
 }
 
+double tan(double);
+double exp(double);
 double acos(double);
 double asin(double);
 double atan(double);

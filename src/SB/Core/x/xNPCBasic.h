@@ -127,8 +127,15 @@ struct xNPCBasic : xEnt, xFactoryInst
     {
         xEntRender(this);
     }
-    virtual void Save(xSerial*) const;
-    virtual void Load(xSerial*);
+
+    virtual void Save(xSerial*) const
+    {
+    }
+
+    virtual void Load(xSerial*)
+    {
+    }
+
     virtual void CollideReview();
 
     /* These most likely return a combination of XENT_COLLTYPE_* values */

@@ -84,7 +84,10 @@ struct xFXRibbon
 
     bool debug_need_update() const;
 
-    void clear();
+    void clear()
+    {
+        joints.clear();
+    }
 
     void init(const char*, const char*);
     void init(S32, const char* name)

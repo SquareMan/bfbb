@@ -1,6 +1,6 @@
 #include <dolphin/pad.h>
 
-#include "std/math.h"
+#include <math.h>
 
 static const PADClampRegion ClampRegion = {
     // Triggers
