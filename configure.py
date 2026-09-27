@@ -13,6 +13,7 @@
 ###
 
 import argparse
+from copy import copy
 import sys
 from pathlib import Path
 from typing import Any, Dict, List
@@ -134,6 +135,12 @@ parser.add_argument(
     dest="progress",
     action="store_false",
     help="disable progress calculation",
+)
+parser.add_argument(
+    "--bisect",
+    dest="bisect",
+    action="store_true",
+    help="iteratively exclude objects from linking to narrow where an unknown issue comes from"
 )
 args = parser.parse_args()
 
@@ -1254,7 +1261,35 @@ config.custom_build_steps = {
 
 if args.mode == "configure":
     # Write build.ninja and objdiff.json
-    generate_build(config)
+    if not args.bisect:
+        generate_build(config)
+    else:
+        config_copy = copy(config)
+        linked_objects = [o for lib in config_copy.libs for o in lib["objects"] if o.completed]
+        for o in linked_objects:
+            o.completed = False
+
+        while(len(linked_objects) > 1):
+            middle = len(linked_objects) // 2
+            for o in linked_objects[middle:]:
+                o.completed = True
+            
+            print(f"Linking {len(linked_objects[middle:])} new objects")
+            generate_build(config_copy)
+
+            for o in linked_objects[middle:]:
+                o.completed = False
+
+            keep = ""
+            while keep != 'y' and keep != 'n':
+                keep = input("Is issue present? Y/N: ").lower()
+            if keep == 'y':
+                linked_objects = linked_objects[middle:]
+            else:
+                linked_objects = linked_objects[:middle]
+            if len(linked_objects) == 1:
+                print(f"Issue located in {linked_objects[0].name}")
+            
 elif args.mode == "progress":
     # Print progress and write progress.json
     calculate_progress(config)
