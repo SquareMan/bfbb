@@ -20,12 +20,15 @@
 
 // Seems that <wchar.h> uses sse2 intrinsics which aren't included by default?
 #include <immintrin.h>
-#include <SDL3/SDL_error.h>
+#include <semaphore>
 #include <synchapi.h>
 #define SDL_MAIN_HANDLED 1
+#include "SDL3/SDL_dialog.h"
+#include <SDL3/SDL_error.h>
 #include "SDL3/SDL_events.h"
 #include "SDL3/SDL_init.h"
 #include <SDL3/SDL_main.h>
+#include "SDL3/SDL_messagebox.h"
 #include <SDL3/SDL_time.h>
 #include <SDL3/SDL_timer.h>
 #include <SDL3/SDL_video.h>
@@ -117,11 +120,29 @@ static void RenderWareExit()
     rw::Engine::term();
 }
 
+static std::binary_semaphore semWaitForAssetPath{0};
+
+void AssetPathSelectedCallback(void* userdata, const char* const* filelist, int filter)
+{
+    if(filelist == NULL)
+    {
+        printf("Could not open folder picker: %s\n", SDL_GetError());
+        return;
+    }
+
+    const char* assets_folder = filelist[0];
+    printf("Assets Folder: %s\n", assets_folder);
+    // TODO: Cross platformify this
+    SetCurrentDirectory(assets_folder);
+    semWaitForAssetPath.release();
+}
+
 void iSystemInit(U32 options)
 {
-    //FIXME: This absolutely can NOT be hardcoded!!!!
-    SetCurrentDirectory(
-        R"(E:\Games\Xbox\Nickelodeon SpongeBob SquarePants - Battle for Bikini Bottom (USA).xiso\)");
+    // TODO: Cache this to avoid alerting every time we start the game
+    SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION, "Setup", "Press OK to open a folder picker and select the path to your extracted Xbox ISO", NULL);
+    SDL_ShowOpenFolderDialog(AssetPathSelectedCallback, NULL, NULL, NULL, false);
+    semWaitForAssetPath.acquire();
 
     SDL_SetAppMetadata("SpongeBob SquarePants: Battle for Bikini Bottom", "PC Port", "");
     SDL_Init(SDL_INIT_GAMEPAD);
