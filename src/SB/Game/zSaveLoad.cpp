@@ -153,6 +153,7 @@ void zUpdateThumbIcon()
 
 void zSaveLoad_Tick()
 {
+    iSystemPaceFrame();
     time_current = (1.0f / (U32)(ITIME_FROM_SECS(1))) * (F32)iTimeGet();
 
     time_elapsed = time_current - time_last;
