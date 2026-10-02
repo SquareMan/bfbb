@@ -2,6 +2,7 @@
 #define LIBRWC_RTSLERP
 
 #include "rtquat.h"
+#include <string.h>
 
 struct RtQuatSlerpCache
 {
