@@ -760,11 +760,20 @@ static RwCamera* ShadowCameraUpdate(RwCamera* shadowCamera, void* model, void (*
 
     GCSaveFrameBuffer();
 
+#ifdef GAMECUBE
+    // ???
+    // This causes the right and bottom edge of the shadow texture not to be cleared,
+    // In practice this results in those edges always end up being considered "in shadow" for every other shadow
+    // Later, the shadow texture is sampled with clamped UVs, so this edge becomes very noticeable
+    // I have no idea why the gamecube does this...
     shadowCamera->frameBuffer->width--;
     shadowCamera->frameBuffer->height--;
+#endif
     RwCameraClear(shadowCamera, &bgColor, rwCAMERACLEARIMAGE);
+#ifdef GAMECUBE
     shadowCamera->frameBuffer->width++;
     shadowCamera->frameBuffer->height++;
+#endif
 
     RwFrameOrthoNormalize((RwFrame*)shadowCamera->object.object.parent);
 

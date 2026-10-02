@@ -10,7 +10,9 @@
 #include <types.h>
 #include <stdlib.h>
 
-#ifdef GAMECUBE
+#if defined(WITH_LIBRW)
+#include <rw.h>
+#elif defined(GAMECUBE)
 #include <driver/gcn/dlrendst.h>
 #endif
 
@@ -520,7 +522,10 @@ void xModelBucket_RenderAlphaLayer(S32 maxLayer)
             {
                 if (curPipeFlags >> 24)
                 {
-#ifdef GAMECUBE
+#if defined(WITH_LIBRW)
+                    rw::SetRenderState(rw::ALPHATESTFUNC, rw::ALPHAGREATEREQUAL);
+                    rw::SetRenderState(rw::ALPHATESTREF, curPipeFlags >> 24);
+#elif defined(GAMECUBE)
                     RwGameCubeSetAlphaCompare(GX_ALWAYS, 0, GX_AOP_AND, GX_GEQUAL,
                                               curPipeFlags >> 24);
                     _rwDlRenderStateSetZCompLoc(FALSE);
@@ -528,7 +533,10 @@ void xModelBucket_RenderAlphaLayer(S32 maxLayer)
                 }
                 else
                 {
-#ifdef GAMECUBE
+#if defined(WITH_LIBRW)
+                    rw::SetRenderState(rw::ALPHATESTFUNC, rw::ALPHAGREATEREQUAL);
+                    rw::SetRenderState(rw::ALPHATESTREF, 1);
+#elif defined(GAMECUBE)
                     RwGameCubeSetAlphaCompare(GX_GEQUAL, 1, GX_AOP_AND, GX_ALWAYS, 0);
                     _rwDlRenderStateSetZCompLoc(TRUE);
 #endif
@@ -600,7 +608,10 @@ void xModelBucket_RenderAlphaLayer(S32 maxLayer)
         }
         if (lastPipeFlags & 0xFF000000)
         {
-#ifdef GAMECUBE
+#if defined(WITH_LIBRW)
+            rw::SetRenderState(rw::ALPHATESTFUNC, rw::ALPHAGREATEREQUAL);
+            rw::SetRenderState(rw::ALPHATESTREF, 1);
+#elif defined(GAMECUBE)
             RwGameCubeSetAlphaCompare(GX_GEQUAL, 1, GX_AOP_AND, GX_ALWAYS, 0);
             _rwDlRenderStateSetZCompLoc(TRUE);
 #endif

@@ -510,8 +510,8 @@ inline RwBool RwIm3DEnd()
 inline void RwIm3DVertexSetPos(RwIm3DVertex* vert, RwReal x, RwReal y, RwReal z)
 {
     vert->setX(x);
-    vert->setX(y);
-    vert->setX(z);
+    vert->setY(y);
+    vert->setZ(z);
 }
 
 inline void RwIm3DVertexSetNormal(RwIm3DVertex* vert, RwReal x, RwReal y, RwReal z)

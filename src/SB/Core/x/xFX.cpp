@@ -3234,8 +3234,8 @@ void xFXAuraRender()
     {
         RwRenderStateSet(rwRENDERSTATETEXTURERASTER, (void*)gAuraTex->raster);
         RwRenderStateSet(rwRENDERSTATEVERTEXALPHAENABLE, (void*)0x1);
-        RwRenderStateSet(rwRENDERSTATESRCBLEND, (void*)0x5);
-        RwRenderStateSet(rwRENDERSTATEDESTBLEND, (void*)0x2);
+        RwRenderStateSet(rwRENDERSTATESRCBLEND, (void*)rwBLENDSRCALPHA);
+        RwRenderStateSet(rwRENDERSTATEDESTBLEND, (void*)rwBLENDONE);
         RwRenderStateSet(rwRENDERSTATEZTESTENABLE, (void*)0x1);
         RwRenderStateSet(rwRENDERSTATEZWRITEENABLE, (void*)0x0);
         RwRenderStateGet(rwRENDERSTATEFOGENABLE, &fogstate);
@@ -3255,8 +3255,8 @@ void xFXAuraRender()
             ap++;
         }
 
-        RwRenderStateSet(rwRENDERSTATESRCBLEND, (void*)0x5);
-        RwRenderStateSet(rwRENDERSTATEDESTBLEND, (void*)0x6);
+        RwRenderStateSet(rwRENDERSTATESRCBLEND, (void*)rwBLENDSRCALPHA);
+        RwRenderStateSet(rwRENDERSTATEDESTBLEND, (void*)rwBLENDINVSRCALPHA);
         RwRenderStateSet(rwRENDERSTATEZTESTENABLE, (void*)0x1);
         RwRenderStateSet(rwRENDERSTATEZWRITEENABLE, (void*)0x1);
         RwRenderStateSet(rwRENDERSTATEFOGENABLE, (void*)fogstate);
