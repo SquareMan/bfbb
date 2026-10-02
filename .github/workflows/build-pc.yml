@@ -1,0 +1,56 @@
+name: Build PC
+
+on:
+  push:
+    branches: [yapp]
+
+jobs:
+  build:
+    outputs:
+      build-timestamp: ${{ steps.get-timestamp.outputs.time }}
+    runs-on: windows-latest
+    steps:
+      - name: Get build timestamp
+        id: get-timestamp
+        run: |
+          echo "time=$(Get-Date -AsUTC -Format yyyy-MM-dd-HHmm)" >> $env:GITHUB_OUTPUT
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          persist-credentials: false
+      - name: Configure
+        run: cmake --preset Release
+      - name: Build
+        run: cmake --build --preset Release -t bfbb
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v7
+        with:
+          archive: true
+          name: bfbb-win-x86-${{ steps.get-timestamp.outputs.time }}
+          path: build-pc/bin/
+  release: 
+    name: Create dev release
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Download artifacts
+        uses: actions/download-artifact@v8
+        with:
+          skip-decompress: true
+          name: bfbb-win-x86-${{ needs.build.outputs.build-timestamp }}
+      - name: Create release
+        run: |
+          gh release create dev-${{ needs.build.outputs.build-timestamp }} --generate-notes --prerelease
+      - name: Upload release artifacts
+        run: |
+          gh release upload dev-${{ needs.build.outputs.build-timestamp }} bfbb-win-x86-${{ needs.build.outputs.build-timestamp }}.zip
