@@ -6,9 +6,11 @@
 
 #include <immintrin.h>
 #include <SDL3/SDL_gamepad.h>
+#include <SDL3/SDL_video.h>
 
 extern xGlobals* xglobals;
 extern zGlobals globals;
+extern SDL_Window* sWindow;
 
 static SDL_Gamepad* sActivePad = NULL;
 
@@ -18,7 +20,7 @@ S32 iPadInit()
     int count;
     SDL_JoystickID* gamepads = SDL_GetGamepads(&count);
 
-    if(count <= 0) 
+    if (count <= 0)
     {
         printf("iPad: no gamepads available\n");
         return 1;
@@ -28,7 +30,7 @@ S32 iPadInit()
     SDL_JoystickID useJoystick = gamepads[0];
 
     sActivePad = SDL_OpenGamepad(useJoystick);
-    if(sActivePad == NULL)
+    if (sActivePad == NULL)
     {
         printf("iPad: Failed to open gamepad device: %s", SDL_GetError());
         return 1;
@@ -82,9 +84,9 @@ S32 iPadUpdate(_tagxPad* pad, U32* on)
 {
     SDL_UpdateGamepads();
     *on = 0;
-    pad->analog1 = {0, 0};
-    pad->analog2 = {0, 0};
-    if(sActivePad == NULL)
+    pad->analog1 = { 0, 0 };
+    pad->analog2 = { 0, 0 };
+    if (sActivePad == NULL)
     {
         return 1;
     }
@@ -96,18 +98,25 @@ S32 iPadUpdate(_tagxPad* pad, U32* on)
     *on |= SDL_GetGamepadButton(sActivePad, SDL_GAMEPAD_BUTTON_DPAD_DOWN) ? XPAD_BUTTON_DOWN : 0;
     *on |= SDL_GetGamepadButton(sActivePad, SDL_GAMEPAD_BUTTON_DPAD_LEFT) ? XPAD_BUTTON_LEFT : 0;
     // *on |= SDL_GetGamepadButton(sActivePad, SDL_GAMEPAD_BUTTON_LEFT_SHOULDER) ? XPAD_BUTTON_L1 : 0;
-    *on |= SDL_GetGamepadAxis(sActivePad, SDL_GAMEPAD_AXIS_LEFT_TRIGGER) > 30000 ? XPAD_BUTTON_L1 : 0;
+    *on |=
+        SDL_GetGamepadAxis(sActivePad, SDL_GAMEPAD_AXIS_LEFT_TRIGGER) > 30000 ? XPAD_BUTTON_L1 : 0;
     *on |= SDL_GetGamepadButton(sActivePad, SDL_GAMEPAD_BUTTON_RIGHT_SHOULDER) ? XPAD_BUTTON_Z : 0;
-    *on |= SDL_GetGamepadAxis(sActivePad, SDL_GAMEPAD_AXIS_RIGHT_TRIGGER) > 30000 ? XPAD_BUTTON_R1 : 0;
-    *on |= SDL_GetGamepadButton(sActivePad, SDL_GAMEPAD_BUTTON_SOUTH) ? XPAD_BUTTON_X: 0;
-    *on |= SDL_GetGamepadButton(sActivePad, SDL_GAMEPAD_BUTTON_EAST) ? XPAD_BUTTON_O: 0;
-    *on |= SDL_GetGamepadButton(sActivePad, SDL_GAMEPAD_BUTTON_WEST) ? XPAD_BUTTON_TRIANGLE: 0;
-    *on |= SDL_GetGamepadButton(sActivePad, SDL_GAMEPAD_BUTTON_NORTH) ? XPAD_BUTTON_SQUARE: 0;
+    *on |=
+        SDL_GetGamepadAxis(sActivePad, SDL_GAMEPAD_AXIS_RIGHT_TRIGGER) > 30000 ? XPAD_BUTTON_R1 : 0;
+    *on |= SDL_GetGamepadButton(sActivePad, SDL_GAMEPAD_BUTTON_SOUTH) ? XPAD_BUTTON_X : 0;
+    *on |= SDL_GetGamepadButton(sActivePad, SDL_GAMEPAD_BUTTON_EAST) ? XPAD_BUTTON_O : 0;
+    *on |= SDL_GetGamepadButton(sActivePad, SDL_GAMEPAD_BUTTON_WEST) ? XPAD_BUTTON_TRIANGLE : 0;
+    *on |= SDL_GetGamepadButton(sActivePad, SDL_GAMEPAD_BUTTON_NORTH) ? XPAD_BUTTON_SQUARE : 0;
 
     pad->analog1.x = SDL_GetGamepadAxis(sActivePad, SDL_GAMEPAD_AXIS_LEFTX) / 256;
     pad->analog1.y = SDL_GetGamepadAxis(sActivePad, SDL_GAMEPAD_AXIS_LEFTY) / 256;
     pad->analog2.x = SDL_GetGamepadAxis(sActivePad, SDL_GAMEPAD_AXIS_RIGHTX) / 256;
     pad->analog2.y = SDL_GetGamepadAxis(sActivePad, SDL_GAMEPAD_AXIS_RIGHTY) / 256;
+
+    char buf[128] = { 0 };
+    snprintf(buf, sizeof(buf), "Left (%d, %d) Right (%d, %d)", pad->analog1.x, pad->analog1.y,
+             pad->analog2.x, pad->analog2.y);
+    SDL_SetWindowTitle(sWindow, buf);
     return 1;
 }
 

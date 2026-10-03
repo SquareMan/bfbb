@@ -33,7 +33,7 @@
 #include <SDL3/SDL_timer.h>
 #include <SDL3/SDL_video.h>
 
-static SDL_Window* sWindow = NULL;
+SDL_Window* sWindow = NULL;
 
 static iTime sLastFrameStartTime = 0;
 static iTime targetFrameTime = SDL_NS_PER_SECOND / 60;
@@ -42,7 +42,7 @@ void iVSync()
 {
     iTime elapsedTime = iTimeGet() - sLastFrameStartTime;
     iTime remainingTime = targetFrameTime - elapsedTime;
-    if(remainingTime > 0)
+    if (remainingTime > 0)
     {
         SDL_DelayPrecise(remainingTime);
     }
@@ -53,7 +53,7 @@ void iVSync()
     SDL_Event event;
     while (SDL_PollEvent(&event))
     {
-        switch(event.type)
+        switch (event.type)
         {
         case SDL_EVENT_WINDOW_CLOSE_REQUESTED:
             // TODO: Graceful shutdown
@@ -120,11 +120,11 @@ static void RenderWareExit()
     rw::Engine::term();
 }
 
-static std::binary_semaphore semWaitForAssetPath{0};
+static std::binary_semaphore semWaitForAssetPath{ 0 };
 
 void AssetPathSelectedCallback(void* userdata, const char* const* filelist, int filter)
 {
-    if(filelist == NULL)
+    if (filelist == NULL)
     {
         printf("Could not open folder picker: %s\n", SDL_GetError());
         return;
@@ -140,7 +140,9 @@ void AssetPathSelectedCallback(void* userdata, const char* const* filelist, int 
 void iSystemInit(U32 options)
 {
     // TODO: Cache this to avoid alerting every time we start the game
-    SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION, "Setup", "Press OK to open a folder picker and select the path to your extracted Xbox ISO", NULL);
+    SDL_ShowSimpleMessageBox(
+        SDL_MESSAGEBOX_INFORMATION, "Setup",
+        "Press OK to open a folder picker and select the path to your extracted Xbox ISO", NULL);
     SDL_ShowOpenFolderDialog(AssetPathSelectedCallback, NULL, NULL, NULL, false);
     semWaitForAssetPath.acquire();
 
