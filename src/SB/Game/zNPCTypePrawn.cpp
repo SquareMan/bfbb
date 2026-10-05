@@ -40,7 +40,7 @@ namespace auto_tweak
 {
     template <>
     inline void load_param<F32, F32>(F32& value, F32 scale, F32 lo, F32 hi, xModelAssetParam* ap,
-                              U32 apsize, const char* name)
+                                     U32 apsize, const char* name)
     {
         value = zParamGetFloat(ap, apsize, name, value);
         if (value < lo)
@@ -56,7 +56,7 @@ namespace auto_tweak
 
     template <>
     inline void load_param<S32, S32>(S32& value, S32 scale, S32 lo, S32 hi, xModelAssetParam* ap,
-                              U32 apsize, const char* name)
+                                     U32 apsize, const char* name)
     {
         S32 result = zParamGetInt(ap, apsize, name, value);
         if (result < lo)
@@ -85,13 +85,13 @@ namespace
     };
 
     const sound_asset_type sound_assets[14] = {
-        { 0, "Prawn_hit", 0, 0 },          { 0, "Prawn_FF_hit", 0, 0 },
-        { 1, "B101_SC_jump", 0, 0 },       { 1, "Prawn_FF_hit", 0, 0 },
-        { 1, "fanfare", 0, 0 },            { 1, "sax", 0, 0 },
-        { 1, "Mon_alert", 0, 0 },          { 2, "RP_whirr_loop", 0, 3 },
-        { 2, "PR_attack_loop", 0, 3 },     { 2, "Prawn_Attack_loop", 0, 3 },
-        { 2, "Crystals_loop", 0, 3 },      { 2, "RSB_foot_loop", 0, 3 },
-        { 3, "PR_attack_loop", 0, 1 },     { 3, "Prawn_Attack_loop", 0, 1 },
+        { 0, "Prawn_hit", 0, 0 },      { 0, "Prawn_FF_hit", 0, 0 },
+        { 1, "B101_SC_jump", 0, 0 },   { 1, "Prawn_FF_hit", 0, 0 },
+        { 1, "fanfare", 0, 0 },        { 1, "sax", 0, 0 },
+        { 1, "Mon_alert", 0, 0 },      { 2, "RP_whirr_loop", 0, 3 },
+        { 2, "PR_attack_loop", 0, 3 }, { 2, "Prawn_Attack_loop", 0, 3 },
+        { 2, "Crystals_loop", 0, 3 },  { 2, "RSB_foot_loop", 0, 3 },
+        { 3, "PR_attack_loop", 0, 1 }, { 3, "Prawn_Attack_loop", 0, 1 },
     };
 
     const char* sound_asset_names[4][6];
@@ -194,14 +194,15 @@ namespace
 
         if (asset.mode & 1)
         {
-            data.handle =
-                xSndPlay3DFade(data.id, volume * snd.volume, 1.0f, asset.priority, 0x800, loc,
-                               snd.range_inner, snd.range_outer, SND_CAT_GAME, 0.0f, snd.delay);
+            data.handle = xSndPlay3DFade(data.id, volume * snd.volume, 1.0f, asset.priority,
+                                         XSND_VOICE_PARENT_TYPE_XVEC3, loc, snd.range_inner,
+                                         snd.range_outer, SND_CAT_GAME, 0.0f, snd.delay);
         }
         else
         {
-            data.handle = xSndPlay3D(data.id, volume * snd.volume, 1.0f, asset.priority, 0x800, loc,
-                                     snd.range_inner, snd.range_outer, SND_CAT_GAME, snd.delay);
+            data.handle = xSndPlay3D(data.id, volume * snd.volume, 1.0f, asset.priority,
+                                     XSND_VOICE_PARENT_TYPE_XVEC3, loc, snd.range_inner,
+                                     snd.range_outer, SND_CAT_GAME, snd.delay);
         }
 
         data.loc = loc;
@@ -612,8 +613,7 @@ namespace
             return FALSE;
         }
 
-        raster =
-            RwRasterCreate(width, height, 32, rwRASTERTYPEZBUFFER | rwRASTERTYPECAMERA);
+        raster = RwRasterCreate(width, height, 32, rwRASTERTYPEZBUFFER | rwRASTERTYPECAMERA);
         if (raster == NULL)
         {
             destroy();
@@ -1411,7 +1411,8 @@ void zNPCPrawn::update_turn(F32 dt)
 
     bool decel = true;
 
-    if (!(xabs(this->turn.vel) < 0.001f) && (diff < 0.0f ? 1 : 0) == (this->turn.vel < 0.0f ? 1 : 0))
+    if (!(xabs(this->turn.vel) < 0.001f) &&
+        (diff < 0.0f ? 1 : 0) == (this->turn.vel < 0.0f ? 1 : 0))
     {
         decel = false;
     }

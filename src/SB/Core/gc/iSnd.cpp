@@ -1022,7 +1022,7 @@ void iSndVolUpdate(xSndVoiceInfo* info, vinfo* vinfo)
 {
     MIXUnMute(vinfo->voice);
     xSndInternalUpdateVoicePos(info);
-    if ((info->flags & 8) != 0)
+    if ((info->flags & XSND_VOICE_POSITIONAL) != 0)
     {
         iSndCalcVol3d(info, vinfo);
     }
@@ -1172,11 +1172,11 @@ void iSndUpdate()
 
         if (active)
         {
-            vp->flags |= 0x1;
+            vp->flags |= XSND_VOICE_ACTIVE;
         }
         else
         {
-            vp->flags &= ~0x1;
+            vp->flags &= ~XSND_VOICE_ACTIVE;
         }
     }
 }
@@ -1208,7 +1208,7 @@ S32 iSndFindFreeVoice(U32 priority, U32 flags, U32 owner)
                     continue;
                 }
 
-                if ((vp->flags & 0x41) == 1)
+                if ((vp->flags & (XSND_VOICE_LOCKABLE | XSND_VOICE_ACTIVE)) == 1)
                 {
                     iSndStop(vp->sndID);
                 }
@@ -1296,7 +1296,7 @@ S32 iSndPrepStream(xSndVoiceInfo* vp)
     s->vinf.flags |= 0x1;
     s->vinf.aid = snd.hdr.assetID;
 
-    if (s->hdr.loop_flag != 0 || (vp->flags & 0x8000))
+    if (s->hdr.loop_flag != 0 || (vp->flags & XSND_VOICE_LOOPING))
     {
         s->vinf.flags |= 0x10000;
     }
@@ -1314,41 +1314,41 @@ S32 iSndPlayMemStream(xSndVoiceInfo* vp)
         BOOL enabled = OSDisableInterrupts();
 
         s->vinf.flags |= 0x400000;
-    s->vinf.flags |= 0x1000000;
-    s->vinf.flags |= 0x2000000;
-    s->x90 = 0;
+        s->vinf.flags |= 0x1000000;
+        s->vinf.flags |= 0x2000000;
+        s->x90 = 0;
 
-    AXPBADDR addr;
-    memcpy(&addr, &s->hdr.loop_flag, sizeof(AXPBADDR));
+        AXPBADDR addr;
+        memcpy(&addr, &s->hdr.loop_flag, sizeof(AXPBADDR));
 
-    U32 start = s->dest_a * 2 + 2;
-    U32 end = s->dest_a * 2 + 0xffff;
+        U32 start = s->dest_a * 2 + 2;
+        U32 end = s->dest_a * 2 + 0xffff;
 
-    addr.loopFlag = 1;
-    addr.format = 0;
-    addr.loopAddressHi = start >> 16;
-    addr.loopAddressLo = start;
-    addr.currentAddressHi = start >> 16;
-    addr.currentAddressLo = start;
-    addr.endAddressHi = end >> 16;
-    addr.endAddressLo = end;
+        addr.loopFlag = 1;
+        addr.format = 0;
+        addr.loopAddressHi = start >> 16;
+        addr.loopAddressLo = start;
+        addr.currentAddressHi = start >> 16;
+        addr.currentAddressLo = start;
+        addr.endAddressHi = end >> 16;
+        addr.endAddressLo = end;
 
-    AXSetVoiceAddr(s->vinf.voice, &addr);
-    AXSetVoiceAdpcm(s->vinf.voice, (AXPBADPCM*)&s->hdr.coef);
-    AXSetVoiceSrcType(s->vinf.voice, 1);
-    AXSetVoiceType(s->vinf.voice, 1);
+        AXSetVoiceAddr(s->vinf.voice, &addr);
+        AXSetVoiceAdpcm(s->vinf.voice, (AXPBADPCM*)&s->hdr.coef);
+        AXSetVoiceSrcType(s->vinf.voice, 1);
+        AXSetVoiceType(s->vinf.voice, 1);
 
-    F32 ratio = std::powf(2.0f, vp->pitch / 12.0f);
-    F32 srcRatio = (s->hdr.sample_rate * ratio) / 32000.0f;
+        F32 ratio = std::powf(2.0f, vp->pitch / 12.0f);
+        F32 srcRatio = (s->hdr.sample_rate * ratio) / 32000.0f;
 
-    s->vinf.voice->pb.src.ratioHi = (S32)srcRatio;
-    s->vinf.voice->pb.src.ratioLo = (S32)(65536.0f * srcRatio);
-    s->vinf.voice->sync |= 0x80000000;
+        s->vinf.voice->pb.src.ratioHi = (S32)srcRatio;
+        s->vinf.voice->pb.src.ratioLo = (S32)(65536.0f * srcRatio);
+        s->vinf.voice->sync |= 0x80000000;
 
-    streams[i].vinf.x14 = 0x7fffffff;
-    streams[i].vinf.x1c = 0x7fffffff;
+        streams[i].vinf.x14 = 0x7fffffff;
+        streams[i].vinf.x1c = 0x7fffffff;
 
-    iSndVolUpdate(vp, &streams[i].vinf);
+        iSndVolUpdate(vp, &streams[i].vinf);
         OSRestoreInterrupts(enabled);
 
         return vp->sndID;
@@ -1521,20 +1521,20 @@ S32 iSndPlaySound(xSndVoiceInfo* vp)
 S32 iSndPlay(xSndVoiceInfo* vp)
 {
     S32 offset = (S32)vp - (S32)gSnd.voice;
-    S32 div = offset / 100;
+    S32 voice = offset / sizeof(xSndVoiceInfo);
 
     xSTAssetName(vp->assetID);
 
-    if ((div < 0) || (div >= 64))
+    if ((voice < 0) || (voice >= 64))
     {
         return 0;
     }
-    else if (div < 6)
+    else if (voice < 6)
     {
         U32 ret = iSndPrepStream(vp);
         if (ret < 0x3a)
         {
-            if (vp->flags & 0x200)
+            if (vp->flags & XSND_VOICE_MEMORY)
             {
                 return iSndPlayMemStream(vp);
             }
@@ -2029,7 +2029,7 @@ F32 iSndGetVol(U32 snd)
 
     for (int i = 0; i < 0x40; i++)
     {
-        if (vp->flags & 1)
+        if (vp->flags & XSND_VOICE_ACTIVE)
         {
             if (vp->sndID == snd)
             {

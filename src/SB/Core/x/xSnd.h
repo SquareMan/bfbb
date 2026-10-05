@@ -18,6 +18,21 @@ enum sound_category
     SND_CAT_NUM_CATEGORIES
 };
 
+#define XSND_VOICE_ACTIVE 0x1
+#define XSND_VOICE_TYPE_EFFECT 0x2
+#define XSND_VOICE_TYPE_STREAM 0x4 // Is stream synonymous with music?
+#define XSND_VOICE_POSITIONAL 0x8
+#define XSND_VOICE_HAS_PARENT 0x10
+#define XSND_VOICE_GETS_EFFECTS 0x20
+#define XSND_VOICE_LOCKABLE 0x40
+#define XSND_VOICE_MEMORY 0x200
+#define XSND_VOICE_BIT_10 0x400
+#define XSND_VOICE_PARENT_TYPE_XVEC3 0x800
+// #define XSND_VOICE_BIT_12 0x1000
+#define XSND_VOICE_LOOPING 0x8000
+#define XSND_VOICE_BIT_16 0x10000
+#define XSND_VOICE_BIT_17 0x20000
+
 struct xSndVoiceInfo
 {
     U32 assetID;
@@ -129,10 +144,10 @@ inline U32 xSndPlay3D(U32 id, F32 vol, F32 pitch, U32 priority, U32 flags, xEnt*
 {
     return xSndPlay3D(id, vol, pitch, priority, flags, ent, radius / 4.0f, radius, category, delay);
 }
-U32 xSndPlay3D(U32 id, F32 vol, F32 pitch, U32 priority, U32 flags, const xVec3* pos, F32 innerRadius,
-               F32 outerRadius, sound_category category, F32 delay);
+U32 xSndPlay3D(U32 id, F32 vol, F32 pitch, U32 priority, U32 flags, const xVec3* pos,
+               F32 innerRadius, F32 outerRadius, sound_category category, F32 delay);
 inline U32 xSndPlay3D(U32 id, F32 vol, F32 pitch, U32 priority, U32 flags, const xVec3* pos,
-                       F32 radius, sound_category category, F32 delay)
+                      F32 radius, sound_category category, F32 delay)
 {
     return xSndPlay3D(id, vol, pitch, priority, flags, pos, radius / 4.0f, radius, category, delay);
 }
@@ -153,8 +168,6 @@ void xSndSetPitch(U32 snd, F32 pitch);
 void xSndSetCategoryVol(sound_category category, F32 vol);
 void xSndSetExternalCallback(void (*callback)(U32));
 U8 xSndStreamReady(U32 lock);
-
-
 
 inline U32 xSndIsPlaying(U32 assetID, U32 parid)
 {
@@ -180,7 +193,7 @@ template <S32 N> struct sound_queue
 
         push(assetID);
     }
-    
+
     void push(U32 id)
     {
         _playing[tail] = id;

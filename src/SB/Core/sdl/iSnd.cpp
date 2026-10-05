@@ -471,7 +471,7 @@ S32 iSndPlay(xSndVoiceInfo* vp)
         U32 ret = iSndPrepStream(vp);
         if (ret < 0x3a)
         {
-            if (vp->flags & 0x200)
+            if (vp->flags & XSND_VOICE_MEMORY)
             {
                 return iSndPlayMemStream(vp);
             }
@@ -501,7 +501,8 @@ void iSndStartStereo(U32 id1, U32 id2, F32 pitch)
 }
 
 void iSndStereo(U32 i)
-{}
+{
+}
 
 void iSndWaitForDeadSounds()
 {
@@ -525,7 +526,8 @@ void iSndSuspendCD(U32)
 }
 
 void iSndSceneExit()
-{}
+{
+}
 
 void iSndMessWithEA(sDSPADPCM* param1)
 {
@@ -562,7 +564,6 @@ S32 iSndLoadSounds(void* data)
 
 void iSndDIEDIEDIE()
 {
-
 }
 
 void iSndSetExternalCallback(iSndExternalCallback callback)
@@ -583,7 +584,7 @@ F32 iSndGetVol(U32 snd)
 
     for (int i = 0; i < 0x40; i++)
     {
-        if (vp->flags & 1)
+        if (vp->flags & XSND_VOICE_ACTIVE)
         {
             if (vp->sndID == snd)
             {

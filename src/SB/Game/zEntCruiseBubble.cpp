@@ -338,8 +338,9 @@ namespace cruise_bubble
             {
                 // using float literals only the TOC address doesnt match
                 // -> will match when file is complete
-                s->handle = xSndPlay3D(s->id, s->volume * volFactor, 0.0f, (U32)128, (U32)2048, pos,
-                                       s->radius_inner, s->radius_outer, SND_CAT_GAME, 0.0f);
+                s->handle = xSndPlay3D(s->id, s->volume * volFactor, 0.0f, (U32)128,
+                                       XSND_VOICE_PARENT_TYPE_XVEC3, pos, s->radius_inner,
+                                       s->radius_outer, SND_CAT_GAME, 0.0f);
             }
 
             if (s->rumble != SDR_None)
@@ -1810,8 +1811,7 @@ namespace cruise_bubble
             cheat_tweak.material.env_texture = xStrHash("aura2");
             cheat_tweak.material.fresnel_alpha = 0.1f;
             cheat_tweak.material.fresnel_coeff = 1.0f;
-            cheat_tweak.material.fresnel_texture =
-                xStrHash("par_cruise_explode");
+            cheat_tweak.material.fresnel_texture = xStrHash("par_cruise_explode");
             cheat_tweak.trail.bubble_rate = 90.0f;
             cheat_tweak.trail.bubble_emit_radius = 0.75f;
             cheat_tweak.trail.wake_emit_radius = 0.3f;

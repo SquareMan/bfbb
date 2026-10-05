@@ -30,14 +30,12 @@ static zNPCSettings* g_dflt_npcsettings;
 static F32 g_tmr_talkless = 10.0f;
 
 // SLOP: move to header
-template<>
-NPCConfig* xListItem<NPCConfig>::Next()
+template <> NPCConfig* xListItem<NPCConfig>::Next()
 {
     return this->next;
 }
 
-template<>
-void xListItem<NPCConfig>::Insert(NPCConfig* list)
+template <> void xListItem<NPCConfig>::Insert(NPCConfig* list)
 {
     NPCConfig* node = (NPCConfig*)this;
 
@@ -3183,11 +3181,11 @@ U32 zNPCCommon::SndStart(U32 aid_toplay, NPCSndProp* sprop, F32 radius)
         pvary = xUtil_choose(pitchChoices, 7, 0);
     }
 
-    xsndflags = 0x10000;
+    xsndflags = XSND_VOICE_BIT_16;
     owner = (U32)this + (flg_snd & 0x3);
     if (flg_snd & 0x1000)
     {
-        xsndflags &= ~0x10000;
+        xsndflags &= ~XSND_VOICE_BIT_16;
     }
 
     if (aid_toplay != 0 && (flg_snd & 0x10000))

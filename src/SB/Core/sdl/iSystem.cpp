@@ -147,7 +147,7 @@ void iSystemInit(U32 options)
     semWaitForAssetPath.acquire();
 
     SDL_SetAppMetadata("SpongeBob SquarePants: Battle for Bikini Bottom", "PC Port", "");
-    SDL_Init(SDL_INIT_GAMEPAD);
+    SDL_Init(SDL_INIT_GAMEPAD | SDL_INIT_AUDIO);
     // Note: SDL_RunApp seems to do some necessary setup on some platforms
     // It doesn't seem like win32 is one of those platforms, but not calling it here
     // might give us issues int the future.

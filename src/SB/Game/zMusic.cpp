@@ -194,7 +194,6 @@ static S32 getCurrLevelMusicEnum()
 
 static S32 zMusicDo(S32 track)
 {
-
     S32 snd_enum;
     F32 vol;
     F32 pitch;
@@ -245,10 +244,10 @@ static S32 zMusicDo(S32 track)
         vol *= 0.7f;
     }
 
-    sMusicTrack[track].snd_id =
-        xSndPlay(sMusicSoundID[snd_enum][0], vol, pitch, 0xFF,
-                 (sMusicTrack[track].loop ? 0x8000 : 0) | 0x10000 | (track << 11) | 0x20000, 0,
-                 SND_CAT_MUSIC, 0.0f);
+    sMusicTrack[track].snd_id = xSndPlay(sMusicSoundID[snd_enum][0], vol, pitch, 0xFF,
+                                         (sMusicTrack[track].loop ? XSND_VOICE_LOOPING : 0) |
+                                             XSND_VOICE_BIT_16 | (track << 11) | XSND_VOICE_BIT_17,
+                                         0, SND_CAT_MUSIC, 0.0f);
 
     if (sMusicTrack[track].snd_id != 0)
     {
@@ -455,8 +454,8 @@ void zMusicUnpause(S32 kill)
         else
         {
             S32 flags = i * 0x800;
-            flags |= ((track->loop != 0) ? 0x8000 : 0) | 0x10000;
-            flags |= 0x20000;
+            flags |= ((track->loop != 0) ? XSND_VOICE_LOOPING : 0) | XSND_VOICE_BIT_16;
+            flags |= XSND_VOICE_BIT_17;
             track->snd_id =
                 xSndPlay(track->assetID, track->lastVol, 0.0f, 0xff, flags, 0, SND_CAT_MUSIC, 0.0f);
         }

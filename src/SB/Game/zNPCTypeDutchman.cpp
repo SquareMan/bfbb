@@ -14,7 +14,7 @@ namespace auto_tweak
 {
     template <>
     inline void load_param<S32, S32>(S32& value, S32 scale, S32 lo, S32 hi, xModelAssetParam* ap,
-                              U32 apsize, const char* name)
+                                     U32 apsize, const char* name)
     {
         S32 v = zParamGetInt(ap, apsize, name, value);
         if (v < lo)
@@ -30,8 +30,8 @@ namespace auto_tweak
     }
 
     template <>
-    inline void load_param<xVec3, S32>(xVec3& value, S32, S32, S32, xModelAssetParam* ap, U32 apsize,
-                                const char* name)
+    inline void load_param<xVec3, S32>(xVec3& value, S32, S32, S32, xModelAssetParam* ap,
+                                       U32 apsize, const char* name)
     {
         xVec3 def = value;
         zParamGetVector(ap, apsize, name, def, &value);
@@ -39,7 +39,7 @@ namespace auto_tweak
 
     template <>
     inline void load_param<F32, F32>(F32& value, F32 scale, F32 lo, F32 hi, xModelAssetParam* ap,
-                              U32 apsize, const char* name)
+                                     U32 apsize, const char* name)
     {
         value = zParamGetFloat(ap, apsize, name, value);
         if (value < lo)
@@ -365,12 +365,14 @@ namespace
 
         if (asset.flags & 1)
         {
-            return xSndPlay3DFade(data.id, volume * snd.volume, 1.0f, asset.priority, 0x800, pos,
-                                  snd.range_inner, snd.range_outer, SND_CAT_GAME, 0.0f, snd.delay);
+            return xSndPlay3DFade(data.id, volume * snd.volume, 1.0f, asset.priority,
+                                  XSND_VOICE_PARENT_TYPE_XVEC3, pos, snd.range_inner,
+                                  snd.range_outer, SND_CAT_GAME, 0.0f, snd.delay);
         }
 
-        return xSndPlay3D(data.id, volume * snd.volume, 1.0f, asset.priority, 0x800, pos,
-                          snd.range_inner, snd.range_outer, SND_CAT_GAME, snd.delay);
+        return xSndPlay3D(data.id, volume * snd.volume, 1.0f, asset.priority,
+                          XSND_VOICE_PARENT_TYPE_XVEC3, pos, snd.range_inner, snd.range_outer,
+                          SND_CAT_GAME, snd.delay);
     }
 
     void kill_sound(S32 which, U32 handle)
@@ -1010,8 +1012,8 @@ namespace
         if (init)
         {
             teleport.turn_max_vel = 720.0f;
-            auto_tweak::load_param<F32, F32>(teleport.turn_max_vel, DEG2RAD(1), 0.01,
-                                             1000000000.0f, ap, apsize, "teleport.turn_max_vel");
+            auto_tweak::load_param<F32, F32>(teleport.turn_max_vel, DEG2RAD(1), 0.01, 1000000000.0f,
+                                             ap, apsize, "teleport.turn_max_vel");
         }
         if (init)
         {
@@ -2784,8 +2786,8 @@ namespace
 {
     void set_vert(RwIm3DVertex& vert, const xVec3& loc, F32 u, F32 v, U8 alpha);
 
-    void set_beam_verts(RwIm3DVertex* vert, const xVec3& loc0, const xVec3& loc1, U8 a0,
-                        U8 a1, const xVec3& half_right)
+    void set_beam_verts(RwIm3DVertex* vert, const xVec3& loc0, const xVec3& loc1, U8 a0, U8 a1,
+                        const xVec3& half_right)
     {
         set_vert(vert[0], loc0 - half_right, 0.0f, 0.0f, a0);
         set_vert(vert[1], loc1 - half_right, 1.0f, 0.0f, a1);
@@ -2820,7 +2822,7 @@ namespace
     }
 
     RwIm3DVertex* render_beam(RwIm3DVertex* vert, const zNPCDutchman::beam_info& beam,
-                                    unsigned long which, U8 alpha)
+                              unsigned long which, U8 alpha)
     {
         const xVec3& start_loc = beam.start_loc;
         const xVec3& end_loc = beam.end[which].loc;
@@ -3265,8 +3267,7 @@ void zNPCGoalDutchmanBeam::calc_beam_loc(xVec2& loc, F32 dist, const beam_data& 
     const beam_config& cfg = tweak.beam;
     F32 frac = (dist - cfg.start_dist) / (cfg.end_dist - cfg.start_dist);
     F32 wave_mag = frac * (cfg.wave_max - cfg.wave_min) + cfg.wave_min;
-    F32 wave_offset =
-        wave_mag * isin(2.0f * PI * (frac * cfg.wave_freq) + data.wave_offset);
+    F32 wave_offset = wave_mag * isin(2.0f * PI * (frac * cfg.wave_freq) + data.wave_offset);
     xVec2 dir_tan = { data.dir.y, -data.dir.x };
 
     loc = data.origin + data.dir * dist + dir_tan * wave_offset;
@@ -3405,8 +3406,8 @@ void zNPCGoalDutchmanBeam::predict_target(xVec3& target) const
     }
     else
     {
-        F32 t = xAccelMoveTime(xsqrt(mag2) - minmag, tweak.beam.accel,
-                               tweak.beam.end_dist, tweak.beam.max_vel);
+        F32 t = xAccelMoveTime(xsqrt(mag2) - minmag, tweak.beam.accel, tweak.beam.end_dist,
+                               tweak.beam.max_vel);
 
         zEntPlayer_PredictPos(&target, t, 1.0f, 1);
     }
@@ -3546,7 +3547,8 @@ void zNPCGoalDutchmanFlame::update_stop(F32 dt)
         anim_done = TRUE;
     }
 
-    if (anim_done && !owner.turning(0.1f) && (owner.move.dest - owner.get_center()).length2() < 0.01f)
+    if (anim_done && !owner.turning(0.1f) &&
+        (owner.move.dest - owner.get_center()).length2() < 0.01f)
     {
         substate = SS_DONE;
         owner.flag.face_player = false;
@@ -3597,7 +3599,7 @@ namespace
 
         return xrmod(PI + (ang2 - ang1)) - PI;
     }
-}
+} // namespace
 
 xFactoryInst* zNPCGoalDutchmanPostFlame::create(S32 who, RyzMemGrow* grow, void* info)
 {

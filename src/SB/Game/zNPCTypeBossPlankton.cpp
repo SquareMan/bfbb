@@ -32,8 +32,7 @@
 #define SOUND_BOLT_HIT 4
 #define SOUND_CHARGE 5
 
-template <>
-inline F32 range_limit<F32>(F32 v, F32 minv, F32 maxv)
+template <> inline F32 range_limit<F32>(F32 v, F32 minv, F32 maxv)
 {
     if (v <= minv)
     {
@@ -52,7 +51,7 @@ namespace auto_tweak
 {
     template <>
     inline void load_param<S32, S32>(S32& value, S32 scale, S32 lo, S32 hi, xModelAssetParam* ap,
-                              U32 apsize, const char* name)
+                                     U32 apsize, const char* name)
     {
         S32 v = zParamGetInt(ap, apsize, name, value);
         if (v < lo)
@@ -68,8 +67,8 @@ namespace auto_tweak
     }
 
     template <>
-    inline void load_param<xVec3, S32>(xVec3& value, S32, S32, S32, xModelAssetParam* ap, U32 apsize,
-                                const char* name)
+    inline void load_param<xVec3, S32>(xVec3& value, S32, S32, S32, xModelAssetParam* ap,
+                                       U32 apsize, const char* name)
     {
         xVec3 def = value;
         zParamGetVector(ap, apsize, name, def, &value);
@@ -77,7 +76,7 @@ namespace auto_tweak
 
     template <>
     inline void load_param<F32, F32>(F32& value, F32 scale, F32 lo, F32 hi, xModelAssetParam* ap,
-                              U32 apsize, const char* name)
+                                     U32 apsize, const char* name)
     {
         value = zParamGetFloat(ap, apsize, name, value);
         if (value < lo)
@@ -90,7 +89,7 @@ namespace auto_tweak
         }
         value = value * scale;
     }
-}
+} // namespace auto_tweak
 
 // These structs were used in deadstripped functions.
 // This function is here to force the symbols to be linked.
@@ -419,8 +418,9 @@ namespace
         }
         else
         {
-            data.handle = xSndPlay3D(data.id, volume * snd.volume, 1.0f, asset.priority, 0x800, pos,
-                                     snd.range_inner, snd.range_outer, SND_CAT_GAME, snd.delay);
+            data.handle = xSndPlay3D(data.id, volume * snd.volume, 1.0f, asset.priority,
+                                     XSND_VOICE_PARENT_TYPE_XVEC3, pos, snd.range_inner,
+                                     snd.range_outer, SND_CAT_GAME, snd.delay);
         }
 
         data.loc = pos;
@@ -518,8 +518,7 @@ inline bool zNPCBPlankton::turning() const
     const xVec2 at = { model->Mat->at.x, model->Mat->at.z };
 
     return !xfeq0(turn.vel) ||
-           (!xfeq0(turn.accel) &&
-            !(turn.dir.x > turn.dir.y && xabs(turn.dir.x - at.x) < 0.001f) &&
+           (!xfeq0(turn.accel) && !(turn.dir.x > turn.dir.y && xabs(turn.dir.x - at.x) < 0.001f) &&
             !(turn.dir.x < turn.dir.y && xabs(turn.dir.y - at.y) < 0.001f));
 }
 
@@ -991,8 +990,8 @@ namespace
         if (init)
         {
             mode_buddy.obstruct_angle = 45.0f;
-            auto_tweak::load_param<F32, F32>(mode_buddy.obstruct_angle, DEG2RAD(1), 0.0f, 90.0f,
-                                             ap, apsize, "mode_buddy.obstruct_angle");
+            auto_tweak::load_param<F32, F32>(mode_buddy.obstruct_angle, DEG2RAD(1), 0.0f, 90.0f, ap,
+                                             apsize, "mode_buddy.obstruct_angle");
         }
         if (init)
         {
@@ -1129,8 +1128,8 @@ namespace
         if (init)
         {
             beam.fx.rand_ang = 6.0f;
-            auto_tweak::load_param<F32, F32>(beam.fx.rand_ang, DEG2RAD(1), 0.0f, 360.0f, ap,
-                                             apsize, "beam.fx.rand_ang");
+            auto_tweak::load_param<F32, F32>(beam.fx.rand_ang, DEG2RAD(1), 0.0f, 360.0f, ap, apsize,
+                                             "beam.fx.rand_ang");
         }
         if (init)
         {
@@ -1865,7 +1864,7 @@ void zNPCBPlankton::update_move(F32 dt)
         break;
     }
     default:
-        break;    
+        break;
     }
 }
 
