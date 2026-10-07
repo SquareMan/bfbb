@@ -1,23 +1,17 @@
-#include <Windows.h>
+#include <macros.h>
+
 #include "iFile.h"
 
-#include "iTRC.h"
-
 #include "xFile.h"
-#include "xMath.h"
-#include "xTRC.h"
 
-#include <processenv.h>
-#include <rwcore.h>
 #include <cassert>
-#include <cstdint>
-#include <macros.h>
-#include <stdio.h>
-#include <string.h>
+#include <rwcore.h>
 
 #include <immintrin.h>
-#include <SDL3/SDL_filesystem.h>
+#include <Windows.h>
 #include <SDL3/SDL_iostream.h>
+#include <SDL3/SDL_log.h>
+#include <SDL3/SDL_filesystem.h>
 
 struct file_queue_entry
 {
@@ -29,7 +23,6 @@ struct file_queue_entry
 };
 
 file_queue_entry file_queue[4];
-
 
 void iFileInit()
 {
@@ -54,15 +47,15 @@ U32* iFileLoad(const char* name, U32* buffer, U32* size)
 
     U32 bufSize = ALIGN_NEXT(info.size, 32);
 
-    if(buffer == NULL)
+    if (buffer == NULL)
     {
-        // Callers use RwFree soo...... 
+        // Callers use RwFree soo......
         buffer = (U32*)RwMalloc(bufSize);
     }
-    
+
     iFileRead(&file, buffer, bufSize);
 
-    if(size != NULL)
+    if (size != NULL)
     {
         *size = bufSize;
     }
@@ -75,20 +68,22 @@ U32 iFileOpen(const char* name, S32 flags, tag_xFile* file)
 {
     tag_iFile* ps = &file->ps;
     SDL_PathInfo info = {};
-    
-    bool fileExists = SDL_GetPathInfo(name, &info);
-    
+
+    if (!SDL_GetPathInfo(name, &info))
+    {
+        SDL_Log("Cannot open file \"%s\": Does not exist\n", name);
+        return 1;
+    }
+
     ps->size = (U32)info.size;
-    
+
     const char* mode;
     switch (flags)
     {
-    case 0:
-        // Simply check if the file exists
-        return fileExists;
     case IFILE_OPEN_WRITE:
         mode = "rw";
         break;
+    case 0:
     case IFILE_OPEN_READ:
         mode = "rb";
         break;
@@ -97,15 +92,15 @@ U32 iFileOpen(const char* name, S32 flags, tag_xFile* file)
         return 1;
     };
 
-    if(!fileExists)
+    SDL_IOStream* io = SDL_IOFromFile(name, mode);
+    file->ps.io = io;
+
+    if (io == NULL)
     {
-        printf("Cannot open file \"%s\": Does not exist\n", name);
+        SDL_Log("Failed to open file \"%s\": %s", name, SDL_GetError());
         return 1;
     }
 
-    SDL_IOStream* io = SDL_IOFromFile(name, mode);
-    file->ps.io = io;
-    
     return 0;
 }
 
@@ -113,7 +108,7 @@ S32 iFileSeek(tag_xFile* file, S32 offset, S32 whence)
 {
     SDL_IOStream* io = file->ps.io;
     SDL_IOWhence sdl_whence;
-    switch(whence)
+    switch (whence)
     {
     case IFILE_SEEK_SET:
         sdl_whence = SDL_IO_SEEK_SET;
@@ -127,8 +122,13 @@ S32 iFileSeek(tag_xFile* file, S32 offset, S32 whence)
     default:
         assert(false && "Unreachable");
     }
-    SDL_SeekIO(io, offset, sdl_whence);
-    return TRUE;
+    Sint64 final = SDL_SeekIO(io, offset, sdl_whence);
+    if (final == -1)
+    {
+        SDL_Log("Could not seek to position %d for file \"%s\": %s", offset, file->relname,
+                SDL_GetError());
+    }
+    return final;
 }
 
 U32 iFileRead(tag_xFile* file, void* buf, U32 size)
@@ -191,10 +191,10 @@ IFILE_READSECTOR_STATUS iFileReadAsyncStatus(S32 key, S32* amtToFar)
 
 void iFileAsyncService()
 {
-    for(int i = 0; i < 4; i++)
+    for (int i = 0; i < 4; i++)
     {
         file_queue_entry* entry = &file_queue[i];
-        if(entry->stat != IFILE_RDSTAT_QUEUED)
+        if (entry->stat != IFILE_RDSTAT_QUEUED)
         {
             continue;
         }
@@ -202,7 +202,7 @@ void iFileAsyncService()
         tag_xFile* file = entry->file;
         entry->stat = IFILE_RDSTAT_DONE;
 
-        if(entry->callback)
+        if (entry->callback)
         {
             entry->callback(file);
         }
@@ -213,9 +213,9 @@ void iFileAsyncService()
 
 U32 iFileClose(tag_xFile* file)
 {
-    if(!SDL_CloseIO(file->ps.io))
+    if (!SDL_CloseIO(file->ps.io))
     {
-        printf("Failed to close file: %s", SDL_GetError());
+        SDL_Log("Failed to close file: %s", SDL_GetError());
         return 1;
     }
     return 0;
@@ -244,7 +244,8 @@ void iFileSetPath(const char* path)
 
 U32 iFileFind(const char* name, tag_xFile* file)
 {
-    return iFileOpen(name, 0, file);
+    SDL_PathInfo info;
+    return SDL_GetPathInfo(name, &info) ? 0 : 1;
 }
 
 void iFileGetInfo(tag_xFile* file, U32* addr, U32* length)

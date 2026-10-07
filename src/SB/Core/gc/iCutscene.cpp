@@ -32,7 +32,8 @@ void iCSSoundSetup(xCutscene* csn)
             csn->SndNumChannel++;
         }
 
-        data = (xCutsceneData*)((U8*)data + ALIGN_NEXT(data->ChunkSize, 16) + sizeof(xCutsceneData));
+        data =
+            (xCutsceneData*)((U8*)data + ALIGN_NEXT(data->ChunkSize, 16) + sizeof(xCutsceneData));
     }
 }
 
@@ -110,7 +111,8 @@ void* iCSSoundGetData(xSndVoiceInfo* vp, U32* size)
             }
         }
 
-        data = (xCutsceneData*)((U8*)data + ALIGN_NEXT(data->ChunkSize, 16) + sizeof(xCutsceneData));
+        data =
+            (xCutsceneData*)((U8*)data + ALIGN_NEXT(data->ChunkSize, 16) + sizeof(xCutsceneData));
     }
 
     if (!retdata)
@@ -159,7 +161,7 @@ U32 iCSFileOpen(xCutscene* csn)
 
     const char* filename = xST_xAssetID_HIPFullPath(csn->Info->AssetID);
 
-    if (iFileOpen(filename, 0x1, &csn->File) == 0)
+    if (iFileOpen(filename, IFILE_OPEN_READ, &csn->File) == 0)
     {
         iFileSeek(&csn->File, headerskip + ((ainfo.sector - csn->File.ps.fileInfo.startAddr) << 5),
                   IFILE_SEEK_SET);

@@ -39,13 +39,15 @@ U32 iFileOpen(const char* name, S32 flags, tag_xFile* file);
 S32 iFileSeek(tag_xFile* file, S32 offset, S32 whence);
 U32 iFileRead(tag_xFile* file, void* buf, U32 size);
 S32 iFileReadAsync(tag_xFile* file, void* buf, U32 aSize, void (*callback)(tag_xFile*),
-                     S32 priority);
+                   S32 priority);
 IFILE_READSECTOR_STATUS iFileReadAsyncStatus(S32 key, S32* amtToFar);
 U32 iFileClose(tag_xFile* file);
 U32 iFileGetSize(tag_xFile* file);
 void iFileReadStop();
 void iFileFullPath(const char* relname, char* fullname);
 void iFileSetPath(CChar* path);
+
+// Returns 0 on success
 U32 iFileFind(const char* name, tag_xFile* file);
 void iFileGetInfo(tag_xFile* file, U32* addr, U32* length);
 void iFileAsyncService();
