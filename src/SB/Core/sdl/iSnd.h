@@ -4,7 +4,8 @@
 #include <types.h>
 
 struct xSndVoiceInfo;
-struct tag_xFile;
+
+#define ISND_TOTAL_VOICES 64
 
 struct iSndVol
 {
@@ -20,35 +21,36 @@ struct iSndInfo
     S32 lastStreamBuffer;
 };
 
-struct iSndFileInfo
+enum XboxSndFormat
 {
-    U32 ID; // offset 0x0
-    U32 assetID; // offset 0x4
-    U16 sample_rate; // offset 0x8
-    U8 is_streamed; // offset 0xA
-    union
-    {
-        struct
-        {
-            U32 address; // offset 0x0
-            U32 size; // offset 0x4
-        } nonstream; // offset 0xC
-        struct
-        {
-            S32 file_index; // offset 0x0
-            U32 lsn; // offset 0x4
-            U32 data_size; // offset 0x8
-            U16 stream_interleave_size; // offset 0xC
-            U16 stream_interleave_count; // offset 0xE
-        } stream; // offset 0xC
-    };
+    // Raw 16-bit samples
+    XBOX_SND_FORMAT_PCM = 1,
+    // Xbox specific ADPCM spec. Data frames are identical to IMA ADPCM
+    XBOX_SND_FORMAT_XBOX_ADPCM = 0x69,
 };
 
-// Size: ???
-// Not in dwarf data
-struct sDSPADPCM
+// Size: 0x2C
+struct XboxSndEntry
 {
-    S32 buffer[6];
+    U16 wFormatTag;
+    U16 nChannels;
+    U32 sample_rate;
+    U32 nAvgBytesPerSec;
+    U16 nBlockAlign;
+    U16 wBitsPerSample;
+    U16 cbSize;
+    U16 NibblesPerBlock;
+    U32 Datasize;
+    U32 assetID;
+    U32 flags;
+    U8 pad[8];
+    void* mem;
+};
+
+struct iSndFileInfo
+{
+    XboxSndEntry hdr;
+    U32 id;
 };
 
 // not in dwarf data,
@@ -78,10 +80,6 @@ void iSndUpdate();
 S32 iSndFindFreeVoice(U32 priority, U32 flags, U32 owner);
 
 S32 iSndPlay(xSndVoiceInfo* vp);
-S32 iSndPrepStream(xSndVoiceInfo *);
-S32 iSndPlayStream(xSndVoiceInfo *);
-S32 iSndPlayMemStream(xSndVoiceInfo *);
-S32 iSndPlaySound(xSndVoiceInfo *);
 void iSndSetVol(U32 snd, F32 vol);
 void iSndSetPitch(U32 snd, F32 pitch);
 void iSndStartStereo(U32 id1, U32 id2, F32 pitch);
@@ -93,11 +91,7 @@ void iSndSuspendCD(U32);
 void iSndSceneExit();
 
 S32 iSndLoadSounds(void*);
-void iSndDIEDIEDIE();
 void iSndSetExternalCallback(iSndExternalCallback callback);
-
-void iSndSuspend();
-void iSndResume();
 
 F32 iSndGetVol(U32 snd);
 

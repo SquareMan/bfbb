@@ -16,6 +16,9 @@ typedef unsigned short U16;
 typedef unsigned int U32;
 typedef unsigned long long U64;
 
+typedef U32 UPTR;
+typedef S32 SPTR;
+
 typedef float F32;
 typedef double F64;
 
@@ -32,7 +35,6 @@ typedef char CChar;
 #else
 typedef const char CChar;
 #endif
-
 
 #ifdef NULL
 #undef NULL

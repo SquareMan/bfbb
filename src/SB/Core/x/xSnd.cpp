@@ -370,20 +370,6 @@ U32 xSndPlay3D(U32 id, F32 vol, F32 pitch, U32 priority, U32 flags, const xVec3*
     }
 }
 
-// iSndLookup() on GameCube hands back a pointer to iSnd.cpp's file-scope
-// `snd` object: a 0x64-byte DSP-ADPCM header followed by the internal sound
-// id. src/SB/Core/gc/iSnd.h still describes iSndFileInfo with the PS2 layout
-// (sample_rate is a U16 at 0x8 there, and there is nothing at 0x64), so the
-// two fields this function needs are reached through the real layout instead.
-struct iSndLookupInfo
-{
-    U32 num_samples; // 0x00
-    U32 num_nibbles; // 0x04
-    U32 sample_rate; // 0x08
-    U8 pad0C[0x58]; // 0x0C
-    S32 ID; // 0x64
-};
-
 bool xSndCategoryGetsEffects(sound_category category);
 
 U32 xSndPlayInternal(U32 id, F32 vol, F32 pitch, U32 priority, U32 flags, U32 parentID,
@@ -452,24 +438,24 @@ U32 xSndPlayInternal(U32 id, F32 vol, F32 pitch, U32 priority, U32 flags, U32 pa
     {
         flags |= XSND_VOICE_TYPE_STREAM;
 
-        iSndLookupInfo* ip = (iSndLookupInfo*)iSndLookup(id);
+        iSndFileInfo* ip = iSndLookup(id);
         if (ip == NULL)
         {
             return 0;
         }
 
-        sample_rate = ip->sample_rate;
+        sample_rate = ip->hdr.sample_rate;
         internalID = -1;
     }
     else
     {
-        iSndLookupInfo* ip = (iSndLookupInfo*)iSndLookup(id);
+        iSndFileInfo* ip = iSndLookup(id);
         if (ip == NULL)
         {
             return 0;
         }
 
-        if (ip->ID >= 0x1000)
+        if (ip->id >= 0x1000)
         {
             flags |= XSND_VOICE_TYPE_EFFECT;
         }
@@ -483,8 +469,8 @@ U32 xSndPlayInternal(U32 id, F32 vol, F32 pitch, U32 priority, U32 flags, U32 pa
             flags |= XSND_VOICE_GETS_EFFECTS;
         }
 
-        sample_rate = ip->sample_rate;
-        internalID = ip->ID;
+        sample_rate = ip->hdr.sample_rate;
+        internalID = ip->id;
     }
 
     U32 voice = iSndFindFreeVoice(priority, flags, parentID);

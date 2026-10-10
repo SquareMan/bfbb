@@ -68,7 +68,7 @@ struct xSndGlobals
     U32 SndCount;
     F32 categoryVolFader[5];
     // Evidence from iSndUpdateSounds() and xSndInit() show that this array is size 64 instead of 48
-    xSndVoiceInfo voice[64];
+    xSndVoiceInfo voice[ISND_TOTAL_VOICES];
     xMat4x3 listenerMat[2];
     sound_listener_game_mode listenerMode;
     U32 suspendCD;

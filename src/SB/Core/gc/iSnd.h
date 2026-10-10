@@ -3,9 +3,13 @@
 
 #include <types.h>
 
+#include "xFile.h"
+
 struct xSndVoiceInfo;
 struct tag_xFile;
 struct _AXVPB;
+
+#define ISND_TOTAL_VOICES 64
 
 struct iSndVol
 {
@@ -21,35 +25,39 @@ struct iSndInfo
     S32 lastStreamBuffer;
 };
 
-struct iSndFileInfo
-{
-    U32 ID; // offset 0x0
-    U32 assetID; // offset 0x4
-    U16 sample_rate; // offset 0x8
-    U8 is_streamed; // offset 0xA
-    union
-    {
-        struct
-        {
-            U32 address; // offset 0x0
-            U32 size; // offset 0x4
-        } nonstream; // offset 0xC
-        struct
-        {
-            S32 file_index; // offset 0x0
-            U32 lsn; // offset 0x4
-            U32 data_size; // offset 0x8
-            U16 stream_interleave_size; // offset 0xC
-            U16 stream_interleave_count; // offset 0xE
-        } stream; // offset 0xC
-    };
-};
-
-// Size: ???
-// Not in dwarf data
 struct sDSPADPCM
 {
-    S32 buffer[6];
+    U32 num_samples; // 0x00
+    U32 num_nibbles; // 0x04
+    U32 sample_rate; // 0x08
+    U16 loop_flag; // 0x0C
+    U16 format; // 0x0E
+    U32 loop_start; // 0x10
+    U32 loop_end; // 0x14
+    U32 cur_addr; // 0x18
+    S16 coef[16]; // 0x1C
+    U16 gain; // 0x3C
+    U16 pred_scale; // 0x3E
+    U16 yn1; // 0x40
+    U16 yn2; // 0x42
+    U16 loop_pred_scale; // 0x44
+    U16 loop_yn1; // 0x46
+    U16 loop_yn2; // 0x48
+    U16 pad[11]; // 0x4A -- pad[0] is tagged 0x63 for memory streams
+    U32 assetID; // 0x60
+};
+
+// iSndLookup() on GameCube hands back a pointer to iSnd.cpp's file-scope
+// `snd` object: a 0x64-byte DSP-ADPCM header followed by the internal sound
+// id. src/SB/Core/gc/iSnd.h still describes iSndFileInfo with the PS2 layout
+// (sample_rate is a U16 at 0x8 there, and there is nothing at 0x64), so the
+// two fields this function needs are reached through the real layout instead.
+struct iSndFileInfo
+{
+    sDSPADPCM hdr; // 0x000
+    U32 id; // 0x064
+    tag_xFile file; // 0x068
+    U32 pad; // 0x17c
 };
 
 // not in dwarf data,

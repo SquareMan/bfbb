@@ -77,6 +77,7 @@ target_include_directories(bfbb SYSTEM PRIVATE
     include/
 )
 set(PLATFORM_SOURCES
+    src/SB/core/sdl/iADPCM.cpp
     src/SB/core/sdl/iAnim.cpp
     src/SB/core/sdl/iAnimSKB.cpp
     src/SB/core/sdl/iCollide.cpp
@@ -331,6 +332,7 @@ target_sources(bfbb
     src/SB/core/x/xVec3Inlines.h
     src/SB/core/x/xVolume.h
 
+    src/SB/core/sdl/iADPCM.h
     src/SB/core/sdl/iAnim.h
     src/SB/core/sdl/iAnimSKB.h
     src/SB/core/sdl/iCollide.h

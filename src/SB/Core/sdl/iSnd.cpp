@@ -1,14 +1,15 @@
 #include "iSnd.h"
 
-#include "iCutscene.h"
-#include "iTRC.h"
 #include "xFile.h"
 #include "xSnd.h"
 #include "xString.h"
 #include "xstransvc.h"
 #include "xMath.h"
 
+#include "iADPCM.h"
+
 #include <cassert>
+#include <macros.h>
 #include <rwplcore.h>
 
 #include <cmath>
@@ -17,152 +18,54 @@
 #include <string.h>
 #include <types.h>
 
-// FIXME: declared in zGame.h, which Core must not include
-void zGameScreenTransitionUpdate(F32 percentComplete, char* msg, U8* rgba);
-
-u32 aram_array[40];
-
-// Private to this translation unit; iSndMessWithEA calls it before the
-// definition, so it needs the forward declaration.
-U32 SampleToNybbleAddress(U32 sample);
-
-// Size: 0x20
-// This was not in dwarf data
-struct vinfo
-{
-    U32 flags;
-    U32 aid;
-    F32 xc;
-    S32 x10;
-    S32 x14;
-    S32 x18;
-    S32 x1c;
-};
-
-// The GC DSPADPCM header, with the asset ID appended. This is what iSnd.h calls
-// sDSPADPCM (see iSndMessWithEA, which writes buffer[5] == loop_end).
-// Size: 0x64
-struct sndhdr
-{
-    U32 num_samples; // 0x00
-    U32 num_nibbles; // 0x04
-    U32 sample_rate; // 0x08
-    U16 loop_flag; // 0x0C
-    U16 format; // 0x0E
-    U32 loop_start; // 0x10
-    U32 loop_end; // 0x14
-    U32 cur_addr; // 0x18
-    S16 coef[16]; // 0x1C
-    U16 gain; // 0x3C
-    U16 pred_scale; // 0x3E
-    U16 yn1; // 0x40
-    U16 yn2; // 0x42
-    U16 loop_pred_scale; // 0x44
-    U16 loop_yn1; // 0x46
-    U16 loop_yn2; // 0x48
-    U16 pad[11]; // 0x4A -- pad[0] is tagged 0x63 for memory streams
-    U32 assetID; // 0x60
-};
+#include <immintrin.h>
+#include <SDL3/SDL_audio.h>
+#include "SDL3/SDL_error.h"
+#include <SDL3/SDL_log.h>
 
 // The header of a loaded SNDI asset.
-struct sndinfo
+struct XboxSNDI
 {
     U32 num_sfx; // 0x00
-    U32 total_size; // 0x04
-    U32 num_streams; // 0x08
-    U32 num_cutscene; // 0x0C
-    sndhdr entry[1]; // 0x10
+    U32 num_streams; // 0x04
+    U32 num_cutscene; // 0x08
+
+    // one entry for sum of previous fields
+    XboxSndEntry entry[]; // 0xc
 };
 
 // Size: 0x11c
 struct sinfo
 {
-    tag_xFile file; // 0x000
-    U32 base; // 0x114
-    sndinfo* info; // 0x118
+    tag_xFile file;
+    void* snd_mem;
+    XboxSNDI* toc;
 };
 
-// Size: 0x180
-struct sndlookup
-{
-    sndhdr hdr; // 0x000
-    U32 id; // 0x064
-    tag_xFile file; // 0x068
-    U32 pad; // 0x17c
-};
-
-// Size: 0x10c
-// Looks like this might be a vinfo struct at the beginning here.
-struct UNK_STREAM
-{
-    vinfo vinf;
-    sndhdr hdr;
-    U32 x84;
-    U32 offset;
-    U32 x8c;
-    U32 x90;
-    U32 x94;
-    U32 source_a;
-    u32 dest_a;
-    u32 dest_b;
-    U32 source_b;
-    U32 xe4;
-    U32 x108;
-};
-
-UNK_STREAM streams[6];
-
-vinfo voices[58];
-
-sinfo sinfo_array[12];
-
-sndlookup snd;
-
-U32* ua_stream_buffer = NULL; //unaligned stream buffer
-U32* stream_buffer = 0;
-u32 silence_buffer = 0;
-volatile u32 zero_point = 0;
-volatile u32 zero_end = 0;
-S32 sinfo_array_max = 0;
-volatile U32 SoundFlags = 0;
-volatile S32 fc = 0;
 static char soundInited = 0;
-U32 houston_we_have_a_problem = 0;
+static SDL_AudioDeviceID output_device = 0;
+static S32 sinfo_array_max = 0;
+static sinfo sinfo_array[12];
+// Stores result of most recent iSndLookup
+static iSndFileInfo snd;
 
-static const char* dump_flags(U32 flags)
-{
-    static char str[0x40];
-
-    memset(str, 0, sizeof(str));
-
-    char* p = str;
-    char cvt[5] = "-01X";
-    *p++ = 'L';
-    *p++ = cvt[(flags & 0x200) ? 1 : (flags & 0x400) ? 2 : 0];
-    *p++ = 'D';
-    *p++ = cvt[(flags & 0x1000) ? 1 : (flags & 0x2000) ? 2 : 0];
-    *p++ = 'P';
-    *p++ = cvt[(flags & 0x4000) ? 1 : (flags & 0x8000) ? 2 : 0];
-    *p++ = (flags & 0x400000) ? 'F' : '-';
-    *p++ = 'R';
-    *p++ = (flags & 0x100) ? 'X' : '-';
-    *p++ = 'D';
-    *p++ = (flags & 0x800) ? 'X' : '-';
-
-    return str;
-}
+#define NUM_STREAMS 6
+#define NUM_EFFECTS (ISND_TOTAL_VOICES - NUM_STREAMS)
+static SDL_AudioStream* voices[ISND_TOTAL_VOICES] = { 0 };
 
 void iSndInit()
 {
     soundInited = 1;
+    output_device = SDL_OpenAudioDevice(SDL_AUDIO_DEVICE_DEFAULT_PLAYBACK, NULL);
 }
 
 void iSndExit()
 {
     soundInited = 0;
+    SDL_CloseAudioDevice(output_device);
+    output_device = 0;
 }
 
-//not sure where this type is from.
 void iSndSetEnvironmentalEffect(isound_effect)
 {
     return;
@@ -179,27 +82,20 @@ bool iSndIsPlaying(U32 assetID)
         return false;
     }
 
-    for (S32 i = 0; i < 6; i++)
+    for (S32 i = 0; i < ISND_TOTAL_VOICES; i++)
     {
         if (gSnd.voice[i].assetID == assetID)
         {
-            if (streams[i].vinf.flags & 0xC000 && (streams[i].vinf.flags & 0x82) == 0)
+            SDL_AudioStream* stream = voices[i];
+            if (SDL_AudioStreamDevicePaused(stream))
             {
-                return true;
+                return TRUE;
             }
-            return false;
-        }
-    }
-
-    for (S32 i = 0; i < 0x3a; i++)
-    {
-        if (gSnd.voice[i + 6].assetID == assetID)
-        {
-            if (voices[i].flags & 0x4 && (voices[i].flags & 0x8) == 0)
+            if (SDL_GetAudioStreamQueued(stream))
             {
-                return true;
+                return TRUE;
             }
-            return false;
+            return FALSE;
         }
     }
     return true;
@@ -207,7 +103,7 @@ bool iSndIsPlaying(U32 assetID)
 
 bool iSndIsPlaying(U32 assetID, U32 parid)
 {
-    for (U32 i = 0; i < 0x40; i++)
+    for (U32 i = 0; i < ISND_TOTAL_VOICES; i++)
     {
         if ((assetID == 0 || gSnd.voice[i].assetID == assetID) && gSnd.voice[i].parentID == parid)
         {
@@ -227,104 +123,88 @@ bool iSndIsPlayingByHandle(U32 handle)
         return false;
     }
 
-    for (S32 i = 0; i < 6; i++)
+    for (S32 i = 0; i < ISND_TOTAL_VOICES; i++)
     {
         if (gSnd.voice[i].sndID == handle)
         {
-            return (streams[i].vinf.flags & 0xC000 && (streams[i].vinf.flags & 0x82) == 0);
-        }
-    }
-
-    for (S32 i = 0; i < 0x3a; i++)
-    {
-        if (gSnd.voice[i + 6].sndID == handle)
-        {
-            return (voices[i].flags & 0x4 && (voices[i].flags & 0x8) == 0);
+            SDL_AudioStream* stream = voices[i];
+            if (SDL_AudioStreamDevicePaused(stream))
+            {
+                return TRUE;
+            }
+            if (SDL_GetAudioStreamQueued(stream))
+            {
+                return TRUE;
+            }
+            return FALSE;
         }
     }
     return false;
 }
 
-static S32 sound_stream;
-
-iSndFileInfo* iSndLookup(U32 id)
+iSndFileInfo* iSndLookup(U32 aid)
 {
     static S32 strm_id = 1;
     static S32 snd_id = 0x1000;
 
-    sound_stream = 0;
-
-    if (id == 0)
+    if (aid == 0)
     {
         return NULL;
     }
 
     for (S32 i = sinfo_array_max - 1; i >= 0; i--)
     {
-        sndinfo* info = sinfo_array[i].info;
+        XboxSNDI* info = sinfo_array[i].toc;
         if (info == NULL)
         {
             continue;
         }
 
-        sndhdr* entry = info->entry;
+        XboxSndEntry* entry = info->entry;
         U32 n = info->num_sfx;
         U32 j = 0;
 
         for (; j < n; j++)
         {
-            if (id == entry[j].assetID)
+            if (aid == entry[j].assetID)
             {
-                memcpy(&snd, &entry[j], sizeof(sndhdr));
-                memcpy(&snd.file, &sinfo_array[i], sizeof(tag_xFile));
+                memcpy(&snd, &entry[j], sizeof(XboxSndEntry));
                 snd.id = snd_id++;
                 if (snd_id >= 0x7ffa)
                 {
                     snd_id = 0x1000;
                 }
-                return (iSndFileInfo*)&snd;
+                return &snd;
             }
         }
 
         n = info->num_streams + n;
         for (; j < n; j++)
         {
-            if (id == entry[j].assetID)
+            if (aid == entry[j].assetID)
             {
-                memcpy(&snd, &entry[j], sizeof(sndhdr));
-                memcpy(&snd.file, &sinfo_array[i], sizeof(tag_xFile));
+                memcpy(&snd, &entry[j], sizeof(XboxSndEntry));
                 snd.id = strm_id++;
                 if (strm_id >= 0xffe)
                 {
                     strm_id = 1;
                 }
-                if (entry[j].pad[0] == 0x63)
-                {
-                    snd.id = 0x1000;
-                    sound_stream = 0;
-                }
-                else
-                {
-                    sound_stream = 1;
-                }
-                return (iSndFileInfo*)&snd;
+                return &snd;
             }
         }
 
         n = info->num_cutscene + n;
         for (; j < n; j++)
         {
-            if (id == entry[j].assetID)
+            if (aid == entry[j].assetID)
             {
-                memcpy(&snd, &entry[j], sizeof(sndhdr));
-                memcpy(&snd.file, &sinfo_array[i], sizeof(tag_xFile));
+                memcpy(&snd, &entry[j], sizeof(XboxSndEntry));
                 snd.id = strm_id++;
                 if (strm_id >= 0xffe)
                 {
                     strm_id = 1;
                 }
-                sound_stream = 2;
-                return (iSndFileInfo*)&snd;
+                return &snd;
             }
         }
     }
@@ -338,6 +218,30 @@ void iSndPause(U32 snd, U32 pause)
     {
         return;
     }
+
+    S32 i;
+    for (i = 0; i < ISND_TOTAL_VOICES; i++)
+    {
+        if (gSnd.voice[i].sndID == snd)
+            break;
+    }
+
+    if (i < ISND_TOTAL_VOICES)
+    {
+        SDL_AudioStream* stream = voices[i];
+        if (stream == NULL)
+        {
+            return;
+        }
+        if (pause)
+        {
+            SDL_UnbindAudioStream(stream);
+        }
+        else if (SDL_GetAudioStreamDevice(stream) == NULL)
+        {
+            SDL_BindAudioStream(output_device, stream);
+        }
+    }
 }
 
 void iSndStop(U32 snd)
@@ -346,9 +250,24 @@ void iSndStop(U32 snd)
     {
         return;
     }
+
+    SDL_AudioStream** stream = NULL;
+    for (S32 i = 0; i < ISND_TOTAL_VOICES; i++)
+    {
+        if (gSnd.voice[i].sndID == snd)
+            stream = &voices[i];
+    }
+
+    if (*stream == NULL)
+    {
+        return;
+    }
+
+    SDL_DestroyAudioStream(*stream);
+    *stream = NULL;
 }
 
-U32 iVolFromX(F32 param1)
+static U32 iVolFromX(F32 param1)
 {
     float f = MAX(param1, 1e-20f);
 
@@ -365,12 +284,12 @@ U32 iVolFromX(F32 param1)
     }
 }
 
-void iSndCalcVol(xSndVoiceInfo* vp, vinfo* info)
+static void iSndCalcVol(xSndVoiceInfo* vp)
 {
     S32 vol = iVolFromX(vp->vol * gSnd.categoryVolFader[vp->category]);
 }
 
-void iSndCalcVol3d(xSndVoiceInfo* vp, vinfo* info)
+static void iSndCalcVol3d(xSndVoiceInfo* vp)
 {
     xVec3 to;
 
@@ -407,175 +326,352 @@ void iSndCalcVol3d(xSndVoiceInfo* vp, vinfo* info)
     }
 }
 
-void iSndVolUpdate(xSndVoiceInfo* info, vinfo* vinfo)
-{
-}
-
-U32 staticibuf;
-
-void iSndUpdateSounds()
-{
-    if (!soundInited)
-    {
-        return;
-    }
-}
-
 void iSndUpdate()
 {
     if (!soundInited)
     {
         return;
     }
+
+    for (S32 i = 0; i < ISND_TOTAL_VOICES; i++)
+    {
+        xSndVoiceInfo* vp = &gSnd.voice[i];
+        SDL_AudioStream** stream = &voices[i];
+        if (stream != NULL && SDL_GetAudioStreamQueued(*stream) == 0)
+        {
+            SDL_DestroyAudioStream(*stream);
+            *stream = NULL;
+            vp->flags &= ~XSND_VOICE_ACTIVE;
+        }
+    }
+}
+
+static SDL_AudioStream* InitVoice(S32 idx)
+{
+    SDL_AudioSpec spec{ .format = SDL_AUDIO_S16LE,
+                        .channels = snd.hdr.nChannels,
+                        .freq = static_cast<int>(snd.hdr.sample_rate) };
+    SDL_AudioStream** stream = &voices[idx];
+    assert(*stream == NULL && "Attempted to reinitialize existing voice");
+    *stream = SDL_CreateAudioStream(&spec, NULL);
+    if (*stream == NULL)
+    {
+        SDL_Log("Failed to create audio stream: %s", SDL_GetError());
+        SDL_DestroyAudioStream(*stream);
+        *stream = NULL;
+        return NULL;
+    }
+    if (!SDL_BindAudioStream(output_device, *stream))
+    {
+        SDL_Log("Failed to bind audio stream: %s", SDL_GetError());
+        SDL_DestroyAudioStream(*stream);
+        *stream = NULL;
+        return NULL;
+    }
+    return *stream;
 }
 
 S32 iSndFindFreeVoice(U32 priority, U32 flags, U32 owner)
 {
+    if (priority > 0xff)
+    {
+        priority = 0xff;
+    }
+
+    if (flags & XSND_VOICE_TYPE_STREAM)
+    {
+        if (owner != 0)
+        {
+            xSndVoiceInfo* begin = gSnd.voice;
+            xSndVoiceInfo* end = &begin[NUM_STREAMS];
+
+            for (xSndVoiceInfo* vp = begin; vp != end; vp++)
+            {
+                S32 i = vp - begin;
+
+                if (vp->lock_owner == 0)
+                {
+                    continue;
+                }
+                if (vp->lock_owner != owner)
+                {
+                    continue;
+                }
+
+                if ((vp->flags & (XSND_VOICE_LOCKABLE | XSND_VOICE_ACTIVE)) == 1)
+                {
+                    iSndStop(vp->sndID);
+                }
+
+                SDL_AudioStream** stream = &voices[i];
+                if (InitVoice(i) == NULL)
+                {
+                    return -1;
+                }
+                return i;
+            }
+        }
+
+        for (S32 i = 0; i < NUM_STREAMS; i++)
+        {
+            if (gSnd.voice[i].lock_owner != 0)
+            {
+                continue;
+            }
+            SDL_AudioStream** stream = &voices[i];
+            if (*stream != NULL)
+            {
+                continue;
+            }
+
+            if (InitVoice(i) == NULL)
+            {
+                return -1;
+            }
+
+            return i;
+        }
+    }
+    else
+    {
+        for (S32 i = 0; i < NUM_EFFECTS; i++)
+        {
+            SDL_AudioStream** stream = &voices[i + NUM_STREAMS];
+            if (*stream == NULL)
+            {
+                if (InitVoice(i + NUM_STREAMS) == NULL)
+                {
+                    return -1;
+                }
+                return i + NUM_STREAMS;
+            }
+        }
+    }
+
     return -1;
-}
-
-S32 iSndPrepStream(xSndVoiceInfo* vp)
-{
-    S32 i = vp - gSnd.voice;
-    return i;
-}
-
-S32 iSndPlayMemStream(xSndVoiceInfo* vp)
-{
-    return 0;
-}
-
-S32 iSndPlayStream(xSndVoiceInfo* vp)
-{
-    return 0;
-}
-
-S32 iSndPlaySound(xSndVoiceInfo* vp)
-{
-    return 0;
 }
 
 S32 iSndPlay(xSndVoiceInfo* vp)
 {
-    S32 offset = (S32)vp - (S32)gSnd.voice;
-    S32 div = offset / 100;
+    assert(snd.hdr.assetID == vp->assetID &&
+           "Snd Asset should have already been looked up before the xSndVoiceInfo was made.");
+    S32 voice = vp - gSnd.voice;
 
-    xSTAssetName(vp->assetID);
-
-    if ((div < 0) || (div >= 64))
+    if ((voice < 0) || (voice >= ISND_TOTAL_VOICES))
     {
-        return 0;
+        return FALSE;
     }
-    else if (div < 6)
+
+    SDL_AudioStream* stream = voices[voice];
+    if (voice < NUM_STREAMS)
     {
-        U32 ret = iSndPrepStream(vp);
-        if (ret < 0x3a)
+        if (snd.hdr.wFormatTag == XBOX_SND_FORMAT_XBOX_ADPCM)
         {
-            if (vp->flags & XSND_VOICE_MEMORY)
+            // TODO: Decode this audio when loading the sound data initially.
+            Uint8* out_buf;
+            Uint32 out_len;
+            if (IMA_ADPCM_Decode(&snd.hdr, &out_buf, &out_len))
             {
-                return iSndPlayMemStream(vp);
+                // Note: For some reason the decoded IMA ADPCM audio plays back at 64/65 speed.
+                // There may be a better fix for this but for now this should work pretty well.
+                SDL_SetAudioStreamFrequencyRatio(stream, 65.0f / 64.0f);
+                SDL_PutAudioStreamData(stream, out_buf, out_len);
+                SDL_FlushAudioStream(stream);
+                SDL_free(out_buf);
             }
             else
             {
-                return iSndPlayStream(vp);
+                SDL_Log("Failed to load WAV: %s", SDL_GetError());
+                return 0;
             }
         }
-        return ret;
+        else
+        {
+            SDL_PutAudioStreamData(stream, snd.hdr.mem, snd.hdr.Datasize);
+            SDL_FlushAudioStream(stream);
+        }
+        return TRUE;
     }
     else
     {
-        return iSndPlaySound(vp);
+        SDL_PutAudioStreamData(stream, snd.hdr.mem, snd.hdr.Datasize);
+        SDL_FlushAudioStream(stream);
+        return TRUE;
     }
 }
 
 void iSndSetVol(U32 snd, F32 vol)
 {
+    if (snd == 0)
+    {
+        return;
+    }
+
+    SDL_AudioStream** stream = NULL;
+    for (S32 i = 0; i < ISND_TOTAL_VOICES; i++)
+    {
+        if (gSnd.voice[i].sndID == snd)
+            stream = &voices[i];
+    }
+
+    if (*stream == NULL)
+    {
+        return;
+    }
+    SDL_SetAudioStreamGain(*stream, vol);
 }
 
 void iSndSetPitch(U32 snd, F32 pitch)
 {
+    // PC_TODO
 }
 
 void iSndStartStereo(U32 id1, U32 id2, F32 pitch)
 {
+    SDL_Log(
+        "iSndStartStereo called. This function is not reachable on GC and not implemented on PC.");
 }
 
 void iSndStereo(U32 i)
 {
-}
-
-void iSndWaitForDeadSounds()
-{
-#ifdef PC_TODO
-    fc = 0;
-    for (int i = 0x8c; fc < i;)
+    if (i == 0)
     {
-        // `i` is weird, it's stored in a saved register but never mutated. However it needs to be mutated to put it in a saved register
-        i = fc;
-        while (fc < i + 0xe)
-            ;
-        // This adds the nonmatching instruction, but get's us back to the state `i`'s register should be in.
-        i = 0x8c;
-        iSndUpdate();
+        gSnd.stereo = FALSE;
     }
-#endif
-}
-
-void iSndSuspendCD(U32)
-{
+    else
+    {
+        gSnd.stereo = TRUE;
+    }
 }
 
 void iSndSceneExit()
 {
-}
+    S32 done = 0;
 
-void iSndMessWithEA(sDSPADPCM* param1)
-{
-    if (param1 != NULL)
+    for (S32 i = 0; i < ISND_TOTAL_VOICES; i++)
     {
-        param1->buffer[5] = SampleToNybbleAddress(param1->buffer[0] - 1);
+        if (gSnd.voice[i].sndID != 0)
+        {
+            iSndStop(gSnd.voice[i].sndID);
+        }
+    }
+
+    for (S32 i = 0; i < ISND_TOTAL_VOICES; i++)
+    {
+        if (gSnd.voice[i].sndID != 0)
+        {
+            iSndStop(gSnd.voice[i].sndID);
+        }
+    }
+
+    sinfo_array_max--;
+    if (sinfo_array[sinfo_array_max].toc != NULL)
+    {
+        RwFree(sinfo_array[sinfo_array_max].snd_mem);
+        RwFree(sinfo_array[sinfo_array_max].toc);
     }
 }
 
-U32 SampleToNybbleAddress(U32 sample)
-{
-    // U32 a = __mulhwu(0x24924925, sample);
-    // U32 b = (sample - a) >> 1;
-
-    // a = b + a;
-    // b = (a >> 3);
-    // a = (a << 1) & 0xfffffff0;
-    // a = a + (sample - (b * 0xe)) + 2;
-
-    // return a;
-
-    assert(false && "TODO");
-    return 0;
-}
-
-void sndloadcb(tag_xFile* tag)
-{
-    SoundFlags = 0;
-}
 S32 iSndLoadSounds(void* data)
 {
-    return 1;
-}
+    XboxSNDI* toc = (XboxSNDI*)data;
 
-void iSndDIEDIEDIE()
-{
+    if (toc->num_sfx == 0 && toc->num_streams == 0 && toc->num_cutscene == 0)
+    {
+        sinfo_array[sinfo_array_max++].toc = NULL;
+        return 0;
+    }
+
+    if (sinfo_array_max >= 12)
+    {
+        exit(-1);
+    }
+
+    XboxSndEntry* entries = toc->entry;
+    sinfo_array[sinfo_array_max].toc = toc;
+
+    char* path = xST_xAssetID_HIPFullPath(entries[0].assetID);
+    U32 hash = xStrHash(path);
+    sinfo* si = &sinfo_array[sinfo_array_max];
+
+    iFileOpen(path, IFILE_OPEN_READ, &si->file);
+
+    U32 max = 0;
+    U32 min = -1;
+    XboxSndEntry* e = entries;
+    for (S32 i = 0; i < toc->num_sfx; i++)
+    {
+        st_PKR_ASSET_TOCINFO xinfo;
+        xSTGetAssetInfoInHxP(e->assetID, &xinfo, hash);
+
+        U32 off = xinfo.plus_offset + (xinfo.sector << 5);
+        U32 end = off + xinfo.size;
+        if (min > off)
+        {
+            min = off;
+        }
+        if (max < end)
+        {
+            max = end;
+        }
+
+        e->mem = (void*)off;
+        e++;
+    }
+
+    for (S32 i = 0; i < toc->num_streams; i++)
+    {
+        st_PKR_ASSET_TOCINFO xinfo;
+
+        xSTGetAssetInfo(entries[i + toc->num_sfx].assetID, &xinfo);
+        xinfo.size = ALIGN_NEXT(xinfo.size, 0x20);
+
+        U32 off = xinfo.plus_offset + (xinfo.sector << 5);
+        U32 end = off + xinfo.size;
+        if (min > off)
+        {
+            min = off;
+        }
+        if (max < end)
+        {
+            max = end;
+        }
+
+        entries[i + toc->num_sfx].mem = (void*)off;
+    }
+
+    if (toc->num_sfx != 0 || toc->num_streams != 0)
+    {
+        U32 total = max - min;
+
+        void* mem = RwMalloc(total);
+        sinfo_array[sinfo_array_max].snd_mem = mem;
+        SPTR delta = (-min + (UPTR)mem);
+
+        XboxSndEntry* e2 = entries;
+        for (S32 i = 0; i < toc->num_sfx; i++)
+        {
+            e2->mem = (void*)((UPTR)e2->mem + delta);
+            e2++;
+        }
+
+        for (S32 i = 0; i < toc->num_streams; i++)
+        {
+            entries[i + toc->num_sfx].mem = (void*)((UPTR)entries[i + toc->num_sfx].mem + delta);
+        }
+
+        iFileSeek(&si->file, min, IFILE_SEEK_SET);
+        iFileRead(&si->file, mem, total);
+    }
+
+    sinfo_array_max++;
+
+    return 1;
 }
 
 void iSndSetExternalCallback(iSndExternalCallback callback)
 {
-}
-
-void iSndSuspend()
-{
-}
-
-void iSndResume()
-{
+    // Not implemented on GC or PC
 }
 
 F32 iSndGetVol(U32 snd)
@@ -599,4 +695,14 @@ F32 iSndGetVol(U32 snd)
     }
 
     return 0.0f;
+}
+
+// Required functions that are N/A to PC
+
+void iSndWaitForDeadSounds()
+{
+}
+
+void iSndSuspendCD(U32)
+{
 }

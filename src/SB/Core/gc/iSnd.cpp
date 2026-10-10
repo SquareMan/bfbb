@@ -91,18 +91,9 @@ struct sinfo
     sndinfo* info; // 0x118
 };
 
-// Size: 0x180
-struct sndlookup
-{
-    sndhdr hdr; // 0x000
-    U32 id; // 0x064
-    tag_xFile file; // 0x068
-    U32 pad; // 0x17c
-};
-
 // Size: 0x10c
 // Looks like this might be a vinfo struct at the beginning here.
-struct UNK_STREAM
+struct streaminfo
 {
     vinfo vinf;
     sndhdr hdr;
@@ -121,13 +112,13 @@ struct UNK_STREAM
     U32 x108;
 };
 
-UNK_STREAM streams[6];
+streaminfo streams[6];
 
 vinfo voices[58];
 
 sinfo sinfo_array[12];
 
-sndlookup snd;
+iSndFileInfo snd;
 
 U32* ua_stream_buffer = NULL; //unaligned stream buffer
 U32* stream_buffer = 0;
@@ -161,7 +152,7 @@ static void dv_callback(void* userdata)
     xSndVoiceInfo* info = &gSnd.voice[stream];
     info->sndID = 0;
     info->flags = 0;
-    if (stream < sizeof(streams) / sizeof(UNK_STREAM))
+    if (stream < sizeof(streams) / sizeof(streaminfo))
     {
         U32 idx = stream;
         if (streams[idx].vinf.voice == NULL)
@@ -180,7 +171,7 @@ static void dv_callback(void* userdata)
     }
     else
     {
-        U32 idx = stream - sizeof(streams) / sizeof(UNK_STREAM);
+        U32 idx = stream - sizeof(streams) / sizeof(streaminfo);
         if (voices[idx].voice == NULL)
         {
             return;
@@ -236,7 +227,7 @@ static void dvdcb(s32 r3, DVDFileInfo* info)
         return;
     }
 
-    UNK_STREAM* data = (UNK_STREAM*)info->cb.userData;
+    streaminfo* data = (streaminfo*)info->cb.userData;
     xSTAssetName(data->vinf.aid);
     dump_flags(data->vinf.flags);
     if (data->vinf.voice == NULL)
@@ -287,7 +278,7 @@ static void arqcb(u32 pointerToARQRequest)
         return;
     }
 
-    UNK_STREAM* data = (UNK_STREAM*)((ARQRequest*)pointerToARQRequest)->owner;
+    streaminfo* data = (streaminfo*)((ARQRequest*)pointerToARQRequest)->owner;
 
     xSTAssetName(data->vinf.aid);
     dump_flags(data->vinf.flags);
@@ -792,7 +783,7 @@ iSndFileInfo* iSndLookup(U32 id)
                 {
                     snd_id = 0x1000;
                 }
-                return (iSndFileInfo*)&snd;
+                return &snd;
             }
         }
 
@@ -817,7 +808,7 @@ iSndFileInfo* iSndLookup(U32 id)
                 {
                     sound_stream = 1;
                 }
-                return (iSndFileInfo*)&snd;
+                return &snd;
             }
         }
 
@@ -834,7 +825,7 @@ iSndFileInfo* iSndLookup(U32 id)
                     strm_id = 1;
                 }
                 sound_stream = 2;
-                return (iSndFileInfo*)&snd;
+                return &snd;
             }
         }
     }
@@ -917,7 +908,7 @@ void iSndStop(U32 snd)
     {
         if (streams[i].vinf.voice != NULL)
         {
-            UNK_STREAM* pv = &streams[i];
+            streaminfo* pv = &streams[i];
             DVDCancel(&pv->fileInfo.cb);
             ARQRemoveRequest(&pv->request);
             AXSetVoiceState(pv->vinf.voice, 0);
@@ -1188,7 +1179,7 @@ S32 iSndFindFreeVoice(U32 priority, U32 flags, U32 owner)
         priority = 0xff;
     }
 
-    if (flags & 0x4)
+    if (flags & XSND_VOICE_TYPE_STREAM)
     {
         if (owner != 0)
         {
@@ -1278,7 +1269,7 @@ S32 iSndFindFreeVoice(U32 priority, U32 flags, U32 owner)
 S32 iSndPrepStream(xSndVoiceInfo* vp)
 {
     S32 i = vp - gSnd.voice;
-    UNK_STREAM* s = &streams[i];
+    streaminfo* s = &streams[i];
 
     if (snd.hdr.assetID != vp->assetID)
     {
@@ -1307,7 +1298,7 @@ S32 iSndPrepStream(xSndVoiceInfo* vp)
 S32 iSndPlayMemStream(xSndVoiceInfo* vp)
 {
     S32 i = vp - gSnd.voice;
-    UNK_STREAM* s = &streams[i];
+    streaminfo* s = &streams[i];
 
     if (s->vinf.voice != NULL && (s->vinf.flags & 0x1))
     {
@@ -1360,7 +1351,7 @@ S32 iSndPlayMemStream(xSndVoiceInfo* vp)
 S32 iSndPlayStream(xSndVoiceInfo* vp)
 {
     S32 i = vp - gSnd.voice;
-    UNK_STREAM* s = &streams[i];
+    streaminfo* s = &streams[i];
 
     if (s->hdr.loop_start + s->x8c >= s->fileInfo.length)
     {
@@ -1725,7 +1716,7 @@ void iSndMessWithEA(sDSPADPCM* param1)
 {
     if (param1 != NULL)
     {
-        param1->buffer[5] = SampleToNybbleAddress(param1->buffer[0] - 1);
+        param1->loop_end = SampleToNybbleAddress(param1->num_samples - 1);
     }
 }
 
@@ -1930,9 +1921,9 @@ void iSndDIEDIEDIE()
     OSDisableInterrupts();
     soundInited = 0;
 
-    for (S32 i = 0; i < (S32)(sizeof(streams) / (sizeof(UNK_STREAM))); i++)
+    for (S32 i = 0; i < (S32)(sizeof(streams) / (sizeof(streaminfo))); i++)
     {
-        UNK_STREAM* pv = &streams[i];
+        streaminfo* pv = &streams[i];
 
         if (pv->vinf.voice != NULL)
         {
@@ -1975,9 +1966,9 @@ void iSndSuspend()
 {
     AXRegisterCallback(0);
 
-    for (S32 i = 0; i < (S32)(sizeof(streams) / (sizeof(UNK_STREAM))); i++)
+    for (S32 i = 0; i < (S32)(sizeof(streams) / (sizeof(streaminfo))); i++)
     {
-        UNK_STREAM* pv = &streams[i];
+        streaminfo* pv = &streams[i];
 
         if (pv->vinf.voice != NULL)
         {
@@ -1999,9 +1990,9 @@ void iSndSuspend()
 
 void iSndResume()
 {
-    for (S32 i = 0; i < (S32)(sizeof(streams) / (sizeof(UNK_STREAM))); i++)
+    for (S32 i = 0; i < (S32)(sizeof(streams) / (sizeof(streaminfo))); i++)
     {
-        UNK_STREAM* pv = &streams[i];
+        streaminfo* pv = &streams[i];
 
         if ((pv->vinf.voice != NULL) && !(pv->vinf.flags & 2))
         {
