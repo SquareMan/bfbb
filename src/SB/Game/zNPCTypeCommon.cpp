@@ -3182,7 +3182,7 @@ U32 zNPCCommon::SndStart(U32 aid_toplay, NPCSndProp* sprop, F32 radius)
     }
 
     xsndflags = XSND_VOICE_BIT_16;
-    owner = (U32)this + (flg_snd & 0x3);
+    owner = (U32)(xEnt*)this + (flg_snd & 0x3);
     if (flg_snd & 0x1000)
     {
         xsndflags &= ~XSND_VOICE_BIT_16;
