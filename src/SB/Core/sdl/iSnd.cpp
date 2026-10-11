@@ -251,79 +251,26 @@ void iSndStop(U32 snd)
         return;
     }
 
+    xSndVoiceInfo* vp = NULL;
     SDL_AudioStream** stream = NULL;
     for (S32 i = 0; i < ISND_TOTAL_VOICES; i++)
     {
         if (gSnd.voice[i].sndID == snd)
+        {
+            vp = &gSnd.voice[i];
             stream = &voices[i];
+        }
     }
 
-    if (*stream == NULL)
+    if (stream == NULL || *stream == NULL)
     {
         return;
     }
+    assert(vp);
 
     SDL_DestroyAudioStream(*stream);
+    vp->flags &= ~XSND_VOICE_ACTIVE;
     *stream = NULL;
-}
-
-static U32 iVolFromX(F32 param1)
-{
-    float f = MAX(param1, 1e-20f);
-
-    S32 i = 43.43f * xlog(f);
-    S32 comp = MIN(i, 0);
-
-    if (comp < -0x388)
-    {
-        return -0x388;
-    }
-    else
-    {
-        return MIN(i, 0);
-    }
-}
-
-static void iSndCalcVol(xSndVoiceInfo* vp)
-{
-    S32 vol = iVolFromX(vp->vol * gSnd.categoryVolFader[vp->category]);
-}
-
-static void iSndCalcVol3d(xSndVoiceInfo* vp)
-{
-    xVec3 to;
-
-    xVec3Sub(&to, &vp->playPos, &gSnd.pos);
-    F32 dist2 = xVec3Length2(&to);
-    xVec3Normalize(&to, &to);
-    F32 pan = xVec3Dot(&to, &gSnd.right);
-
-    F32 volscale;
-    if (dist2 > vp->outerRadius2)
-    {
-        volscale = 0.0f;
-    }
-    else if (dist2 <= vp->innerRadius2)
-    {
-        volscale = 1.0f;
-    }
-    else
-    {
-        F32 fadeRange = vp->outerRadius2 - vp->innerRadius2;
-        volscale = std::sqrtf((fadeRange - (dist2 - vp->innerRadius2)) / fadeRange);
-    }
-
-    S32 ipan = (S32)(64.0f * pan) + 0x40;
-    S32 vol = iVolFromX(volscale * (vp->vol * gSnd.categoryVolFader[vp->category]));
-
-    if (ipan < 0)
-    {
-        ipan = 0;
-    }
-    else if (ipan > 0x7f)
-    {
-        ipan = 0x7f;
-    }
 }
 
 void iSndUpdate()
@@ -403,7 +350,6 @@ S32 iSndFindFreeVoice(U32 priority, U32 flags, U32 owner)
                     iSndStop(vp->sndID);
                 }
 
-                SDL_AudioStream** stream = &voices[i];
                 if (InitVoice(i) == NULL)
                 {
                     return -1;
@@ -418,17 +364,15 @@ S32 iSndFindFreeVoice(U32 priority, U32 flags, U32 owner)
             {
                 continue;
             }
-            SDL_AudioStream** stream = &voices[i];
-            if (*stream != NULL)
+
+            if (voices[i] != NULL)
             {
                 continue;
             }
-
             if (InitVoice(i) == NULL)
             {
                 return -1;
             }
-
             return i;
         }
     }
@@ -436,15 +380,15 @@ S32 iSndFindFreeVoice(U32 priority, U32 flags, U32 owner)
     {
         for (S32 i = 0; i < NUM_EFFECTS; i++)
         {
-            SDL_AudioStream** stream = &voices[i + NUM_STREAMS];
-            if (*stream == NULL)
+            if (voices[i + NUM_STREAMS] != NULL)
             {
-                if (InitVoice(i + NUM_STREAMS) == NULL)
-                {
-                    return -1;
-                }
-                return i + NUM_STREAMS;
+                continue;
             }
+            if (InitVoice(i + NUM_STREAMS) == NULL)
+            {
+                return -1;
+            }
+            return i + NUM_STREAMS;
         }
     }
 
@@ -463,6 +407,9 @@ S32 iSndPlay(xSndVoiceInfo* vp)
     }
 
     SDL_AudioStream* stream = voices[voice];
+
+    iSndSetVol(vp->sndID, vp->vol);
+
     if (voice < NUM_STREAMS)
     {
         if (snd.hdr.wFormatTag == XBOX_SND_FORMAT_XBOX_ADPCM)
@@ -470,7 +417,7 @@ S32 iSndPlay(xSndVoiceInfo* vp)
             // TODO: Decode this audio when loading the sound data initially.
             Uint8* out_buf;
             Uint32 out_len;
-            if (IMA_ADPCM_Decode(&snd.hdr, &out_buf, &out_len))
+            if (Xbox_ADPCM_Decode(&snd.hdr, &out_buf, &out_len))
             {
                 SDL_PutAudioStreamData(stream, out_buf, out_len);
                 SDL_FlushAudioStream(stream);
@@ -497,6 +444,51 @@ S32 iSndPlay(xSndVoiceInfo* vp)
     }
 }
 
+static void iSndCalcVol(xSndVoiceInfo* vp, SDL_AudioStream* stream)
+{
+    SDL_SetAudioStreamGain(stream, vp->vol * gSnd.categoryVolFader[vp->category]);
+}
+
+static void iSndCalcVol3d(xSndVoiceInfo* vp, SDL_AudioStream* stream)
+{
+    xVec3 to;
+
+    xVec3Sub(&to, &vp->playPos, &gSnd.pos);
+    F32 dist2 = xVec3Length2(&to);
+    xVec3Normalize(&to, &to);
+    F32 pan = xVec3Dot(&to, &gSnd.right);
+
+    F32 volscale;
+    if (dist2 > vp->outerRadius2)
+    {
+        volscale = 0.0f;
+    }
+    else if (dist2 <= vp->innerRadius2)
+    {
+        volscale = 1.0f;
+    }
+    else
+    {
+        F32 fadeRange = vp->outerRadius2 - vp->innerRadius2;
+        volscale = std::sqrtf((fadeRange - (dist2 - vp->innerRadius2)) / fadeRange);
+    }
+
+    S32 ipan = (S32)(64.0f * pan) + 0x40;
+    S32 vol = volscale * (vp->vol * gSnd.categoryVolFader[vp->category]);
+
+    if (ipan < 0)
+    {
+        ipan = 0;
+    }
+    else if (ipan > 0x7f)
+    {
+        ipan = 0x7f;
+    }
+
+    SDL_SetAudioStreamGain(stream, vol);
+    // TODO: panning
+}
+
 void iSndSetVol(U32 snd, F32 vol)
 {
     if (snd == 0)
@@ -504,18 +496,30 @@ void iSndSetVol(U32 snd, F32 vol)
         return;
     }
 
-    SDL_AudioStream** stream = NULL;
+    SDL_AudioStream* stream = NULL;
+    xSndVoiceInfo* info = NULL;
     for (S32 i = 0; i < ISND_TOTAL_VOICES; i++)
     {
         if (gSnd.voice[i].sndID == snd)
-            stream = &voices[i];
+        {
+            stream = voices[i];
+            info = &gSnd.voice[i];
+        }
     }
+    assert(info);
 
-    if (*stream == NULL)
+    if (stream == NULL)
     {
         return;
     }
-    SDL_SetAudioStreamGain(*stream, vol);
+    if ((info->flags & XSND_VOICE_POSITIONAL) != 0)
+    {
+        iSndCalcVol3d(info, stream);
+    }
+    else
+    {
+        iSndCalcVol(info, stream);
+    }
 }
 
 void iSndSetPitch(U32 snd, F32 pitch)
