@@ -474,7 +474,7 @@ static void iSndCalcVol3d(xSndVoiceInfo* vp, SDL_AudioStream* stream)
     }
 
     S32 ipan = (S32)(64.0f * pan) + 0x40;
-    S32 vol = volscale * (vp->vol * gSnd.categoryVolFader[vp->category]);
+    F32 vol = volscale * (vp->vol * gSnd.categoryVolFader[vp->category]);
 
     if (ipan < 0)
     {
