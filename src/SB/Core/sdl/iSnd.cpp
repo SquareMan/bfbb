@@ -410,38 +410,29 @@ S32 iSndPlay(xSndVoiceInfo* vp)
 
     iSndSetVol(vp->sndID, vp->vol);
 
-    if (voice < NUM_STREAMS)
-    {
         if (snd.hdr.wFormatTag == XBOX_SND_FORMAT_XBOX_ADPCM)
         {
             // TODO: Decode this audio when loading the sound data initially.
-            Uint8* out_buf;
-            Uint32 out_len;
-            if (Xbox_ADPCM_Decode(&snd.hdr, &out_buf, &out_len))
+        U8* out_buf = NULL;
+        U32 out_len = 0;
+        if (!Xbox_ADPCM_Decode(&snd.hdr, &out_buf, &out_len))
             {
+            SDL_Log("Failed to decode Xbox ADPCM formatted sound asset 0x%08x: %s", snd.hdr.assetID,
+                    SDL_GetError());
+            return FALSE;
+        }
+
                 SDL_PutAudioStreamData(stream, out_buf, out_len);
                 SDL_FlushAudioStream(stream);
                 SDL_free(out_buf);
-            }
-            else
-            {
-                SDL_Log("Failed to load WAV: %s", SDL_GetError());
-                return 0;
-            }
-        }
-        else
-        {
-            SDL_PutAudioStreamData(stream, snd.hdr.mem, snd.hdr.Datasize);
-            SDL_FlushAudioStream(stream);
-        }
-        return TRUE;
     }
     else
     {
         SDL_PutAudioStreamData(stream, snd.hdr.mem, snd.hdr.Datasize);
         SDL_FlushAudioStream(stream);
-        return TRUE;
     }
+
+    return TRUE;
 }
 
 static void iSndCalcVol(xSndVoiceInfo* vp, SDL_AudioStream* stream)
