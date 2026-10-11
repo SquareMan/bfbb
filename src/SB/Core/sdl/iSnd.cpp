@@ -472,9 +472,6 @@ S32 iSndPlay(xSndVoiceInfo* vp)
             Uint32 out_len;
             if (IMA_ADPCM_Decode(&snd.hdr, &out_buf, &out_len))
             {
-                // Note: For some reason the decoded IMA ADPCM audio plays back at 64/65 speed.
-                // There may be a better fix for this but for now this should work pretty well.
-                SDL_SetAudioStreamFrequencyRatio(stream, 65.0f / 64.0f);
                 SDL_PutAudioStreamData(stream, out_buf, out_len);
                 SDL_FlushAudioStream(stream);
                 SDL_free(out_buf);

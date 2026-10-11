@@ -21,8 +21,14 @@
 
 /*
     The following is a lightly modified version of the IMA ADPCM decoder from SDL3.
-    It has been edited to allow decoding raw data that has been stripped of it's
-    WAV container and to source it's format information from a BfBB SNDI entry.*/
+    It has been edited to account for Xbox ADPCM differences, to allow decoding
+    raw data that has been stripped of it's WAV container, and to source it's format
+    information from a BfBB SNDI entry.
+
+    The main difference to IMA ADPCM mentioned above is how we treat the predictor at
+    the beginning of each block: We use it when decoding the following sample nibble, but
+    it is not treated as an output sample. As such, we have one fewer sample per block.
+*/
 
 #include "iADPCM.h"
 
@@ -55,6 +61,7 @@ typedef struct ADPCM_DecoderState
         Uint8* data;
         size_t size;
         size_t pos;
+        Sint16 pred;
     } block;
 
     // Decoded 16-bit PCM data.
@@ -81,7 +88,8 @@ static int SafeMult(size_t* f1, size_t f2)
     return 0;
 }
 
-static Sint16 IMA_ADPCM_ProcessNibble(Sint8* cindex, Sint16 lastsample, Uint8 nybble)
+// Identical to IMA_ADPCM
+static Sint16 Xbox_ADPCM_ProcessNibble(Sint8* cindex, Sint16 lastsample, Uint8 nybble)
 {
     const Sint32 max_audioval = 32767;
     const Sint32 min_audioval = -32768;
@@ -154,7 +162,7 @@ static Sint16 IMA_ADPCM_ProcessNibble(Sint8* cindex, Sint16 lastsample, Uint8 ny
     return (Sint16)sample;
 }
 
-static bool IMA_ADPCM_DecodeBlockHeader(ADPCM_DecoderState* state)
+static bool Xbox_ADPCM_DecodeBlockHeader(ADPCM_DecoderState* state)
 {
     Sint16 step;
     Uint32 c;
@@ -170,7 +178,8 @@ static bool IMA_ADPCM_DecodeBlockHeader(ADPCM_DecoderState* state)
         {
             sample -= 0x10000;
         }
-        state->output.data[state->output.pos++] = (Sint16)sample;
+        // Difference to IMA ADPCM: The predictor is written as a sample
+        state->block.pred = (Sint16)sample;
 
         // Channel step index.
         step = (Sint16)state->block.data[o + 2];
@@ -185,9 +194,6 @@ static bool IMA_ADPCM_DecodeBlockHeader(ADPCM_DecoderState* state)
 
     state->block.pos += state->blockheadersize;
 
-    // Header provided one sample frame.
-    state->framesleft--;
-
     return true;
 }
 
@@ -196,7 +202,7 @@ static bool IMA_ADPCM_DecodeBlockHeader(ADPCM_DecoderState* state)
  * contains full sample frames (same sample count for each channel).
  * Incomplete sample frames are discarded.
  */
-static bool IMA_ADPCM_DecodeBlockData(ADPCM_DecoderState* state)
+static bool Xbox_ADPCM_DecodeBlockData(ADPCM_DecoderState* state)
 {
     size_t i;
     const Uint32 channels = state->channels;
@@ -211,7 +217,8 @@ static bool IMA_ADPCM_DecodeBlockData(ADPCM_DecoderState* state)
 
     size_t outpos = state->output.pos;
 
-    Sint64 blockframesleft = state->samplesperblock - 1;
+    // Difference to IMA ADPCM: No need to account for the predictor here
+    Sint64 blockframesleft = state->samplesperblock;
     if (blockframesleft > state->framesleft)
     {
         blockframesleft = state->framesleft;
@@ -237,6 +244,11 @@ static bool IMA_ADPCM_DecodeBlockData(ADPCM_DecoderState* state)
      * decodes the samples as they come from the input data and puts them at
      * the appropriate places in the output data.
      */
+
+    // Keep previous sample which may come from the block header.
+    // Difference to IMA ADPCM: The predictor is not written to the output but always used
+    // by the first sample nibble of each block
+    Sint16 prev_sample = state->block.pred;
     while (blockframesleft > 0)
     {
         const size_t subblocksamples = blockframesleft < 8 ? (size_t)blockframesleft : 8;
@@ -244,8 +256,6 @@ static bool IMA_ADPCM_DecodeBlockData(ADPCM_DecoderState* state)
         for (c = 0; c < channels; c++)
         {
             Uint8 nybble = 0;
-            // Load previous sample which may come from the block header.
-            Sint16 sample = state->output.data[outpos + c - channels];
 
             for (i = 0; i < subblocksamples; i++)
             {
@@ -258,8 +268,10 @@ static bool IMA_ADPCM_DecodeBlockData(ADPCM_DecoderState* state)
                     nybble = state->block.data[blockpos++];
                 }
 
-                sample = IMA_ADPCM_ProcessNibble((Sint8*)state->cstate + c, sample, nybble & 0x0f);
+                Sint16 sample =
+                    Xbox_ADPCM_ProcessNibble((Sint8*)state->cstate + c, prev_sample, nybble & 0x0f);
                 state->output.data[outpos + c + i * channels] = sample;
+                prev_sample = sample;
             }
         }
 
@@ -274,7 +286,7 @@ static bool IMA_ADPCM_DecodeBlockData(ADPCM_DecoderState* state)
     return result;
 }
 
-bool IMA_ADPCM_Decode(XboxSndEntry* file, Uint8** audio_buf, Uint32* audio_len)
+bool Xbox_ADPCM_Decode(XboxSndEntry* file, Uint8** audio_buf, Uint32* audio_len)
 {
     bool result;
     size_t bytesleft, outputsize;
@@ -296,7 +308,8 @@ bool IMA_ADPCM_Decode(XboxSndEntry* file, Uint8** audio_buf, Uint32* audio_len)
 
     const size_t blockdatasize = (size_t)state.blocksize - state.blockheadersize;
     const size_t blockframebitsize = (size_t)file->wBitsPerSample * state.channels;
-    state.samplesperblock = file->NibblesPerBlock + 1;
+    // Difference to IMA ADPCM: Predictors are not treated as samples
+    state.samplesperblock = file->NibblesPerBlock;
 
     state.framesize = state.channels * sizeof(Sint16);
     state.framestotal = state.samplesperblock * (file->Datasize / state.blocksize);
@@ -340,6 +353,7 @@ bool IMA_ADPCM_Decode(XboxSndEntry* file, Uint8** audio_buf, Uint32* audio_len)
         state.block.data = state.input.data + state.input.pos;
         state.block.size = bytesleft < state.blocksize ? bytesleft : state.blocksize;
         state.block.pos = 0;
+        state.block.pred = 0;
 
         if (state.output.size - state.output.pos < (Uint64)state.framesleft * state.channels)
         {
@@ -350,11 +364,11 @@ bool IMA_ADPCM_Decode(XboxSndEntry* file, Uint8** audio_buf, Uint32* audio_len)
         }
 
         // Initialize decoder with the values from the block header.
-        result = IMA_ADPCM_DecodeBlockHeader(&state);
+        result = Xbox_ADPCM_DecodeBlockHeader(&state);
         if (result)
         {
             // Decode the block data. It stores the samples directly in the output.
-            result = IMA_ADPCM_DecodeBlockData(&state);
+            result = Xbox_ADPCM_DecodeBlockData(&state);
         }
 
         if (!result)
