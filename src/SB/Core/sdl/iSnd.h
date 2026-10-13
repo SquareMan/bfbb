@@ -81,6 +81,7 @@ S32 iSndFindFreeVoice(U32 priority, U32 flags, U32 owner);
 
 S32 iSndPlay(xSndVoiceInfo* vp);
 void iSndSetVol(U32 snd, F32 vol);
+// Observation: pitch is specified in semitones of adjustment
 void iSndSetPitch(U32 snd, F32 pitch);
 void iSndStartStereo(U32 id1, U32 id2, F32 pitch);
 void iSndStereo(U32 stereo);

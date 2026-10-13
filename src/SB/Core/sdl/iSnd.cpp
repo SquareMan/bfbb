@@ -53,6 +53,61 @@ static iSndFileInfo snd;
 #define NUM_EFFECTS (ISND_TOTAL_VOICES - NUM_STREAMS)
 static SDL_AudioStream* voices[ISND_TOTAL_VOICES] = { 0 };
 
+static SDL_AudioStream* iSndInitVoice(S32 idx)
+{
+    SDL_AudioSpec spec{ .format = SDL_AUDIO_S16LE,
+                        .channels = snd.hdr.nChannels,
+                        .freq = static_cast<int>(snd.hdr.sample_rate) };
+    assert(voices[idx] == NULL && "Attempted to reinitialize existing voice");
+    voices[idx] = SDL_CreateAudioStream(&spec, NULL);
+    if (voices[idx] == NULL)
+    {
+        SDL_Log("Failed to create audio stream: %s", SDL_GetError());
+        SDL_DestroyAudioStream(voices[idx]);
+        voices[idx] = NULL;
+        return NULL;
+    }
+    if (!SDL_BindAudioStream(output_device, voices[idx]))
+    {
+        SDL_Log("Failed to bind audio stream: %s", SDL_GetError());
+        SDL_DestroyAudioStream(voices[idx]);
+        voices[idx] = NULL;
+        return NULL;
+    }
+    return voices[idx];
+}
+
+static void iSndDeinitVoice(S32 idx)
+{
+    if (voices[idx] == NULL)
+    {
+        return;
+    }
+
+    SDL_DestroyAudioStream(voices[idx]);
+    voices[idx] = NULL;
+    gSnd.voice[idx].flags &= ~XSND_VOICE_ACTIVE;
+}
+
+// Lookup the index of a given sound ID in the voices array
+// Return -1 if sound ID is invalid
+static S32 iSndIdToIdx(S32 sndID)
+{
+    if (sndID == 0)
+    {
+        return -1;
+    }
+
+    for (S32 i = 0; i < ISND_TOTAL_VOICES; i++)
+    {
+        if (gSnd.voice[i].sndID == sndID)
+        {
+            return i;
+        }
+    }
+    return -1;
+}
+
 void iSndInit()
 {
     soundInited = 1;
@@ -219,58 +274,36 @@ void iSndPause(U32 snd, U32 pause)
         return;
     }
 
-    S32 i;
-    for (i = 0; i < ISND_TOTAL_VOICES; i++)
+    S32 i = iSndIdToIdx(snd);
+    if (i < 0)
     {
-        if (gSnd.voice[i].sndID == snd)
-            break;
+        return;
     }
 
-    if (i < ISND_TOTAL_VOICES)
+    SDL_AudioStream* stream = voices[i];
+    if (stream == NULL)
     {
-        SDL_AudioStream* stream = voices[i];
-        if (stream == NULL)
-        {
-            return;
-        }
-        if (pause)
-        {
-            SDL_UnbindAudioStream(stream);
-        }
-        else if (SDL_GetAudioStreamDevice(stream) == NULL)
-        {
-            SDL_BindAudioStream(output_device, stream);
-        }
+        return;
+    }
+    if (pause)
+    {
+        SDL_UnbindAudioStream(stream);
+    }
+    else if (SDL_GetAudioStreamDevice(stream) == NULL)
+    {
+        SDL_BindAudioStream(output_device, stream);
     }
 }
 
 void iSndStop(U32 snd)
 {
-    if (snd == 0)
+    S32 i = iSndIdToIdx(snd);
+    if (i < 0)
     {
         return;
     }
 
-    xSndVoiceInfo* vp = NULL;
-    SDL_AudioStream** stream = NULL;
-    for (S32 i = 0; i < ISND_TOTAL_VOICES; i++)
-    {
-        if (gSnd.voice[i].sndID == snd)
-        {
-            vp = &gSnd.voice[i];
-            stream = &voices[i];
-        }
-    }
-
-    if (stream == NULL || *stream == NULL)
-    {
-        return;
-    }
-    assert(vp);
-
-    SDL_DestroyAudioStream(*stream);
-    vp->flags &= ~XSND_VOICE_ACTIVE;
-    *stream = NULL;
+    iSndDeinitVoice(i);
 }
 
 void iSndUpdate()
@@ -283,39 +316,23 @@ void iSndUpdate()
     for (S32 i = 0; i < ISND_TOTAL_VOICES; i++)
     {
         xSndVoiceInfo* vp = &gSnd.voice[i];
-        SDL_AudioStream** stream = &voices[i];
-        if (stream != NULL && SDL_GetAudioStreamQueued(*stream) == 0)
+        SDL_AudioStream* stream = voices[i];
+        if (stream == NULL)
         {
-            SDL_DestroyAudioStream(*stream);
-            *stream = NULL;
-            vp->flags &= ~XSND_VOICE_ACTIVE;
+            continue;
+        }
+
+        if (SDL_GetAudioStreamQueued(stream) == 0)
+        {
+            iSndDeinitVoice(i);
+            continue;
+        }
+
+        if (vp->flags & XSND_VOICE_POSITIONAL)
+        {
+            // iSndCalcVol3d(vp, stream);
         }
     }
-}
-
-static SDL_AudioStream* InitVoice(S32 idx)
-{
-    SDL_AudioSpec spec{ .format = SDL_AUDIO_S16LE,
-                        .channels = snd.hdr.nChannels,
-                        .freq = static_cast<int>(snd.hdr.sample_rate) };
-    SDL_AudioStream** stream = &voices[idx];
-    assert(*stream == NULL && "Attempted to reinitialize existing voice");
-    *stream = SDL_CreateAudioStream(&spec, NULL);
-    if (*stream == NULL)
-    {
-        SDL_Log("Failed to create audio stream: %s", SDL_GetError());
-        SDL_DestroyAudioStream(*stream);
-        *stream = NULL;
-        return NULL;
-    }
-    if (!SDL_BindAudioStream(output_device, *stream))
-    {
-        SDL_Log("Failed to bind audio stream: %s", SDL_GetError());
-        SDL_DestroyAudioStream(*stream);
-        *stream = NULL;
-        return NULL;
-    }
-    return *stream;
 }
 
 S32 iSndFindFreeVoice(U32 priority, U32 flags, U32 owner)
@@ -350,7 +367,7 @@ S32 iSndFindFreeVoice(U32 priority, U32 flags, U32 owner)
                     iSndStop(vp->sndID);
                 }
 
-                if (InitVoice(i) == NULL)
+                if (iSndInitVoice(i) == NULL)
                 {
                     return -1;
                 }
@@ -369,7 +386,7 @@ S32 iSndFindFreeVoice(U32 priority, U32 flags, U32 owner)
             {
                 continue;
             }
-            if (InitVoice(i) == NULL)
+            if (iSndInitVoice(i) == NULL)
             {
                 return -1;
             }
@@ -384,7 +401,7 @@ S32 iSndFindFreeVoice(U32 priority, U32 flags, U32 owner)
             {
                 continue;
             }
-            if (InitVoice(i + NUM_STREAMS) == NULL)
+            if (iSndInitVoice(i + NUM_STREAMS) == NULL)
             {
                 return -1;
             }
@@ -409,22 +426,23 @@ S32 iSndPlay(xSndVoiceInfo* vp)
     SDL_AudioStream* stream = voices[voice];
 
     iSndSetVol(vp->sndID, vp->vol);
+    iSndSetPitch(vp->sndID, vp->pitch);
 
-        if (snd.hdr.wFormatTag == XBOX_SND_FORMAT_XBOX_ADPCM)
-        {
-            // TODO: Decode this audio when loading the sound data initially.
+    if (snd.hdr.wFormatTag == XBOX_SND_FORMAT_XBOX_ADPCM)
+    {
+        // TODO: Decode this audio when loading the sound data initially.
         U8* out_buf = NULL;
         U32 out_len = 0;
         if (!Xbox_ADPCM_Decode(&snd.hdr, &out_buf, &out_len))
-            {
+        {
             SDL_Log("Failed to decode Xbox ADPCM formatted sound asset 0x%08x: %s", snd.hdr.assetID,
                     SDL_GetError());
             return FALSE;
         }
 
-                SDL_PutAudioStreamData(stream, out_buf, out_len);
-                SDL_FlushAudioStream(stream);
-                SDL_free(out_buf);
+        SDL_PutAudioStreamData(stream, out_buf, out_len);
+        SDL_FlushAudioStream(stream);
+        SDL_free(out_buf);
     }
     else
     {
@@ -482,40 +500,53 @@ static void iSndCalcVol3d(xSndVoiceInfo* vp, SDL_AudioStream* stream)
 
 void iSndSetVol(U32 snd, F32 vol)
 {
-    if (snd == 0)
+    S32 i = iSndIdToIdx(snd);
+    if (i < 0)
     {
         return;
     }
 
-    SDL_AudioStream* stream = NULL;
-    xSndVoiceInfo* info = NULL;
-    for (S32 i = 0; i < ISND_TOTAL_VOICES; i++)
-    {
-        if (gSnd.voice[i].sndID == snd)
-        {
-            stream = voices[i];
-            info = &gSnd.voice[i];
-        }
-    }
-    assert(info);
-
+    SDL_AudioStream* stream = voices[i];
+    xSndVoiceInfo* vp = &gSnd.voice[i];
     if (stream == NULL)
     {
         return;
     }
-    if ((info->flags & XSND_VOICE_POSITIONAL) != 0)
+
+    vp->vol = vol;
+    if ((vp->flags & XSND_VOICE_POSITIONAL) != 0)
     {
-        iSndCalcVol3d(info, stream);
+        iSndCalcVol3d(vp, stream);
     }
     else
     {
-        iSndCalcVol(info, stream);
+        iSndCalcVol(vp, stream);
     }
 }
 
 void iSndSetPitch(U32 snd, F32 pitch)
 {
-    // PC_TODO
+    S32 i = iSndIdToIdx(snd);
+    if (i < 0)
+    {
+        return;
+    }
+
+    SDL_AudioStream* stream = voices[i];
+    if (stream == NULL)
+    {
+        return;
+    }
+
+    // Note: GC iSndSetPitch does not update the xSndVoiceInfo pitch field.
+    // Game code never reads/writes it after creating the sound intially so
+    // it doesn't actually matter. I will air on the side of matching the
+    // original implementation here, but maybe it would be a good idea later
+    // to update the value so mods can interact with it?
+    // gSnd.voice[i].pitch = pitch;
+
+    F32 ratio = std::powf(2.0f, pitch / 12.0f);
+    SDL_SetAudioStreamFrequencyRatio(stream, ratio);
 }
 
 void iSndStartStereo(U32 id1, U32 id2, F32 pitch)
@@ -526,14 +557,7 @@ void iSndStartStereo(U32 id1, U32 id2, F32 pitch)
 
 void iSndStereo(U32 i)
 {
-    if (i == 0)
-    {
-        gSnd.stereo = FALSE;
-    }
-    else
-    {
-        gSnd.stereo = TRUE;
-    }
+    gSnd.stereo = i != 0;
 }
 
 void iSndSceneExit()
@@ -589,7 +613,7 @@ S32 iSndLoadSounds(void* data)
     iFileOpen(path, IFILE_OPEN_READ, &si->file);
 
     U32 max = 0;
-    U32 min = -1;
+    U32 min = UINT32_MAX;
     XboxSndEntry* e = entries;
     for (S32 i = 0; i < toc->num_sfx; i++)
     {
@@ -598,14 +622,8 @@ S32 iSndLoadSounds(void* data)
 
         U32 off = xinfo.plus_offset + (xinfo.sector << 5);
         U32 end = off + xinfo.size;
-        if (min > off)
-        {
-            min = off;
-        }
-        if (max < end)
-        {
-            max = end;
-        }
+        min = MIN(min, off);
+        max = MAX(max, end);
 
         e->mem = (void*)off;
         e++;
@@ -620,14 +638,8 @@ S32 iSndLoadSounds(void* data)
 
         U32 off = xinfo.plus_offset + (xinfo.sector << 5);
         U32 end = off + xinfo.size;
-        if (min > off)
-        {
-            min = off;
-        }
-        if (max < end)
-        {
-            max = end;
-        }
+        min = MIN(min, off);
+        max = MAX(max, end);
 
         entries[i + toc->num_sfx].mem = (void*)off;
     }
@@ -668,22 +680,20 @@ void iSndSetExternalCallback(iSndExternalCallback callback)
 
 F32 iSndGetVol(U32 snd)
 {
-    xSndVoiceInfo* vp = &gSnd.voice[0];
-
-    for (int i = 0; i < 0x40; i++)
+    S32 i = iSndIdToIdx(snd);
+    if (i < 0)
     {
-        if (vp->flags & XSND_VOICE_ACTIVE)
+        return 0.0f;
+    }
+    xSndVoiceInfo* vp = &gSnd.voice[i];
+
+    if (vp->flags & XSND_VOICE_ACTIVE)
+    {
+        if (gSnd.categoryVolFader[vp->category] <= 0.0f)
         {
-            if (vp->sndID == snd)
-            {
-                if (gSnd.categoryVolFader[vp->category] <= 0.0f)
-                {
-                    return 0.0f;
-                }
-                return (vp->vol / gSnd.categoryVolFader[vp->category]);
-            }
+            return 0.0f;
         }
-        vp++;
+        return (vp->vol / gSnd.categoryVolFader[vp->category]);
     }
 
     return 0.0f;
