@@ -3,6 +3,8 @@
 
 #include "iSnd.h"
 
-bool Xbox_ADPCM_Decode(XboxSndEntry* file, U8** audio_buf, U32* audio_len);
+// When `dst_buf` is NULL: returns required buffer length in `dst_len`
+// without decoding
+bool Xbox_ADPCM_Decode(XboxSndEntry* file, void* src_buf, S16* dst_buf, U32* dst_len);
 
 #endif

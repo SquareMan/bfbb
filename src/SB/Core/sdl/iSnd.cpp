@@ -428,27 +428,8 @@ S32 iSndPlay(xSndVoiceInfo* vp)
     iSndSetVol(vp->sndID, vp->vol);
     iSndSetPitch(vp->sndID, vp->pitch);
 
-    if (snd.hdr.wFormatTag == XBOX_SND_FORMAT_XBOX_ADPCM)
-    {
-        // TODO: Decode this audio when loading the sound data initially.
-        U8* out_buf = NULL;
-        U32 out_len = 0;
-        if (!Xbox_ADPCM_Decode(&snd.hdr, &out_buf, &out_len))
-        {
-            SDL_Log("Failed to decode Xbox ADPCM formatted sound asset 0x%08x: %s", snd.hdr.assetID,
-                    SDL_GetError());
-            return FALSE;
-        }
-
-        SDL_PutAudioStreamData(stream, out_buf, out_len);
-        SDL_FlushAudioStream(stream);
-        SDL_free(out_buf);
-    }
-    else
-    {
-        SDL_PutAudioStreamData(stream, snd.hdr.mem, snd.hdr.Datasize);
-        SDL_FlushAudioStream(stream);
-    }
+    SDL_PutAudioStreamData(stream, snd.hdr.mem, snd.hdr.Datasize);
+    SDL_FlushAudioStream(stream);
 
     return TRUE;
 }
@@ -591,84 +572,92 @@ void iSndSceneExit()
 S32 iSndLoadSounds(void* data)
 {
     XboxSNDI* toc = (XboxSNDI*)data;
-
+    sinfo* si = &sinfo_array[sinfo_array_max++];
     if (toc->num_sfx == 0 && toc->num_streams == 0 && toc->num_cutscene == 0)
     {
-        sinfo_array[sinfo_array_max++].toc = NULL;
+        si->toc = NULL;
         return 0;
     }
+    si->toc = toc;
+
+    XboxSndEntry* entries = toc->entry;
+    XboxSndEntry* entries_end = entries + toc->num_sfx + toc->num_streams;
+    assert(entries != entries_end && "Sound header entries missing for SNDI asset");
 
     if (sinfo_array_max >= 12)
     {
+        SDL_Log("iSnd: Too many scenes loaded.");
         exit(-1);
     }
 
-    XboxSndEntry* entries = toc->entry;
-    sinfo_array[sinfo_array_max].toc = toc;
-
     char* path = xST_xAssetID_HIPFullPath(entries[0].assetID);
     U32 hash = xStrHash(path);
-    sinfo* si = &sinfo_array[sinfo_array_max];
 
     iFileOpen(path, IFILE_OPEN_READ, &si->file);
 
-    U32 max = 0;
-    U32 min = UINT32_MAX;
-    XboxSndEntry* e = entries;
-    for (S32 i = 0; i < toc->num_sfx; i++)
+    U32 total = 0;
+    for (XboxSndEntry* e = entries; e != entries_end; e++)
     {
         st_PKR_ASSET_TOCINFO xinfo;
         xSTGetAssetInfoInHxP(e->assetID, &xinfo, hash);
 
         U32 off = xinfo.plus_offset + (xinfo.sector << 5);
-        U32 end = off + xinfo.size;
-        min = MIN(min, off);
-        max = MAX(max, end);
+
+        switch (e->wFormatTag)
+        {
+        case SND_FORMAT_XBOX_ADPCM:
+        {
+            U32 decoded_size = 0;
+            if (!Xbox_ADPCM_Decode(e, NULL, NULL, &decoded_size))
+            {
+                SDL_Log("iSnd: Failed to calculate decoded size of Xbox ADPCM sound asset 0x%08x",
+                        e->assetID);
+                exit(-1);
+            }
+            total += decoded_size;
+            break;
+        }
+        case SND_FORMAT_PCM:
+        default:
+            total += xinfo.size;
+            break;
+        }
 
         e->mem = (void*)off;
-        e++;
     }
 
-    for (S32 i = 0; i < toc->num_streams; i++)
+    void* mem = RwMalloc(total);
+    si->snd_mem = mem;
+
+    for (XboxSndEntry* e = entries; e != entries_end; e++)
     {
-        st_PKR_ASSET_TOCINFO xinfo;
-
-        xSTGetAssetInfo(entries[i + toc->num_sfx].assetID, &xinfo);
-        xinfo.size = ALIGN_NEXT(xinfo.size, 0x20);
-
-        U32 off = xinfo.plus_offset + (xinfo.sector << 5);
-        U32 end = off + xinfo.size;
-        min = MIN(min, off);
-        max = MAX(max, end);
-
-        entries[i + toc->num_sfx].mem = (void*)off;
-    }
-
-    if (toc->num_sfx != 0 || toc->num_streams != 0)
-    {
-        U32 total = max - min;
-
-        void* mem = RwMalloc(total);
-        sinfo_array[sinfo_array_max].snd_mem = mem;
-        SPTR delta = (-min + (UPTR)mem);
-
-        XboxSndEntry* e2 = entries;
-        for (S32 i = 0; i < toc->num_sfx; i++)
+        iFileSeek(&si->file, (U32)e->mem, IFILE_SEEK_SET);
+        e->mem = mem;
+        assert((UPTR)e->mem == ALIGN_NEXT((UPTR)e->mem, 0x2));
+        switch (e->wFormatTag)
         {
-            e2->mem = (void*)((UPTR)e2->mem + delta);
-            e2++;
-        }
-
-        for (S32 i = 0; i < toc->num_streams; i++)
+        case SND_FORMAT_XBOX_ADPCM:
         {
-            entries[i + toc->num_sfx].mem = (void*)((UPTR)entries[i + toc->num_sfx].mem + delta);
+            void* src_buf = RwMalloc(e->Datasize);
+            iFileRead(&si->file, src_buf, e->Datasize);
+
+            U32 decoded_size = 0;
+            if (!Xbox_ADPCM_Decode(e, src_buf, (Sint16*)e->mem, &decoded_size) || decoded_size == 0)
+            {
+                SDL_Log("Failed to decode Xbox ADPCM data for sound asset 0x%08x", e->assetID);
+            }
+            RwFree(src_buf);
+            e->Datasize = decoded_size;
+            mem = (void*)((U32)mem + decoded_size);
+            break;
         }
-
-        iFileSeek(&si->file, min, IFILE_SEEK_SET);
-        iFileRead(&si->file, mem, total);
+        case SND_FORMAT_PCM:
+        default:
+            iFileRead(&si->file, e->mem, e->Datasize);
+            mem = (void*)((U32)mem + e->Datasize);
+            break;
+        }
     }
-
-    sinfo_array_max++;
 
     return 1;
 }

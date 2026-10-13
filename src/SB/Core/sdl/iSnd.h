@@ -21,12 +21,12 @@ struct iSndInfo
     S32 lastStreamBuffer;
 };
 
-enum XboxSndFormat
+enum SndFormat
 {
     // Raw 16-bit samples
-    XBOX_SND_FORMAT_PCM = 1,
+    SND_FORMAT_PCM = 1,
     // Xbox specific ADPCM spec. Data frames are identical to IMA ADPCM
-    XBOX_SND_FORMAT_XBOX_ADPCM = 0x69,
+    SND_FORMAT_XBOX_ADPCM = 0x69,
 };
 
 // Size: 0x2C

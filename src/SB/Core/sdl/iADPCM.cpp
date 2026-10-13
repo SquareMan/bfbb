@@ -286,7 +286,7 @@ static bool Xbox_ADPCM_DecodeBlockData(ADPCM_DecoderState* state)
     return result;
 }
 
-bool Xbox_ADPCM_Decode(XboxSndEntry* file, Uint8** audio_buf, Uint32* audio_len)
+bool Xbox_ADPCM_Decode(XboxSndEntry* file, void* src_buf, Sint16* dst_buf, Uint32* dst_len)
 {
     bool result;
     size_t bytesleft, outputsize;
@@ -296,8 +296,7 @@ bool Xbox_ADPCM_Decode(XboxSndEntry* file, Uint8** audio_buf, Uint32* audio_len)
     // Nothing to decode, nothing to return.
     if (file->Datasize == 0)
     {
-        *audio_buf = NULL;
-        *audio_len = 0;
+        *dst_len = 0;
         return true;
     }
 
@@ -315,7 +314,7 @@ bool Xbox_ADPCM_Decode(XboxSndEntry* file, Uint8** audio_buf, Uint32* audio_len)
     state.framestotal = state.samplesperblock * (file->Datasize / state.blocksize);
     state.framesleft = state.framestotal;
 
-    state.input.data = (Uint8*)file->mem;
+    state.input.data = (Uint8*)src_buf;
     state.input.size = file->Datasize;
     state.input.pos = 0;
 
@@ -330,13 +329,15 @@ bool Xbox_ADPCM_Decode(XboxSndEntry* file, Uint8** audio_buf, Uint32* audio_len)
         return SDL_SetError("WAVE file too big");
     }
 
+    if (dst_buf == NULL)
+    {
+        *dst_len = outputsize;
+        return true;
+    }
+
     state.output.pos = 0;
     state.output.size = outputsize / sizeof(Sint16);
-    state.output.data = (Sint16*)SDL_malloc(outputsize);
-    if (!state.output.data)
-    {
-        return false;
-    }
+    state.output.data = dst_buf;
 
     cstate = (Sint8*)SDL_calloc(state.channels, sizeof(Sint8));
     if (!cstate)
@@ -381,8 +382,7 @@ bool Xbox_ADPCM_Decode(XboxSndEntry* file, Uint8** audio_buf, Uint32* audio_len)
         bytesleft = state.input.size - state.input.pos;
     }
 
-    *audio_buf = (Uint8*)state.output.data;
-    *audio_len = (Uint32)outputsize;
+    *dst_len = (Uint32)outputsize;
 
     SDL_free(cstate);
 
