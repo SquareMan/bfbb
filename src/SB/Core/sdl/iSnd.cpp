@@ -209,21 +209,22 @@ iSndFileInfo* iSndLookup(U32 aid)
 
     for (S32 i = sinfo_array_max - 1; i >= 0; i--)
     {
-        XboxSNDI* info = sinfo_array[i].toc;
-        if (info == NULL)
+        XboxSNDI* toc = sinfo_array[i].toc;
+        if (toc == NULL)
         {
             continue;
         }
 
-        XboxSndEntry* entry = info->entry;
-        U32 n = info->num_sfx;
+        XboxSndEntry* entry = toc->entry;
+        U32 n = toc->num_sfx;
         U32 j = 0;
 
         for (; j < n; j++)
         {
             if (aid == entry[j].assetID)
             {
-                memcpy(&snd, &entry[j], sizeof(XboxSndEntry));
+                memcpy(&snd.hdr, &entry[j], sizeof(XboxSndEntry));
+                snd.hdr_ptr = &entry[j];
                 snd.id = snd_id++;
                 if (snd_id >= 0x7ffa)
                 {
@@ -233,12 +234,13 @@ iSndFileInfo* iSndLookup(U32 aid)
             }
         }
 
-        n = info->num_streams + n;
+        n = toc->num_streams + n;
         for (; j < n; j++)
         {
             if (aid == entry[j].assetID)
             {
-                memcpy(&snd, &entry[j], sizeof(XboxSndEntry));
+                memcpy(&snd.hdr, &entry[j], sizeof(XboxSndEntry));
+                snd.hdr_ptr = &entry[j];
                 snd.id = strm_id++;
                 if (strm_id >= 0xffe)
                 {
@@ -248,12 +250,13 @@ iSndFileInfo* iSndLookup(U32 aid)
             }
         }
 
-        n = info->num_cutscene + n;
+        n = toc->num_cutscene + n;
         for (; j < n; j++)
         {
             if (aid == entry[j].assetID)
             {
-                memcpy(&snd, &entry[j], sizeof(XboxSndEntry));
+                memcpy(&snd.hdr, &entry[j], sizeof(XboxSndEntry));
+                snd.hdr_ptr = &entry[j];
                 snd.id = strm_id++;
                 if (strm_id >= 0xffe)
                 {
@@ -412,6 +415,18 @@ S32 iSndFindFreeVoice(U32 priority, U32 flags, U32 owner)
     return -1;
 }
 
+static void iSndLoopCallback(void* userdata, SDL_AudioStream* stream, int additional_amount,
+                             int total_amount)
+{
+    if (additional_amount == 0)
+    {
+        return;
+    }
+
+    XboxSndEntry* entry = (XboxSndEntry*)userdata;
+    SDL_PutAudioStreamData(stream, entry->mem, entry->Datasize);
+}
+
 S32 iSndPlay(xSndVoiceInfo* vp)
 {
     assert(snd.hdr.assetID == vp->assetID &&
@@ -430,6 +445,11 @@ S32 iSndPlay(xSndVoiceInfo* vp)
 
     SDL_PutAudioStreamData(stream, snd.hdr.mem, snd.hdr.Datasize);
     SDL_FlushAudioStream(stream);
+
+    if (vp->flags & XSND_VOICE_LOOPING || snd.hdr.flags & XBOX_SND_LOOPING)
+    {
+        SDL_SetAudioStreamGetCallback(stream, iSndLoopCallback, snd.hdr_ptr);
+    }
 
     return TRUE;
 }

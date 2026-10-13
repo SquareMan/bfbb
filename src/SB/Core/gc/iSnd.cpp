@@ -776,7 +776,7 @@ iSndFileInfo* iSndLookup(U32 id)
         {
             if (id == entry[j].assetID)
             {
-                memcpy(&snd, &entry[j], sizeof(sndhdr));
+                memcpy(&snd.hdr, &entry[j], sizeof(sndhdr));
                 memcpy(&snd.file, &sinfo_array[i], sizeof(tag_xFile));
                 snd.id = snd_id++;
                 if (snd_id >= 0x7ffa)
@@ -792,7 +792,7 @@ iSndFileInfo* iSndLookup(U32 id)
         {
             if (id == entry[j].assetID)
             {
-                memcpy(&snd, &entry[j], sizeof(sndhdr));
+                memcpy(&snd.hdr, &entry[j], sizeof(sndhdr));
                 memcpy(&snd.file, &sinfo_array[i], sizeof(tag_xFile));
                 snd.id = strm_id++;
                 if (strm_id >= 0xffe)
@@ -817,7 +817,7 @@ iSndFileInfo* iSndLookup(U32 id)
         {
             if (id == entry[j].assetID)
             {
-                memcpy(&snd, &entry[j], sizeof(sndhdr));
+                memcpy(&snd.hdr, &entry[j], sizeof(sndhdr));
                 memcpy(&snd.file, &sinfo_array[i], sizeof(tag_xFile));
                 snd.id = strm_id++;
                 if (strm_id >= 0xffe)

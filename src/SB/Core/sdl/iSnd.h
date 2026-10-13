@@ -21,12 +21,17 @@ struct iSndInfo
     S32 lastStreamBuffer;
 };
 
-enum SndFormat
+enum XboxSndFormat
 {
     // Raw 16-bit samples
     SND_FORMAT_PCM = 1,
     // Xbox specific ADPCM spec. Data frames are identical to IMA ADPCM
     SND_FORMAT_XBOX_ADPCM = 0x69,
+};
+
+enum XboxSndFlags
+{
+    XBOX_SND_LOOPING = 1,
 };
 
 // Size: 0x2C
@@ -50,6 +55,10 @@ struct XboxSndEntry
 struct iSndFileInfo
 {
     XboxSndEntry hdr;
+    // This is super awkward. We need a stable pointer to a header for the loop callback.
+    // Ideally `hdr` would just be a pointer since it would be stable for the lifetime of
+    //the current level, but unfortunately game code accesses it with struct syntax.
+    XboxSndEntry* hdr_ptr;
     U32 id;
 };
 
