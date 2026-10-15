@@ -4,3 +4,6 @@
 [submodule "third_party/sdl"]
 	path = third_party/sdl
 	url = https://github.com/libsdl-org/SDL.git
+[submodule "third_party/sdl_mixer"]
+	path = third_party/sdl_mixer
+	url = https://github.com/libsdl-org/SDL_mixer.git

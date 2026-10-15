@@ -23,6 +23,7 @@ target_compile_options(librw PRIVATE -Wno-everything)
 
 # ------------------ sdl ----------------------------------
 add_subdirectory(third_party/sdl)
+add_subdirectory(third_party/sdl_mixer)
 
 # ----------------- librw c-style wrapper ------------------
 add_library(librwc STATIC)
@@ -61,7 +62,7 @@ target_sources(librwc
 
 # ----------------- Main Game Executable ------------------
 add_executable(bfbb)
-target_link_libraries(bfbb PUBLIC librwc SDL3::SDL3)
+target_link_libraries(bfbb PUBLIC librwc SDL3::SDL3 SDL3_mixer::SDL3_mixer)
 # FIXME: This should be removable after getting the build fully linking and removing the dependency on gc headers
 # silence warning from RenderWare macros doing cursed enum stuff
 target_compile_options(bfbb PRIVATE -Wno-deprecated-enum-enum-conversion)

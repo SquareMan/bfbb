@@ -22,6 +22,7 @@
 #include <SDL3/SDL_audio.h>
 #include "SDL3/SDL_error.h"
 #include <SDL3/SDL_log.h>
+#include <SDL3_mixer/SDL_mixer.h>
 
 // The header of a loaded SNDI asset.
 struct XboxSNDI
@@ -43,7 +44,7 @@ struct sinfo
 };
 
 static char soundInited = 0;
-static SDL_AudioDeviceID output_device = 0;
+static MIX_Mixer* output_device = NULL;
 static S32 sinfo_array_max = 0;
 static sinfo sinfo_array[12];
 // Stores result of most recent iSndLookup
@@ -51,27 +52,15 @@ static iSndFileInfo snd;
 
 #define NUM_STREAMS 6
 #define NUM_EFFECTS (ISND_TOTAL_VOICES - NUM_STREAMS)
-static SDL_AudioStream* voices[ISND_TOTAL_VOICES] = { 0 };
+static MIX_Track* voices[ISND_TOTAL_VOICES] = { 0 };
 
-static SDL_AudioStream* iSndInitVoice(S32 idx)
+static MIX_Track* iSndInitVoice(S32 idx)
 {
-    SDL_AudioSpec spec{ .format = SDL_AUDIO_S16LE,
-                        .channels = snd.hdr.nChannels,
-                        .freq = static_cast<int>(snd.hdr.sample_rate) };
     assert(voices[idx] == NULL && "Attempted to reinitialize existing voice");
-    voices[idx] = SDL_CreateAudioStream(&spec, NULL);
+    voices[idx] = MIX_CreateTrack(output_device);
     if (voices[idx] == NULL)
     {
-        SDL_Log("Failed to create audio stream: %s", SDL_GetError());
-        SDL_DestroyAudioStream(voices[idx]);
-        voices[idx] = NULL;
-        return NULL;
-    }
-    if (!SDL_BindAudioStream(output_device, voices[idx]))
-    {
-        SDL_Log("Failed to bind audio stream: %s", SDL_GetError());
-        SDL_DestroyAudioStream(voices[idx]);
-        voices[idx] = NULL;
+        SDL_Log("Failed to create audio track: %s", SDL_GetError());
         return NULL;
     }
     return voices[idx];
@@ -84,7 +73,7 @@ static void iSndDeinitVoice(S32 idx)
         return;
     }
 
-    SDL_DestroyAudioStream(voices[idx]);
+    MIX_DestroyTrack(voices[idx]);
     voices[idx] = NULL;
     gSnd.voice[idx].flags &= ~XSND_VOICE_ACTIVE;
 }
@@ -110,15 +99,26 @@ static S32 iSndIdToIdx(S32 sndID)
 
 void iSndInit()
 {
+    if (!MIX_Init())
+    {
+        SDL_Log("iSnd: Failed to initialize SDL_mixer library: %s", SDL_GetError());
+        return;
+    }
+    output_device = MIX_CreateMixerDevice(SDL_AUDIO_DEVICE_DEFAULT_PLAYBACK, NULL);
+    if (output_device == NULL)
+    {
+        SDL_Log("iSnd: Failed to initialize sound output mixer: %s", SDL_GetError());
+        return;
+    }
     soundInited = 1;
-    output_device = SDL_OpenAudioDevice(SDL_AUDIO_DEVICE_DEFAULT_PLAYBACK, NULL);
 }
 
 void iSndExit()
 {
     soundInited = 0;
-    SDL_CloseAudioDevice(output_device);
-    output_device = 0;
+    MIX_DestroyMixer(output_device);
+    output_device = NULL;
+    MIX_Quit();
 }
 
 void iSndSetEnvironmentalEffect(isound_effect)
@@ -141,16 +141,7 @@ bool iSndIsPlaying(U32 assetID)
     {
         if (gSnd.voice[i].assetID == assetID)
         {
-            SDL_AudioStream* stream = voices[i];
-            if (SDL_AudioStreamDevicePaused(stream))
-            {
-                return TRUE;
-            }
-            if (SDL_GetAudioStreamQueued(stream))
-            {
-                return TRUE;
-            }
-            return FALSE;
+            return MIX_TrackPlaying(voices[i]);
         }
     }
     return true;
@@ -182,16 +173,7 @@ bool iSndIsPlayingByHandle(U32 handle)
     {
         if (gSnd.voice[i].sndID == handle)
         {
-            SDL_AudioStream* stream = voices[i];
-            if (SDL_AudioStreamDevicePaused(stream))
-            {
-                return TRUE;
-            }
-            if (SDL_GetAudioStreamQueued(stream))
-            {
-                return TRUE;
-            }
-            return FALSE;
+            return MIX_TrackPlaying(voices[i]);
         }
     }
     return false;
@@ -283,18 +265,18 @@ void iSndPause(U32 snd, U32 pause)
         return;
     }
 
-    SDL_AudioStream* stream = voices[i];
-    if (stream == NULL)
+    MIX_Track* track = voices[i];
+    if (track == NULL)
     {
         return;
     }
     if (pause)
     {
-        SDL_UnbindAudioStream(stream);
+        MIX_PauseTrack(track);
     }
-    else if (SDL_GetAudioStreamDevice(stream) == NULL)
+    else
     {
-        SDL_BindAudioStream(output_device, stream);
+        MIX_ResumeTrack(track);
     }
 }
 
@@ -309,6 +291,44 @@ void iSndStop(U32 snd)
     iSndDeinitVoice(i);
 }
 
+static void iSndCalcVol(xSndVoiceInfo* vp, MIX_Track* track)
+{
+    MIX_SetTrackGain(track, vp->vol * gSnd.categoryVolFader[vp->category]);
+}
+
+static void iSndCalcVol3d(xSndVoiceInfo* vp, MIX_Track* track)
+{
+    xVec3 to;
+
+    xVec3Sub(&to, &gSnd.pos, &vp->playPos);
+    F32 dist2 = xVec3Length2(&to);
+    xVec3Normalize(&to, &to);
+    F32 pan = (xVec3Dot(&to, &gSnd.right) + 1.0f) / 2.0f;
+
+    F32 volscale;
+    if (dist2 > vp->outerRadius2)
+    {
+        volscale = 0.0f;
+    }
+    else if (dist2 <= vp->innerRadius2)
+    {
+        volscale = 1.0f;
+    }
+    else
+    {
+        F32 fadeRange = vp->outerRadius2 - vp->innerRadius2;
+        volscale = std::sqrtf((fadeRange - (dist2 - vp->innerRadius2)) / fadeRange);
+    }
+
+    F32 vol = volscale * (vp->vol * gSnd.categoryVolFader[vp->category]);
+
+    // Equal-Power panning: Attempt to ensure equivalent perceived loudness at all angles
+    MIX_StereoGains gains = { sin((1 - pan) * HALF_PI), sin(pan * HALF_PI) };
+
+    MIX_SetTrackGain(track, vol);
+    MIX_SetTrackStereo(track, &gains);
+}
+
 void iSndUpdate()
 {
     if (!soundInited)
@@ -319,13 +339,13 @@ void iSndUpdate()
     for (S32 i = 0; i < ISND_TOTAL_VOICES; i++)
     {
         xSndVoiceInfo* vp = &gSnd.voice[i];
-        SDL_AudioStream* stream = voices[i];
-        if (stream == NULL)
+        MIX_Track* track = voices[i];
+        if (track == NULL)
         {
             continue;
         }
 
-        if (SDL_GetAudioStreamQueued(stream) == 0)
+        if (!MIX_TrackPlaying(track) && !MIX_TrackPaused(track))
         {
             iSndDeinitVoice(i);
             continue;
@@ -333,7 +353,7 @@ void iSndUpdate()
 
         if (vp->flags & XSND_VOICE_POSITIONAL)
         {
-            // iSndCalcVol3d(vp, stream);
+            iSndCalcVol3d(vp, track);
         }
     }
 }
@@ -415,18 +435,6 @@ S32 iSndFindFreeVoice(U32 priority, U32 flags, U32 owner)
     return -1;
 }
 
-static void iSndLoopCallback(void* userdata, SDL_AudioStream* stream, int additional_amount,
-                             int total_amount)
-{
-    if (additional_amount == 0)
-    {
-        return;
-    }
-
-    XboxSndEntry* entry = (XboxSndEntry*)userdata;
-    SDL_PutAudioStreamData(stream, entry->mem, entry->Datasize);
-}
-
 S32 iSndPlay(xSndVoiceInfo* vp)
 {
     assert(snd.hdr.assetID == vp->assetID &&
@@ -438,65 +446,25 @@ S32 iSndPlay(xSndVoiceInfo* vp)
         return FALSE;
     }
 
-    SDL_AudioStream* stream = voices[voice];
+    MIX_Track* track = voices[voice];
 
     iSndSetVol(vp->sndID, vp->vol);
     iSndSetPitch(vp->sndID, vp->pitch);
 
-    SDL_PutAudioStreamData(stream, snd.hdr.mem, snd.hdr.Datasize);
-    SDL_FlushAudioStream(stream);
+    SDL_AudioSpec spec{ .format = SDL_AUDIO_S16LE,
+                        .channels = snd.hdr.nChannels,
+                        .freq = static_cast<int>(snd.hdr.sample_rate) };
+    MIX_Audio* audio =
+        MIX_LoadRawAudioNoCopy(output_device, snd.hdr.mem, snd.hdr.Datasize, &spec, false);
+    MIX_SetTrackAudio(track, audio);
+    MIX_PlayTrack(track, 0);
 
     if (vp->flags & XSND_VOICE_LOOPING || snd.hdr.flags & XBOX_SND_LOOPING)
     {
-        SDL_SetAudioStreamGetCallback(stream, iSndLoopCallback, snd.hdr_ptr);
+        MIX_SetTrackLoops(track, -1);
     }
 
     return TRUE;
-}
-
-static void iSndCalcVol(xSndVoiceInfo* vp, SDL_AudioStream* stream)
-{
-    SDL_SetAudioStreamGain(stream, vp->vol * gSnd.categoryVolFader[vp->category]);
-}
-
-static void iSndCalcVol3d(xSndVoiceInfo* vp, SDL_AudioStream* stream)
-{
-    xVec3 to;
-
-    xVec3Sub(&to, &vp->playPos, &gSnd.pos);
-    F32 dist2 = xVec3Length2(&to);
-    xVec3Normalize(&to, &to);
-    F32 pan = xVec3Dot(&to, &gSnd.right);
-
-    F32 volscale;
-    if (dist2 > vp->outerRadius2)
-    {
-        volscale = 0.0f;
-    }
-    else if (dist2 <= vp->innerRadius2)
-    {
-        volscale = 1.0f;
-    }
-    else
-    {
-        F32 fadeRange = vp->outerRadius2 - vp->innerRadius2;
-        volscale = std::sqrtf((fadeRange - (dist2 - vp->innerRadius2)) / fadeRange);
-    }
-
-    S32 ipan = (S32)(64.0f * pan) + 0x40;
-    F32 vol = volscale * (vp->vol * gSnd.categoryVolFader[vp->category]);
-
-    if (ipan < 0)
-    {
-        ipan = 0;
-    }
-    else if (ipan > 0x7f)
-    {
-        ipan = 0x7f;
-    }
-
-    SDL_SetAudioStreamGain(stream, vol);
-    // TODO: panning
 }
 
 void iSndSetVol(U32 snd, F32 vol)
@@ -507,9 +475,9 @@ void iSndSetVol(U32 snd, F32 vol)
         return;
     }
 
-    SDL_AudioStream* stream = voices[i];
+    MIX_Track* track = voices[i];
     xSndVoiceInfo* vp = &gSnd.voice[i];
-    if (stream == NULL)
+    if (track == NULL)
     {
         return;
     }
@@ -517,11 +485,11 @@ void iSndSetVol(U32 snd, F32 vol)
     vp->vol = vol;
     if ((vp->flags & XSND_VOICE_POSITIONAL) != 0)
     {
-        iSndCalcVol3d(vp, stream);
+        iSndCalcVol3d(vp, track);
     }
     else
     {
-        iSndCalcVol(vp, stream);
+        iSndCalcVol(vp, track);
     }
 }
 
@@ -533,8 +501,8 @@ void iSndSetPitch(U32 snd, F32 pitch)
         return;
     }
 
-    SDL_AudioStream* stream = voices[i];
-    if (stream == NULL)
+    MIX_Track* track = voices[i];
+    if (track == NULL)
     {
         return;
     }
@@ -547,7 +515,7 @@ void iSndSetPitch(U32 snd, F32 pitch)
     // gSnd.voice[i].pitch = pitch;
 
     F32 ratio = std::powf(2.0f, pitch / 12.0f);
-    SDL_SetAudioStreamFrequencyRatio(stream, ratio);
+    MIX_SetTrackFrequencyRatio(track, ratio);
 }
 
 void iSndStartStereo(U32 id1, U32 id2, F32 pitch)
