@@ -9,6 +9,7 @@ extern "C" int sprintf(char*, const char*, ...);
 
 #include <types.h>
 
+#include "zMenu.h"
 #include "iSystem.h"
 #include "xMemMgr.h"
 #include "zVar.h"
@@ -81,11 +82,6 @@ void zMenuInit(U32 theSceneID);
 void zMenuSetup();
 U32 zMenuLoop();
 void zMenuExit();
-// zMenu.cpp defines this returning bool; zMain sees it as S32. The mangled name
-// carries no return type, so the two declarations name the same symbol - and the
-// retail zMain.o assigns the result with a plain `mr`, which only an int-typed
-// declaration produces.
-S32 zMenuCardCheckStartup(S32* bytesNeeded, S32* availOnDisk, S32* neededFiles);
 S32 zMenuGetBadCard();
 U32 zMenuGetCorruptFiles(char name[][64]);
 S32 zMenuIsFirstBoot();
@@ -153,7 +149,7 @@ void zMainOutputMgrSetup()
 {
     iTime tim = iTimeGet();
     (void)__FUNCTION__; // stands in for the (NDEBUG'd) load-timing report; retail's object
-                  // carries the __FUNCTION__ string object this evaluation emits
+    // carries the __FUNCTION__ string object this evaluation emits
     iTimeDiffSec(tim);
     iTimeGet();
 }
@@ -164,7 +160,7 @@ void zMainInitGlobals()
     globals.sceneFirst = 1;
     iTime tim = iTimeGet();
     (void)__FUNCTION__; // stands in for the (NDEBUG'd) load-timing report; retail's object
-                  // carries the __FUNCTION__ string object this evaluation emits
+    // carries the __FUNCTION__ string object this evaluation emits
     iTimeDiffSec(tim);
     iTimeGet();
 }
@@ -789,8 +785,7 @@ void zMainLoop()
 
     {
         static U32 menuModeID = 'MNU3';
-        static U32 gameSceneID = (globals.sceneStart[0] << 24) |
-                                 (globals.sceneStart[1] << 16) |
+        static U32 gameSceneID = (globals.sceneStart[0] << 24) | (globals.sceneStart[1] << 16) |
                                  (globals.sceneStart[2] << 8) | globals.sceneStart[3];
 
         newGameSceneID = gameSceneID;
@@ -906,7 +901,7 @@ void zMainReadINI()
 
     iTime tim = iTimeGet();
     (void)__FUNCTION__; // stands in for the (NDEBUG'd) load-timing report; retail's object
-                  // carries the __FUNCTION__ string object this evaluation emits
+    // carries the __FUNCTION__ string object this evaluation emits
     iTimeDiffSec(tim);
     iTimeGet();
 
@@ -944,9 +939,9 @@ void zMainFirstScreen(S32 mode)
                 "\n"
                 "Licensed by Nintendo";
             iColor_tag color = { 255, 230, 0, 200 };
-            xtextbox tb = xtextbox::create(
-                xfont::create(1, NSCREENX(19.0f), NSCREENY(22.0f), 0.0f, color, screen_bounds),
-                screen_bounds, 2, 0.0f, 0.0f, 0.0f, 0.0f);
+            xtextbox tb = xtextbox::create(xfont::create(1, NSCREENX(19.0f), NSCREENY(22.0f), 0.0f,
+                                                         color, screen_bounds),
+                                           screen_bounds, 2, 0.0f, 0.0f, 0.0f, 0.0f);
 
             tb.set_text(text);
             tb.bounds = screen_bounds;

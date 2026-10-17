@@ -342,7 +342,7 @@ U32 zMenuGetCorruptFiles(char name[][64])
     return corruptFileCount;
 }
 
-bool zMenuCardCheckStartup(S32* bytesNeeded, S32* availOnDisk, S32* neededFiles)
+S32 zMenuCardCheckStartup(S32* bytesNeeded, S32* availOnDisk, S32* neededFiles)
 {
     st_XSAVEGAME_DATA* ldinst = xSGInit(XSG_MODE_SAVE);
     S32 tgtcnt, tgtmax;
@@ -476,7 +476,7 @@ bool zMenuCardCheckStartup(S32* bytesNeeded, S32* availOnDisk, S32* neededFiles)
         }
     }
     xSGDone(ldinst);
-    return !rc;
+    return rc ? 0 : 1;
 }
 
 S32 zMenuGetBadCard()
