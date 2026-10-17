@@ -8,7 +8,6 @@
 
 #include <cassert>
 
-
 RpAtomic* RpAtomicForAllIntersections(RpAtomic* atomic, RpIntersection* intersection,
                                       RpIntersectionCallBackGeometryTriangle callBack, void* data)
 {
@@ -88,6 +87,9 @@ RpAtomic* RpAtomicForAllIntersections(RpAtomic* atomic, RpIntersection* intersec
     {
         RwSphere modelSpaceSphere = intersection->t.sphere;
         RwV3dTransformPoints(&modelSpaceSphere.center, &modelSpaceSphere.center, 1, &worldToFrame);
+        // Assume that the atomic's scale is uniform. There's nothing we could reliably do if that's not the case anyway.
+        float scale = rw::length(worldToFrame.right);
+        modelSpaceSphere.radius *= scale;
 
         for (int i = 0; i < geo->numTriangles; i++)
         {
