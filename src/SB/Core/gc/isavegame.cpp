@@ -658,16 +658,16 @@ S32 iSGSaveFile(st_ISGSESSION* isgdata, const char* fname, char* data, S32 n, S3
     ResetButton::DisableReset();
     if (isgdata->slot < 0)
     {
-        isgdata->unk_26c = ISG_OPSTAT_FAILURE;
-        isgdata->unk_268 = ISG_OPERR_NOCARD;
+        isgdata->io_status = ISG_OPSTAT_FAILURE;
+        isgdata->io_err = ISG_OPERR_NOCARD;
         return 0;
     }
 
     st_ISG_MEMCARD_DATA* mcdata = &isgdata->mcdata[isgdata->slot];
     if (mcdata->unk_12c != 0)
     {
-        isgdata->unk_26c = ISG_OPSTAT_FAILURE;
-        isgdata->unk_268 = ISG_OPERR_DAMAGE;
+        isgdata->io_status = ISG_OPSTAT_FAILURE;
+        isgdata->io_err = ISG_OPERR_DAMAGE;
         return 0;
     }
 
@@ -733,21 +733,21 @@ S32 iSGSaveFile(st_ISGSESSION* isgdata, const char* fname, char* data, S32 n, S3
     ResetButton::EnableReset();
     iTRCDisk::CheckDVDAndResetState();
 
-    isgdata->unk_268 = ISG_OPERR_NONE;
+    isgdata->io_err = ISG_OPERR_NONE;
     if (writeret != 0)
     {
-        isgdata->unk_26c = ISG_OPSTAT_SUCCESS;
+        isgdata->io_status = ISG_OPSTAT_SUCCESS;
     }
     else
     {
-        isgdata->unk_26c = ISG_OPSTAT_FAILURE;
+        isgdata->io_status = ISG_OPSTAT_FAILURE;
         if (operr != ISG_OPERR_NONE)
         {
-            isgdata->unk_268 = operr;
+            isgdata->io_err = operr;
         }
         else
         {
-            isgdata->unk_268 = ISG_OPERR_UNKNOWN;
+            isgdata->io_err = ISG_OPERR_UNKNOWN;
         }
     }
     return writeret;
@@ -774,16 +774,16 @@ S32 iSGReadLeader(st_ISGSESSION* isgdata, const char* fname, char* databuf, S32 
     en_ASYNC_OPERR operr = ISG_OPERR_NONE;
     if (isgdata->slot < 0)
     {
-        isgdata->unk_26c = ISG_OPSTAT_FAILURE;
-        isgdata->unk_268 = ISG_OPERR_NOCARD;
+        isgdata->io_status = ISG_OPSTAT_FAILURE;
+        isgdata->io_err = ISG_OPERR_NOCARD;
         return 0;
     }
     data = &isgdata->mcdata[isgdata->slot];
 
     if (data->unk_12c != 0)
     {
-        isgdata->unk_26c = ISG_OPSTAT_FAILURE;
-        isgdata->unk_268 = ISG_OPERR_DAMAGE;
+        isgdata->io_status = ISG_OPSTAT_FAILURE;
+        isgdata->io_err = ISG_OPERR_DAMAGE;
         return 0;
     }
 
@@ -822,21 +822,21 @@ S32 iSGReadLeader(st_ISGSESSION* isgdata, const char* fname, char* databuf, S32 
         xMemPopTemp(alloc);
     }
 
-    isgdata->unk_268 = ISG_OPERR_NONE;
+    isgdata->io_err = ISG_OPERR_NONE;
     if (readret != 0)
     {
-        isgdata->unk_26c = ISG_OPSTAT_SUCCESS;
+        isgdata->io_status = ISG_OPSTAT_SUCCESS;
     }
     else
     {
-        isgdata->unk_26c = ISG_OPSTAT_FAILURE;
+        isgdata->io_status = ISG_OPSTAT_FAILURE;
         if (data->unk_12c != 0)
         {
-            isgdata->unk_268 = ISG_OPERR_DAMAGE;
+            isgdata->io_err = ISG_OPERR_DAMAGE;
         }
         else
         {
-            isgdata->unk_268 = ISG_OPERR_OTHER;
+            isgdata->io_err = ISG_OPERR_OTHER;
         }
     }
     return readret;
@@ -844,7 +844,7 @@ S32 iSGReadLeader(st_ISGSESSION* isgdata, const char* fname, char* databuf, S32 
 
 en_ASYNC_OPSTAT iSGPollStatus(st_ISGSESSION* isgdata, en_ASYNC_OPCODE* curop, S32 block)
 {
-    return isgdata->unk_26c;
+    return isgdata->io_status;
 }
 
 en_ASYNC_OPERR iSGOpError(st_ISGSESSION* isgdata, char* errmsg)
@@ -877,19 +877,19 @@ en_ASYNC_OPERR iSGOpError(st_ISGSESSION* isgdata, char* errmsg)
     en_ASYNC_OPERR err;
     if (errmsg == NULL)
     {
-        return isgdata->unk_268;
+        return isgdata->io_err;
     }
 
-    if (isgdata->unk_268 < ISG_OPERR_NOMORE)
+    if (isgdata->io_err < ISG_OPERR_NOMORE)
     {
-        strncpy(errmsg, errmsgs[isgdata->unk_268], 0x80);
+        strncpy(errmsg, errmsgs[isgdata->io_err], 0x80);
     }
     else
     {
         strncpy(errmsg, errmsgs[ISG_OPERR_UNKNOWN], 0x80);
     }
     errmsg[0x7f] = NULL;
-    return isgdata->unk_268;
+    return isgdata->io_err;
 }
 
 static S32 iSG_start_your_engines()
@@ -1052,7 +1052,7 @@ static S32 iSG_mc_isformatted(st_ISG_MEMCARD_DATA* mcdata)
     return rc;
 }
 
-static S32 iSG_mc_isGCcard(st_ISG_MEMCARD_DATA* mcdata, int* param2, int* param3)
+static S32 iSG_mc_isGCcard(st_ISG_MEMCARD_DATA* mcdata, int* encodingError, int* ioError)
 {
     S32 result = 0;
     S32 rc = 0;
@@ -1062,14 +1062,14 @@ static S32 iSG_mc_isGCcard(st_ISG_MEMCARD_DATA* mcdata, int* param2, int* param3
     s32 memSize = 0;
     s32 sectorSize = 0;
 
-    if (param2)
+    if (encodingError)
     {
-        *param2 = 0;
+        *encodingError = 0;
     }
 
-    if (param3)
+    if (ioError)
     {
-        *param3 = 0;
+        *ioError = 0;
     }
 
     if (mcdata->unk_0 == 0)
@@ -1111,21 +1111,21 @@ static S32 iSG_mc_isGCcard(st_ISG_MEMCARD_DATA* mcdata, int* param2, int* param3
             if (result == CARD_RESULT_ENCODING)
             {
                 rc = 3;
-                if (param2)
+                if (encodingError)
                 {
-                    *param2 = 1;
+                    *encodingError = 1;
                 }
             }
             else
             {
                 rc = 0;
-                if (result == CARD_RESULT_ENCODING && param2)
+                if (result == CARD_RESULT_ENCODING && encodingError)
                 {
-                    *param2 = 1;
+                    *encodingError = 1;
                 }
-                if (result == CARD_RESULT_IOERROR && param3)
+                if (result == CARD_RESULT_IOERROR && ioError)
                 {
-                    *param3 = 1;
+                    *ioError = 1;
                 }
             }
         }
@@ -1138,9 +1138,9 @@ static S32 iSG_mc_isGCcard(st_ISG_MEMCARD_DATA* mcdata, int* param2, int* param3
             result = CARDGetEncoding(mcdata->chan, &encoding);
         } while (result == CARD_RESULT_BUSY);
 
-        if (result == CARD_RESULT_READY && encoding && param2)
+        if (result == CARD_RESULT_READY && encoding && encodingError)
         {
-            *param2 = 1;
+            *encodingError = 1;
         }
     }
 
@@ -1293,7 +1293,8 @@ static S32 iSG_curKosher(CARDStat* stat, CARDFileInfo* info)
 
     return rc;
 }
-static S32 iSG_fileKosher(st_ISG_MEMCARD_DATA* mcdata, const char* param2, int param3, int* param4)
+
+static S32 iSG_fileKosher(st_ISG_MEMCARD_DATA* mcdata, const char* fname, int param3, int* param4)
 {
     S32 rc = 0;
     en_ASYNC_OPERR operr = ISG_OPERR_NONE;
@@ -1303,7 +1304,7 @@ static S32 iSG_fileKosher(st_ISG_MEMCARD_DATA* mcdata, const char* param2, int p
         *param4 = 0;
     }
 
-    if (iSG_mc_fopen(mcdata, param2, -1, ISG_IOMODE_READ, &operr) == 0)
+    if (iSG_mc_fopen(mcdata, fname, -1, ISG_IOMODE_READ, &operr) == 0)
     {
         return -1;
     }
@@ -1314,7 +1315,7 @@ static S32 iSG_fileKosher(st_ISG_MEMCARD_DATA* mcdata, const char* param2, int p
     if (ret == 0)
     {
         rc = 0;
-        if (param3 && iSG_mc_fdel(mcdata, param2) && param4)
+        if (param3 && iSG_mc_fdel(mcdata, fname) && param4)
         {
             *param4 = 1;
         }

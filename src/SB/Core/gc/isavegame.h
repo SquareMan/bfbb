@@ -73,6 +73,14 @@ enum en_CHGCODE
     ISG_CHG_GAMELIST
 };
 
+enum en_NAMEGEN_TYPE
+{
+    ISG_NGTYP_GAMEDIR,
+    ISG_NGTYP_GAMEFILE,
+    ISG_NGTYP_CONFIG,
+    ISG_NGTYP_ICONTHUM
+};
+
 /* DWARF Definitions (PS2)
 
 class st_ISG_MEMCARD_DATA {
@@ -129,21 +137,15 @@ struct st_ISGSESSION
     st_ISG_MEMCARD_DATA mcdata[ISG_NUM_SLOTS];
     S32 slot;
     S32 unk_264;
-    en_ASYNC_OPERR unk_268;
-    en_ASYNC_OPSTAT unk_26c;
+    en_ASYNC_OPERR io_err;
+    en_ASYNC_OPSTAT io_status;
     S32 unk_270;
     void (*chgfunc)(void*, en_CHGCODE); // 0x274
     void* cltdata; // 0x278
     S32 unk_27c;
 };
 
-enum en_NAMEGEN_TYPE
-{
-    ISG_NGTYP_GAMEDIR,
-    ISG_NGTYP_GAMEFILE,
-    ISG_NGTYP_CONFIG,
-    ISG_NGTYP_ICONTHUM
-};
+struct st_ISGSESSION;
 
 S32 iSGStartup();
 S32 iSGShutdown();

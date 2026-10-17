@@ -3,7 +3,6 @@
 
 #include <types.h>
 
-
 enum en_ISG_IOMODE
 {
     ISG_IOMODE_READ = 0x1,
@@ -72,26 +71,6 @@ enum en_CHGCODE
     ISG_CHG_GAMELIST
 };
 
-struct st_ISG_MEMCARD_DATA
-{
-    U32 TODO;
-};
-
-#define ISG_NUM_SLOTS 2
-#define ISG_NUM_FILES 3
-struct st_ISGSESSION
-{
-    st_ISG_MEMCARD_DATA mcdata[ISG_NUM_SLOTS];
-    S32 slot;
-    S32 unk_264;
-    en_ASYNC_OPERR unk_268;
-    en_ASYNC_OPSTAT unk_26c;
-    S32 unk_270;
-    void (*chgfunc)(void*, en_CHGCODE); // 0x274
-    void* cltdata; // 0x278
-    S32 unk_27c;
-};
-
 enum en_NAMEGEN_TYPE
 {
     ISG_NGTYP_GAMEDIR,
@@ -99,6 +78,8 @@ enum en_NAMEGEN_TYPE
     ISG_NGTYP_CONFIG,
     ISG_NGTYP_ICONTHUM
 };
+
+struct st_ISGSESSION;
 
 S32 iSGStartup();
 S32 iSGShutdown();
