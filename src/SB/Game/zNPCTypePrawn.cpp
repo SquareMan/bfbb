@@ -613,7 +613,7 @@ namespace
             return FALSE;
         }
 
-        raster = RwRasterCreate(width, height, 32, rwRASTERTYPEZBUFFER | rwRASTERTYPECAMERA);
+        raster = RwRasterCreate(width, height, 32, rwRASTERTYPECAMERATEXTURE);
         if (raster == NULL)
         {
             destroy();

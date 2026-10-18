@@ -493,10 +493,10 @@ static RwCamera* CameraCreate(S32 a, S32 b, S32 c)
     if (camera != NULL)
     {
         RwCameraSetFrame(camera, RwFrameCreate());
-        camera->frameBuffer = RwRasterCreate(a, b, 0, 2);
+        camera->frameBuffer = RwRasterCreate(a, b, 0, rwRASTERTYPECAMERA);
         if (c != 0)
         {
-            camera->zBuffer = RwRasterCreate(a, b, 0, 1);
+            camera->zBuffer = RwRasterCreate(a, b, 0, rwRASTERTYPEZBUFFER);
         }
         if (camera->object.object.parent != NULL)
         {

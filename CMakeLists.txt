@@ -72,7 +72,7 @@ target_compile_options(bfbb PRIVATE -Wno-deprecated-enum-enum-conversion)
 # For now we'll force it to allow this, but this is pretty cringe
 target_link_options(bfbb PRIVATE -Wl,/force:multiple)
 target_compile_definitions(bfbb PRIVATE _CRT_SECURE_NO_WARNINGS _CRT_NONSTDC_NO_WARNINGS)
-target_compile_definitions(bfbb PRIVATE WITH_LIBRW)
+target_compile_definitions(bfbb PRIVATE WITH_LIBRW AVOID_UB)
 
 target_include_directories(bfbb SYSTEM PRIVATE
     include/

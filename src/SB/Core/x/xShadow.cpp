@@ -74,7 +74,8 @@ void xShadow_ListAdd(xEnt* ent);
 void xShadowManager_Add(xEnt* ent);
 static void GCSaveFrameBuffer();
 static RwCamera* ShadowCameraSetSpherePersp(RwCamera* camera, RwV3d* center, F32 radius);
-int Im2DRenderQuad(float x1, float y1, float x2, float y2, float z, float recipCamZ, float uvOffset);
+int Im2DRenderQuad(float x1, float y1, float x2, float y2, float z, float recipCamZ,
+                   float uvOffset);
 
 static RwCamera* ShadowCameraUpdate(RwCamera* shadowCamera, void* model, void (*renderCB)(void*),
                                     xVec3* center, F32 radius, S32 shadowMode);
@@ -84,7 +85,7 @@ static void GCRestoreFrameBuffer();
 void xShadowInit()
 {
     xShadowCameraCreate();
-    gc_saveraster = RwRasterCreate(256, 256, 32, 0x504);
+    gc_saveraster = RwRasterCreate(256, 256, 32, rwRASTERFORMAT8888 | rwRASTERTYPETEXTURE);
     shadow_ent_count = 0;
     ShadowLight = RpLightCreate(1);
     RpLightSetColor(ShadowLight, &ShadowLightColor);
@@ -123,7 +124,8 @@ static S32 SetupShadow()
     // equal to either display width or height.
     // On GCN, this routine normally won't happen,
     // as we're already below both dimensions.
-    for (; (res > 640) || (res > 480); res >>= 1);
+    for (; (res > 640) || (res > 480); res >>= 1)
+        ;
 
     ShadowCamera = ShadowCameraCreatePersp(res);
     if (ShadowCamera == NULL)
@@ -154,7 +156,8 @@ U32 xShadowCameraCreate()
     return ((-setup | setup) >> 0x1f);
 }
 
-void xShadowCameraUpdate(void* model, void(*renderCB)(void*), xVec3* center, float radius, int shadowMode)
+void xShadowCameraUpdate(void* model, void (*renderCB)(void*), xVec3* center, float radius,
+                         int shadowMode)
 {
     ShadowCameraSetSpherePersp(ShadowCamera, (RwV3d*)center, radius);
     ShadowCameraUpdate(ShadowCamera, model, renderCB, center, radius, shadowMode);
@@ -294,13 +297,8 @@ static void modelRenderCB(void* model)
 
 U32 xShadowReceiveShadowSetup(xEnt* ent)
 {
-    if
-    (
-    (ent->model != NULL) &&
-    (xEntIsVisible(ent)) &&
-    (ent->baseFlags & 0x10) &&
-    (!iModelCull(ent->model->Data, ent->model->Mat))
-    )
+    if ((ent->model != NULL) && (xEntIsVisible(ent)) && (ent->baseFlags & 0x10) &&
+        (!iModelCull(ent->model->Data, ent->model->Mat)))
     {
         return 1;
     }
@@ -846,10 +844,8 @@ static S32 CmpShadowMgr(const void* a, const void* b)
     xEnt* entA = ((const xShadowMgr*)a)->ent;
     xEnt* entB = ((const xShadowMgr*)b)->ent;
 
-    S32 isPlayerA =
-        (entA->baseType == eBaseTypePlayer) || (entA->baseType == eBaseTypeBoulder);
-    S32 isPlayerB =
-        (entB->baseType == eBaseTypePlayer) || (entB->baseType == eBaseTypeBoulder);
+    S32 isPlayerA = (entA->baseType == eBaseTypePlayer) || (entA->baseType == eBaseTypeBoulder);
+    S32 isPlayerB = (entB->baseType == eBaseTypePlayer) || (entB->baseType == eBaseTypeBoulder);
 
     if (isPlayerA && !isPlayerB)
     {
@@ -1038,7 +1034,7 @@ static S32 ShadowRender(RwCamera* shadowCamera, RwRaster* shadowRast, RpIntersec
     else
     {
         RpCollisionWorldForAllIntersections(globals.sceneCur->env->geom->world, shadowZone,
-                                           ShadowRenderTriangleCB, &param);
+                                            ShadowRenderTriangleCB, &param);
     }
 
     if (Im3DBufferPos != 0)
@@ -1071,19 +1067,19 @@ static void GCRestoreFrameBuffer()
     RwCamera* cam = RwCameraGetCurrentCamera();
     F32 recipCamZ = (1.0f / cam->farPlane);
 
-    RwRenderStateSet(rwRENDERSTATESRCBLEND,      (void*)2);
-    RwRenderStateSet(rwRENDERSTATEDESTBLEND,     (void*)1);
-    RwRenderStateSet(rwRENDERSTATEZTESTENABLE,   (void*)0);
-    RwRenderStateSet(rwRENDERSTATEZWRITEENABLE,  (void*)0);
+    RwRenderStateSet(rwRENDERSTATESRCBLEND, (void*)2);
+    RwRenderStateSet(rwRENDERSTATEDESTBLEND, (void*)1);
+    RwRenderStateSet(rwRENDERSTATEZTESTENABLE, (void*)0);
+    RwRenderStateSet(rwRENDERSTATEZWRITEENABLE, (void*)0);
     RwRenderStateSet(rwRENDERSTATETEXTUREFILTER, (void*)1);
     RwRenderStateSet(rwRENDERSTATETEXTURERASTER, gc_saveraster);
 
     Im2DRenderQuad(0.0f, 0.0f, 256.0f, 256.0f, RwIm2DGetFarScreenZ(), recipCamZ, 0.001953125f);
 
-    RwRenderStateSet(rwRENDERSTATEZTESTENABLE,  (void*)1);
+    RwRenderStateSet(rwRENDERSTATEZTESTENABLE, (void*)1);
     RwRenderStateSet(rwRENDERSTATEZWRITEENABLE, (void*)1);
-    RwRenderStateSet(rwRENDERSTATESRCBLEND,     (void*)5);
-    RwRenderStateSet(rwRENDERSTATEDESTBLEND,    (void*)6);
+    RwRenderStateSet(rwRENDERSTATESRCBLEND, (void*)5);
+    RwRenderStateSet(rwRENDERSTATEDESTBLEND, (void*)6);
 }
 
 static RwCamera* ShadowCameraCreatePersp(S32 param)
@@ -1101,7 +1097,7 @@ static RwCamera* ShadowCameraCreatePersp(S32 param)
 
         if (cam->object.object.parent != NULL)
         {
-            RwRaster* raster = RwRasterCreate(param, param, 0, 1);
+            RwRaster* raster = RwRasterCreate(param, param, 0, rwRASTERTYPEZBUFFER);
             if (raster != NULL)
             {
                 cam->zBuffer = raster;
@@ -1264,8 +1260,7 @@ static S32 shadowCacheLeafCB(S32 numTriangles, S32 triOffset, void* data)
             F32 pdot = nz * posX + nx * posZ;
 
             if ((pdot > 0.0f) &&
-                (pdot * pdot >=
-                 nmag2 * (cbparam->capsuleRadius * cbparam->capsuleRadius)))
+                (pdot * pdot >= nmag2 * (cbparam->capsuleRadius * cbparam->capsuleRadius)))
             {
                 goto next_tri;
             }
@@ -1282,8 +1277,7 @@ static S32 shadowCacheLeafCB(S32 numTriangles, S32 triOffset, void* data)
             F32 dotB = dotBx + dotBz;
 
             if ((dotA < 0.0f) && (dotB < 0.0f) &&
-                ((startX - wv[k].x) * (startX - wv[k].x) +
-                     (startZ - wv[k].z) * (startZ - wv[k].z) >
+                ((startX - wv[k].x) * (startX - wv[k].x) + (startZ - wv[k].z) * (startZ - wv[k].z) >
                  cbparam->capsuleRadius * cbparam->capsuleRadius))
             {
                 goto next_tri;
@@ -2017,10 +2011,9 @@ void xShadowManager_Render()
             }
             else
             {
-                rad = 0.167f *
-                      (ent->bound.box.box.upper.x + ent->bound.box.box.upper.y +
-                       ent->bound.box.box.upper.z - ent->bound.box.box.lower.x -
-                       ent->bound.box.box.lower.y - ent->bound.box.box.lower.z);
+                rad = 0.167f * (ent->bound.box.box.upper.x + ent->bound.box.box.upper.y +
+                                ent->bound.box.box.upper.z - ent->bound.box.box.lower.x -
+                                ent->bound.box.box.lower.y - ent->bound.box.box.lower.z);
             }
 
             xShadowSimple_Add(ent->simpShadow, ent, rad, 1.0f);

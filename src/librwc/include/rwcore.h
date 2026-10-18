@@ -72,7 +72,7 @@ inline RwBool RwFrameDestroy(RwFrame* frame)
     return false;
 }
 
-inline RwFrame *RwFrameGetRoot(const RwFrame * frame)
+inline RwFrame* RwFrameGetRoot(const RwFrame* frame)
 {
     return frame->root;
 }
@@ -124,13 +124,13 @@ inline RwFrame* RwFrameRotate(RwFrame* frame, const RwV3d* axis, RwReal angle,
     return frame;
 }
 
-typedef RwFrame *(*RwFrameCallBack)(RwFrame *frame, void *data);
+typedef RwFrame* (*RwFrameCallBack)(RwFrame* frame, void* data);
 inline RwFrame* RwFrameForAllChildren(RwFrame* frame, RwFrameCallBack callBack, void* data)
 {
     return frame->forAllChildren(callBack, data);
 }
 
-inline RwBool RwFrameDestroyHierarchy(RwFrame * frame)
+inline RwBool RwFrameDestroyHierarchy(RwFrame* frame)
 {
     frame->destroyHierarchy();
     return 1;
@@ -227,9 +227,9 @@ constexpr RwInt32 rwCAMERACLEARSTENCIL = rw::Camera::CLEARSTENCIL;
 inline RwCamera* RwCameraClear(RwCamera* camera, RwRGBA* colour, RwInt32 clearMode)
 {
     //librw doesn't allow colour to be null for CLEARZ mode, that should probably be fixed upstream
-    if(colour == NULL && clearMode == rwCAMERACLEARZ)
+    if (colour == NULL && clearMode == rwCAMERACLEARZ)
     {
-        static RwRGBA black = {0, 0, 0, 255};
+        static RwRGBA black = { 0, 0, 0, 255 };
         colour = &black;
     }
 
@@ -247,7 +247,7 @@ inline RwCamera* RwCameraEndUpdate(RwCamera* camera)
     camera->endUpdate();
 
     // librw does not unset these globals in endUpdate, leading to use-after-free issues
-    // when accessing RwCameraGetCurrentCamera 
+    // when accessing RwCameraGetCurrentCamera
     rw::engine->currentCamera = NULL;
     rw::engine->currentWorld = NULL;
 
@@ -293,6 +293,22 @@ constexpr RwUInt32 rwRASTERTYPECAMERA = rw::Raster::CAMERA;
 constexpr RwUInt32 rwRASTERTYPETEXTURE = rw::Raster::TEXTURE;
 constexpr RwUInt32 rwRASTERTYPECAMERATEXTURE = rw::Raster::CAMERATEXTURE;
 constexpr RwUInt32 rwRASTERTYPEDONTALLOCATE = rw::Raster::DONTALLOCATE;
+
+constexpr RwUInt32 rwRASTERFORMATDEFAULT = rw::Raster::DEFAULT;
+constexpr RwUInt32 rwRASTERFORMAT1555 = rw::Raster::C1555;
+constexpr RwUInt32 rwRASTERFORMAT565 = rw::Raster::C565;
+constexpr RwUInt32 rwRASTERFORMAT4444 = rw::Raster::C4444;
+constexpr RwUInt32 rwRASTERFORMATLUM8 = rw::Raster::LUM8;
+constexpr RwUInt32 rwRASTERFORMAT8888 = rw::Raster::C8888;
+constexpr RwUInt32 rwRASTERFORMAT888 = rw::Raster::C888;
+constexpr RwUInt32 rwRASTERFORMAT16 = rw::Raster::D16;
+constexpr RwUInt32 rwRASTERFORMAT24 = rw::Raster::D24;
+constexpr RwUInt32 rwRASTERFORMAT32 = rw::Raster::D32;
+constexpr RwUInt32 rwRASTERFORMAT555 = rw::Raster::C555;
+constexpr RwUInt32 rwRASTERFORMATAUTOMIPMAP = rw::Raster::AUTOMIPMAP;
+constexpr RwUInt32 rwRASTERFORMATPAL8 = rw::Raster::PAL8;
+constexpr RwUInt32 rwRASTERFORMATPAL4 = rw::Raster::PAL4;
+constexpr RwUInt32 rwRASTERFORMATMIPMAP = rw::Raster::MIPMAP;
 
 inline RwRaster* RwRasterCreate(RwInt32 width, RwInt32 height, RwInt32 depth, RwInt32 flags)
 {
@@ -399,7 +415,7 @@ inline RwTexDictionary* RwTexDictionaryStreamRead(RwStream* stream)
         RwTexture* tex = rw::Texture::fromDict(lnk);
         RwRaster* raster = tex->raster;
 
-        if(raster->format & rw::Raster::C888)
+        if (raster->format & rw::Raster::C888)
         {
             // This is mostly stolen from Treedome and I'm not familiar enough with RW asset types right now to
             // know for sure if this is a good idea. I think librw needs to be fixed to handle this case
