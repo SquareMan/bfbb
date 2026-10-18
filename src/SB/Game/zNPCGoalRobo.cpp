@@ -968,7 +968,7 @@ S32 zNPCGoalAlertFodBomb::Process(en_trantype* trantype, F32 dt, void* updCtxt, 
 
 void zNPCGoalAlertFodBomb::Detonate()
 {
-    zNPCFodBomb* npc = *(zNPCFodBomb**)(&psyche->clt_owner);
+    zNPCFodBomb* npc = (zNPCFodBomb*)psyche->clt_owner;
     npc->SndPlayRandom(NPC_STYP_ATTACK);
     NPCHazard* haz = HAZ_Acquire();
     if (haz != NULL)
@@ -3677,8 +3677,7 @@ S32 zNPCGoalAlertChuck::ZoomMove(F32 dt)
     {
         xVec3SMulBy(&dir, (1.0f / dist));
         npc->ThrottleApply(dt, &dir, 0);
-        dst_zoom =
-            -((dt * npc->spd_throttle) * (xabs(dir.x) + xabs(dir.z)) - dst_zoom);
+        dst_zoom = -((dt * npc->spd_throttle) * (xabs(dir.x) + xabs(dir.z)) - dst_zoom);
     }
     if (dst_zoom < 0.0f)
     {
@@ -4446,8 +4445,7 @@ S32 zNPCGoalAttackHammer::Process(en_trantype* trantype, F32 dt, void* updCtxt, 
     F32 tym_animCurr = npc->AnimTimeCurrent();
     S32 doPLYRTests = (tym_animCurr > 1.0f);
     S32 doCHCKTests = (tym_animCurr > 1.15f);
-    S32 zapidx =
-        (bool)((tym_animCurr > tym_animDamage[0]) && (tym_animCurr < tym_animDamage[1]));
+    S32 zapidx = (bool)((tym_animCurr > tym_animDamage[0]) && (tym_animCurr < tym_animDamage[1]));
 
     if (doPLYRTests && zapidx && !(flg_attack & 3))
     {
@@ -4588,8 +4586,7 @@ S32 zNPCGoalAttackHammer::ShockwaveTests(xVec3* pos_vert, F32 dt)
         collist[i].flags = k_HIT_0xF00 | k_HIT_CALC_HDNG;
     }
 
-    S32 num_hit =
-        iSphereHitsEnv3(&bnd.sph, globals.sceneCur->env, collist, numrec, 0.78539819f);
+    S32 num_hit = iSphereHitsEnv3(&bnd.sph, globals.sceneCur->env, collist, numrec, 0.78539819f);
 
     for (S32 i = 0; i < num_hit; i++)
     {
@@ -6374,8 +6371,7 @@ void zNPCGoalLassoThrow::ApplyYank(S32 left)
 {
     zNPCRobot* npc = (zNPCRobot*)(psyche->clt_owner);
     xVec3 dir_aim = { 0.0f, 0.0f, 0.0f };
-    xMat3x3 mat_rot = { { 0.0f, 0.0f, 0.0f }, 0, { 0.0f, 0.0f, 0.0f }, 0, { 0.0f, 0.0f, 0.0f },
-                        0 };
+    xMat3x3 mat_rot = { { 0.0f, 0.0f, 0.0f }, 0, { 0.0f, 0.0f, 0.0f }, 0, { 0.0f, 0.0f, 0.0f }, 0 };
     F32 goleft;
     F32 ang_ref;
 
