@@ -31,11 +31,11 @@ void zRumbleStart(S32 pad_id, _tagSDRumbleType rumble_type, xEnt* ent)
         xPadAddRumble(pad_id, eRumble_Heavy, 0.06f, 0, 0);
         break;
     case SDR_CruiseBubbleLaunch:
-        xPadAddRumble(pad_id, eRumble_VeryLight, 0.5f, 1, 1);
+        xPadAddRumble(pad_id, eRumble_VeryLight, 0.5f, 1, RUMBLE_FX_DECAY);
         break;
     case SDR_CruiseBubbleExplode:
         xPadAddRumble(pad_id, eRumble_VeryLightHi, 0.1f, 1, 0);
-        xPadAddRumble(pad_id, eRumble_VeryHeavy, 0.3f, 0, 1);
+        xPadAddRumble(pad_id, eRumble_VeryHeavy, 0.3f, 0, RUMBLE_FX_DECAY);
         break;
     case SDR_DamageByEGen:
         xPadAddRumble(pad_id, eRumble_MediumHi, 0.1f, 1, 0);
@@ -45,23 +45,23 @@ void zRumbleStart(S32 pad_id, _tagSDRumbleType rumble_type, xEnt* ent)
         break;
     case SDR_XploDestroyedObj:
         xPadAddRumble(pad_id, eRumble_Medium, 0.1f, 1, 0);
-        xPadAddRumble(pad_id, eRumble_Heavy, 0.1f, 0, 1);
+        xPadAddRumble(pad_id, eRumble_Heavy, 0.1f, 0, RUMBLE_FX_DECAY);
         break;
     case SDR_DustDestroyedObj:
         xPadAddRumble(pad_id, eRumble_Light, 0.05f, 1, 0);
-        xPadAddRumble(pad_id, eRumble_Medium, 0.15f, 0, 1);
+        xPadAddRumble(pad_id, eRumble_Medium, 0.15f, 0, RUMBLE_FX_DECAY);
         break;
     case SDR_Test:
-        xPadAddRumble(pad_id, eRumble_VeryLightHi, 0.5f, 1, 1);
+        xPadAddRumble(pad_id, eRumble_VeryLightHi, 0.5f, 1, RUMBLE_FX_DECAY);
         break;
     case SDR_EventLight:
-        xPadAddRumble(pad_id, eRumble_Light, 0.35f, 1, 1);
+        xPadAddRumble(pad_id, eRumble_Light, 0.35f, 1, RUMBLE_FX_DECAY);
         break;
     case SDR_EventMedium:
-        xPadAddRumble(pad_id, eRumble_Medium, 0.35f, 1, 1);
+        xPadAddRumble(pad_id, eRumble_Medium, 0.35f, 1, RUMBLE_FX_DECAY);
         break;
     case SDR_EventHeavy:
-        xPadAddRumble(pad_id, eRumble_Heavy, 0.35f, 1, 1);
+        xPadAddRumble(pad_id, eRumble_Heavy, 0.35f, 1, RUMBLE_FX_DECAY);
         break;
     case SDR_TeleportStart:
         xPadAddRumble(pad_id, eRumble_VeryLight, 0.6f, 1, 0);

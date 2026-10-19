@@ -18,12 +18,6 @@ static _tagxRumble mRumbleList[32];
 _tagxPad* gDebugPad;
 _tagxPad* gPlayerPad;
 
-
-// NOTE: xPad.h declares this as xPadAnalogIsDigital(F32, F32), which does not
-// match the definition below and resolves the calls in xPadUpdate to a symbol
-// that does not exist. Declare the real signature here.
-void xPadAnalogIsDigital(S32 idx, S32 enable);
-
 S32 xPadInit()
 {
     memset(mPad, 0, sizeof(mPad));

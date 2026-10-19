@@ -6,6 +6,7 @@
 
 #include <immintrin.h>
 #include <SDL3/SDL_gamepad.h>
+#include <SDL3/SDL_log.h>
 
 extern xGlobals* xglobals;
 extern zGlobals globals;
@@ -111,20 +112,56 @@ S32 iPadUpdate(_tagxPad* pad, U32* on)
     return 1;
 }
 
+struct RumbleFrequencies
+{
+    U16 low;
+    U16 high;
+};
+
+static RumbleFrequencies sRumbleFrequencies[eRumble_Total] = {
+    { 0, 0 }, // eRumble_Off
+    { 0, 1 * UINT16_MAX / 2 }, // eRumble_Hi (unused),
+    { UINT16_MAX / 5, 0 }, // eRumble_VeryLight
+    { 0, 2 * (UINT16_MAX / 5) }, // eRumble_LightHi
+    { 2 * (UINT16_MAX / 5), 0 }, // eRumble_Light
+    { 0, 3 * (UINT16_MAX / 5) }, // eRumble_MediumHi
+    { 3 * (UINT16_MAX / 5), 0 }, // eRumble_Medium
+    { 0, 4 * (UINT16_MAX / 5) }, // eRumble_HeavyHi
+    { 4 * (UINT16_MAX / 5), 0 }, // eRumble_Heavy
+    { 0, UINT16_MAX }, // eRumble_VeryHeavyHi
+    { UINT16_MAX, 0 } // eRumble_VeryHeavy,
+};
+
+static RumbleFrequencies sCurrentRumble = { 0 };
+
 void iPadRumbleFx(_tagxPad* p, _tagxRumble* r, F32 time_passed)
 {
+    if (r->fxflags & RUMBLE_FX_DECAY)
+    {
+        sCurrentRumble.low -= sCurrentRumble.low / r->seconds * time_passed;
+        sCurrentRumble.high -= sCurrentRumble.high / r->seconds * time_passed;
+        SDL_Log("Rumble FX: %d, %d", sCurrentRumble.low, sCurrentRumble.high);
+        SDL_RumbleGamepad(sActivePad, sCurrentRumble.low, sCurrentRumble.high,
+                          r->seconds * 1000.0f);
+    }
 }
 
 void iPadStopRumble(_tagxPad* pad)
 {
+    SDL_RumbleGamepad(sActivePad, 0, 0, 0);
 }
 
 void iPadStopRumble()
 {
+    _tagxPad* pad = &mPad[globals.currentActivePad];
+    iPadStopRumble(pad);
 }
 
 void iPadStartRumble(_tagxPad* pad, _tagxRumble* rumble)
 {
+    sCurrentRumble = sRumbleFrequencies[rumble->type];
+    SDL_RumbleGamepad(sActivePad, sCurrentRumble.low, sCurrentRumble.high,
+                      rumble->seconds * 1000.0f);
 }
 
 void iPadKill()

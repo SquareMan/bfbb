@@ -93,7 +93,7 @@ void xPadDestroyRumbleChain(_tagxPad* pad);
 void xPadDestroyRumbleChain(S32 idx);
 S32 xPadAddRumble(S32 idx, _tagRumbleType type, F32 time, S32 replace, U32 fxflags);
 
-void xPadAnalogIsDigital(F32, F32);
+void xPadAnalogIsDigital(S32 idx, S32 enable);
 
 inline F32 normalize_analog(S32 v, S32 v_min, S32 v_max, S32 dead_center, S32 dead_min,
                             S32 dead_max);

@@ -21,6 +21,9 @@ enum _tagRumbleType
     eRumbleForceU32 = 0x7fffffff
 };
 
+// fxflags
+#define RUMBLE_FX_DECAY 0x1
+
 struct _tagxRumble
 {
     _tagRumbleType type;
