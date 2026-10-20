@@ -1,3 +1,4 @@
+#include <cstdint>
 #include <cstdio>
 #include <types.h>
 
@@ -12,6 +13,7 @@ extern xGlobals* xglobals;
 extern zGlobals globals;
 
 static SDL_Gamepad* sActivePad = NULL;
+static S16 sTriggerThreshold = 30000;
 
 S32 iPadInit()
 {
@@ -19,7 +21,7 @@ S32 iPadInit()
     int count;
     SDL_JoystickID* gamepads = SDL_GetGamepads(&count);
 
-    if(count <= 0) 
+    if (count <= 0)
     {
         printf("iPad: no gamepads available\n");
         return 1;
@@ -29,7 +31,7 @@ S32 iPadInit()
     SDL_JoystickID useJoystick = gamepads[0];
 
     sActivePad = SDL_OpenGamepad(useJoystick);
-    if(sActivePad == NULL)
+    if (sActivePad == NULL)
     {
         printf("iPad: Failed to open gamepad device: %s", SDL_GetError());
         return 1;
@@ -83,9 +85,9 @@ S32 iPadUpdate(_tagxPad* pad, U32* on)
 {
     SDL_UpdateGamepads();
     *on = 0;
-    pad->analog1 = {0, 0};
-    pad->analog2 = {0, 0};
-    if(sActivePad == NULL)
+    pad->analog1 = { 0, 0 };
+    pad->analog2 = { 0, 0 };
+    if (sActivePad == NULL)
     {
         return 1;
     }
@@ -102,13 +104,13 @@ S32 iPadUpdate(_tagxPad* pad, U32* on)
     *on |= SDL_GetGamepadButton(sActivePad, SDL_GAMEPAD_BUTTON_LEFT_SHOULDER) ?
                XPAD_BUTTON_LBUMPER :
                0;
-    *on |= SDL_GetGamepadAxis(sActivePad, SDL_GAMEPAD_AXIS_LEFT_TRIGGER) > 30000 ?
+    *on |= SDL_GetGamepadAxis(sActivePad, SDL_GAMEPAD_AXIS_LEFT_TRIGGER) > sTriggerThreshold ?
                XPAD_BUTTON_LTRIGGER :
                0;
     *on |= SDL_GetGamepadButton(sActivePad, SDL_GAMEPAD_BUTTON_RIGHT_SHOULDER) ?
                XPAD_BUTTON_RBUMPER :
                0;
-    *on |= SDL_GetGamepadAxis(sActivePad, SDL_GAMEPAD_AXIS_RIGHT_TRIGGER) > 30000 ?
+    *on |= SDL_GetGamepadAxis(sActivePad, SDL_GAMEPAD_AXIS_RIGHT_TRIGGER) > sTriggerThreshold ?
                XPAD_BUTTON_RTRIGGER :
                0;
     *on |= SDL_GetGamepadButton(sActivePad, SDL_GAMEPAD_BUTTON_SOUTH) ? XPAD_BUTTON_SOUTH : 0;
