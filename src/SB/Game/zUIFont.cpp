@@ -186,37 +186,37 @@ void zUIFont_Update(zUIFont* ent, xScene*, F32)
         {
             zEntEvent(ent, ent, eEventPadPressSelect);
         }
-        else if (ent->uiButton & XPAD_BUTTON_R1)
+        else if (ent->uiButton & XPAD_BUTTON_RTRIGGER)
         {
             zEntEvent(ent, ent, eEventPadPressR1);
-            ent->uiButton = XPAD_BUTTON_R1;
+            ent->uiButton = XPAD_BUTTON_RTRIGGER;
         }
-        else if (ent->uiButton & XPAD_BUTTON_R2)
+        else if (ent->uiButton & XPAD_BUTTON_RBUMPER)
         {
             zEntEvent(ent, ent, eEventPadPressR2);
-            ent->uiButton = XPAD_BUTTON_R2;
+            ent->uiButton = XPAD_BUTTON_RBUMPER;
         }
-        else if (ent->uiButton & XPAD_BUTTON_L1)
+        else if (ent->uiButton & XPAD_BUTTON_LTRIGGER)
         {
             zEntEvent(ent, ent, eEventPadPressL1);
         }
-        else if (ent->uiButton & XPAD_BUTTON_L2)
+        else if (ent->uiButton & XPAD_BUTTON_LBUMPER)
         {
             zEntEvent(ent, ent, eEventPadPressL2);
         }
-        else if (ent->uiButton & XPAD_BUTTON_X)
+        else if (ent->uiButton & XPAD_BUTTON_SOUTH)
         {
             zEntEvent(ent, ent, eEventPadPressX);
         }
-        else if (ent->uiButton & XPAD_BUTTON_O)
+        else if (ent->uiButton & XPAD_ACTION_OPTIONS)
         {
             zEntEvent(ent, ent, eEventPadPressO);
         }
-        else if (ent->uiButton & XPAD_BUTTON_TRIANGLE)
+        else if (ent->uiButton & XPAD_ACTION_BACK)
         {
             zEntEvent(ent, ent, eEventPadPressTriangle);
         }
-        else if (ent->uiButton & XPAD_BUTTON_SQUARE)
+        else if (ent->uiButton & XPAD_BUTTON_NORTH)
         {
             zEntEvent(ent, ent, eEventPadPressSquare);
         }

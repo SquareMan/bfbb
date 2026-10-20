@@ -262,7 +262,8 @@ xVec3 floor_safe_vec;
 xAnimTransition sandyHitTran[8];
 xAnimTransition patrickHitTran[8];
 
-static enum {
+static enum
+{
     WallJumpResult_NoJump,
     WallJumpResult_Jump,
 } sWallJumpResult;
@@ -1278,8 +1279,9 @@ static void PlayerAbsControl(xEnt* ent, F32 x, F32 z, F32 dt)
                                 if (globals.player.cheat_mode)
                                 {
                                     stackMag *= 3.0f;
-                                    if (globals.pad0->on & (XPAD_BUTTON_R1 | XPAD_BUTTON_R2 |
-                                                            XPAD_BUTTON_L1 | XPAD_BUTTON_L2))
+                                    if (globals.pad0->on &
+                                        (XPAD_BUTTON_RTRIGGER | XPAD_BUTTON_RBUMPER |
+                                         XPAD_BUTTON_LTRIGGER | XPAD_BUTTON_LBUMPER))
                                     {
                                         stackMag *= 4.0f;
                                     }
@@ -1326,33 +1328,105 @@ static void PlayerAbsControl(xEnt* ent, F32 x, F32 z, F32 dt)
 
 static PlayerStreakInfo sStreakInfo[3][4] = {
     {
-        { FALSE, 0xdead, &sSpongeBobLHand, &sSpongeBobLElbow, 0.7f, 1, { 255, 255, 128, 255 },
+        { FALSE,
+          0xdead,
+          &sSpongeBobLHand,
+          &sSpongeBobLElbow,
+          0.7f,
+          1,
+          { 255, 255, 128, 255 },
           { 196, 196, 64, 255 } },
-        { FALSE, 0xdead, &sSpongeBobRHand, &sSpongeBobRElbow, 0.7f, 1, { 255, 255, 128, 255 },
+        { FALSE,
+          0xdead,
+          &sSpongeBobRHand,
+          &sSpongeBobRElbow,
+          0.7f,
+          1,
+          { 255, 255, 128, 255 },
           { 196, 196, 64, 255 } },
-        { FALSE, 0xdead, &sSpongeBobLFoot, &sSpongeBobLKnee, 0.7f, 1, { 255, 255, 128, 255 },
+        { FALSE,
+          0xdead,
+          &sSpongeBobLFoot,
+          &sSpongeBobLKnee,
+          0.7f,
+          1,
+          { 255, 255, 128, 255 },
           { 196, 196, 64, 255 } },
-        { FALSE, 0xdead, &sSpongeBobRFoot, &sSpongeBobRKnee, 0.7f, 1, { 255, 255, 128, 255 },
+        { FALSE,
+          0xdead,
+          &sSpongeBobRFoot,
+          &sSpongeBobRKnee,
+          0.7f,
+          1,
+          { 255, 255, 128, 255 },
           { 196, 196, 64, 255 } },
     },
     {
-        { FALSE, 0xdead, &sSandyLHand, &sSandyLElbow, 0.8f, 1, { 192, 192, 255, 255 },
+        { FALSE,
+          0xdead,
+          &sSandyLHand,
+          &sSandyLElbow,
+          0.8f,
+          1,
+          { 192, 192, 255, 255 },
           { 192, 192, 255, 255 } },
-        { FALSE, 0xdead, &sSandyRHand, &sSandyRElbow, 0.8f, 1, { 192, 192, 255, 255 },
+        { FALSE,
+          0xdead,
+          &sSandyRHand,
+          &sSandyRElbow,
+          0.8f,
+          1,
+          { 192, 192, 255, 255 },
           { 192, 192, 255, 255 } },
-        { FALSE, 0xdead, &sSandyLFoot, &sSandyLKnee, 0.8f, 1, { 192, 192, 255, 255 },
+        { FALSE,
+          0xdead,
+          &sSandyLFoot,
+          &sSandyLKnee,
+          0.8f,
+          1,
+          { 192, 192, 255, 255 },
           { 192, 192, 255, 255 } },
-        { FALSE, 0xdead, &sSandyRFoot, &sSandyRKnee, 0.8f, 1, { 192, 192, 255, 255 },
+        { FALSE,
+          0xdead,
+          &sSandyRFoot,
+          &sSandyRKnee,
+          0.8f,
+          1,
+          { 192, 192, 255, 255 },
           { 192, 192, 255, 255 } },
     },
     {
-        { FALSE, 0xdead, &sPatrickLHand, &sPatrickLElbow, 0.6f, 1, { 255, 133, 133, 255 },
+        { FALSE,
+          0xdead,
+          &sPatrickLHand,
+          &sPatrickLElbow,
+          0.6f,
+          1,
+          { 255, 133, 133, 255 },
           { 255, 133, 133, 255 } },
-        { FALSE, 0xdead, &sPatrickRHand, &sPatrickRElbow, 0.6f, 1, { 255, 133, 133, 255 },
+        { FALSE,
+          0xdead,
+          &sPatrickRHand,
+          &sPatrickRElbow,
+          0.6f,
+          1,
+          { 255, 133, 133, 255 },
           { 255, 133, 133, 255 } },
-        { FALSE, 0xdead, &sPatrickLFoot, &sPatrickLKnee, 0.6f, 1, { 255, 133, 133, 255 },
+        { FALSE,
+          0xdead,
+          &sPatrickLFoot,
+          &sPatrickLKnee,
+          0.6f,
+          1,
+          { 255, 133, 133, 255 },
           { 255, 133, 133, 255 } },
-        { FALSE, 0xdead, &sPatrickRFoot, &sPatrickRKnee, 0.6f, 1, { 255, 133, 133, 255 },
+        { FALSE,
+          0xdead,
+          &sPatrickRFoot,
+          &sPatrickRKnee,
+          0.6f,
+          1,
+          { 255, 133, 133, 255 },
           { 255, 133, 133, 255 } },
     },
 };
@@ -1664,7 +1738,7 @@ static U32 BubbleSpinCheck(xAnimTransition*, xAnimSingle*, void*)
         return 0;
     }
 
-    return (!globals.player.ControlOff && globals.pad0->pressed & XPAD_BUTTON_TRIANGLE);
+    return (!globals.player.ControlOff && globals.pad0->pressed & XPAD_ACTION_SPIN);
 }
 
 static U32 BubbleSpinCB(xAnimTransition*, xAnimSingle* anim, void*)
@@ -1693,7 +1767,7 @@ static U32 BubbleBashCheck(xAnimTransition*, xAnimSingle* anim, void*)
         return 0;
     }
 
-    return (!globals.player.ControlOff && globals.pad0->pressed & XPAD_BUTTON_SQUARE);
+    return (!globals.player.ControlOff && globals.pad0->pressed & XPAD_ACTION_BASH);
 }
 
 // probably equivalent: looks like sda relocation memes on sPlayerCollAdjust
@@ -1737,7 +1811,7 @@ static U32 BubbleBounceCheck(xAnimTransition* tran, xAnimSingle* anim, void* par
         return false;
     }
 
-    return (!globals.player.ControlOff && (globals.pad0->pressed & XPAD_BUTTON_O));
+    return (!globals.player.ControlOff && (globals.pad0->pressed & XPAD_ACTION_BOUNCE));
 }
 
 // equivalent: sda relocation memes
@@ -1814,7 +1888,7 @@ static U32 BbowlCheck(xAnimTransition* tran, xAnimSingle* anim, void* param_3)
         return false;
     }
 
-    return (!globals.player.ControlOff && ((globals.pad0->pressed & XPAD_BUTTON_O)) &&
+    return (!globals.player.ControlOff && ((globals.pad0->pressed & XPAD_ACTION_BOWL)) &&
             globals.player.g.PowerUp[0]);
 }
 
@@ -2183,7 +2257,7 @@ static U32 SpatulaGrabStopCB(xAnimTransition*, xAnimSingle*, void* data)
 static U32 LCopterCheck(xAnimTransition*, xAnimSingle*, void*)
 {
     return (globals.player.JumpState && sLassoInfo->canCopter && !globals.player.ControlOff &&
-            (globals.pad0->pressed & XPAD_BUTTON_X));
+            (globals.pad0->pressed & XPAD_ACTION_JUMP));
 }
 
 // Equivalent: sda relocation scheduling
@@ -2289,7 +2363,7 @@ static float sTongueDblSpeedMult;
 
 static U32 WallJumpLaunchCheck(class xAnimTransition*, class xAnimSingle*, void*)
 {
-    if (globals.player.ControlOff || !(globals.pad0->pressed & XPAD_BUTTON_X) ||
+    if (globals.player.ControlOff || !(globals.pad0->pressed & XPAD_ACTION_JUMP) ||
         !globals.player.IsJumping || globals.player.s->Wall.PeakHeight <= 0.0f)
     {
         return false;
@@ -2363,7 +2437,7 @@ static U32 WallJumpLandFlightCallback(xAnimTransition* tran, xAnimSingle* anim, 
 static U32 JumpCheck(xAnimTransition* tran, xAnimSingle* anim, void* param_3)
 {
     return (globals.player.CanJump && !globals.player.ControlOff &&
-            (globals.pad0->pressed & XPAD_BUTTON_X));
+            (globals.pad0->pressed & XPAD_ACTION_JUMP));
 }
 
 static void zEntPlayerJumpAddDriver(xEnt* ent);
@@ -2428,7 +2502,7 @@ static U32 DblJumpCheck(xAnimTransition*, xAnimSingle*, void*)
         return 0;
     }
 
-    if (globals.player.ControlOff || !(globals.pad0->pressed & XPAD_BUTTON_X) ||
+    if (globals.player.ControlOff || !(globals.pad0->pressed & XPAD_ACTION_JUMP) ||
         !globals.player.Jump_CanDouble)
     {
         return 0;
@@ -2515,7 +2589,7 @@ static U32 FallCheck(xAnimTransition*, xAnimSingle* anim, void*)
     return !((anim && anim->State &&
               (strcmp(anim->State->Name, "LCopter01") == 0 ||
                strcmp(anim->State->Name, "LCopterHeadUp01") == 0)) &&
-             (globals.player.ControlOff == 0 && (globals.pad0->on & XPAD_BUTTON_X) &&
+             (globals.player.ControlOff == 0 && (globals.pad0->on & XPAD_ACTION_JUMP) &&
               sLassoInfo->copterTime > 0.0f)) &&
            globals.player.JumpState != 0 && globals.player.JumpState != 1;
 }
@@ -2628,9 +2702,7 @@ static U32 BoulderRollDoneCheck()
         return 0;
     }
 
-    return !globals.player.ControlOff &&
-               (globals.pad0->pressed &
-                (XPAD_BUTTON_TRIANGLE | XPAD_BUTTON_SQUARE | XPAD_BUTTON_O | XPAD_BUTTON_X)) ||
+    return !globals.player.ControlOff && (globals.pad0->pressed & XPAD_ACTION_BALL_CANCEL) ||
            boulderRollShouldEnd;
 }
 
@@ -2742,7 +2814,7 @@ static U32 TrackFallCB(xAnimTransition*, xAnimSingle*, void*)
 static U32 TrackPrefallJumpCheck(xAnimTransition*, xAnimSingle*, void*)
 {
     return globals.player.CanJump && !globals.player.ControlOff &&
-           globals.pad0->pressed & XPAD_BUTTON_X && tslide_inair_tmr != 0.0f &&
+           globals.pad0->pressed & XPAD_ACTION_JUMP && tslide_inair_tmr != 0.0f &&
            tslide_inair_tmr < 0.25f;
 }
 
@@ -2806,7 +2878,7 @@ static U32 PatrickGrabThrow(xAnimTransition*, xAnimSingle*, void*)
         return 0;
     }
 
-    return !globals.player.ControlOff && globals.pad0->pressed & XPAD_BUTTON_O;
+    return !globals.player.ControlOff && globals.pad0->pressed & XPAD_ACTION_PICKUP;
 }
 
 static U32 PatrickAttackCheck(xAnimTransition*, xAnimSingle*, void*)
@@ -2816,12 +2888,12 @@ static U32 PatrickAttackCheck(xAnimTransition*, xAnimSingle*, void*)
         return 0;
     }
 
-    return !globals.player.ControlOff && globals.pad0->pressed & XPAD_BUTTON_TRIANGLE;
+    return !globals.player.ControlOff && globals.pad0->pressed & XPAD_ACTION_SPIN;
 }
 
 static U32 PatrickStunCheck(xAnimTransition*, xAnimSingle*, void*)
 {
-    return !globals.player.ControlOff && globals.pad0->pressed & XPAD_BUTTON_O;
+    return !globals.player.ControlOff && globals.pad0->pressed & XPAD_ACTION_BOUNCE;
 }
 
 // Equivalent: scheduling
@@ -2982,8 +3054,9 @@ void zEntPlayerSpeakStop()
 static xEnt* GetPatrickTarget(xEnt* ent)
 {
     xEnt* result = NULL;
-    zPlatform* plat =
-        ent->collis->colls[0].flags & 1 ? XCOLLIDE_DOWNCAST_OPTR(zPlatform*, ent->collis->colls[0].optr) : NULL;
+    zPlatform* plat = ent->collis->colls[0].flags & 1 ?
+                          XCOLLIDE_DOWNCAST_OPTR(zPlatform*, ent->collis->colls[0].optr) :
+                          NULL;
 
     if (plat && plat->baseType == eBaseTypePlatform && plat->plat_flags & 2)
     {
@@ -3052,8 +3125,8 @@ static xEnt* GetPatrickTarget(xEnt* ent)
         else if (tgtent->baseType == eBaseTypeNPC)
         {
             U32 t = ((xNPCBasic*)tgtent)->SelfType();
-            if (t == NPC_TYPE_JELLYPINK || t == NPC_TYPE_JELLYBLUE ||
-                t == NPC_TYPE_KINGNEPTUNE || t == NPC_TYPE_MIMEFISH)
+            if (t == NPC_TYPE_JELLYPINK || t == NPC_TYPE_JELLYBLUE || t == NPC_TYPE_KINGNEPTUNE ||
+                t == NPC_TYPE_MIMEFISH)
             {
                 continue;
             }
@@ -3500,7 +3573,7 @@ static U32 LassoSwingBeginCheck(xAnimTransition*, xAnimSingle*, void*)
 
 static U32 LassoSwingReleaseCheck(xAnimTransition*, xAnimSingle*, void*)
 {
-    return (!globals.player.ControlOff && (globals.pad0->pressed & XPAD_BUTTON_X) &&
+    return (!globals.player.ControlOff && (globals.pad0->pressed & XPAD_ACTION_JUMP) &&
             sSwingTimeElapsed > 0.5f) ||
            sLassoInfo->swingTarget == NULL || !(sLassoInfo->swingTarget->flags & 1);
 }
@@ -3617,7 +3690,8 @@ static U8 StunBubbleTrail(xAnimSingle* single)
     S32 ret = 0;
     xAnimState* astate = single->State;
     if ((strcmp(astate->Name, "StunFall") == 0) ||
-        ((strcmp(astate->Name, "StunJump") == 0) && (single->Time >= 0.6f) && (single->Time <= 1.0f)))
+        ((strcmp(astate->Name, "StunJump") == 0) && (single->Time >= 0.6f) &&
+         (single->Time <= 1.0f)))
     {
         ret = 1;
     }
@@ -4201,8 +4275,8 @@ static S32 CheckObjectAgainstMeleeBound(xEnt* cbent, void* cbdata)
     S32 worldSpaceNorm;
 
     if (!(cbent->baseFlags & 0x20) ||
-        (!(cbent->moreFlags & 0x10) && cbent->baseType != eBaseTypeStatic) ||
-        !(cbent->flags & 1) || cbent->model == NULL)
+        (!(cbent->moreFlags & 0x10) && cbent->baseType != eBaseTypeStatic) || !(cbent->flags & 1) ||
+        cbent->model == NULL)
     {
         return 1;
     }
@@ -4249,8 +4323,8 @@ static S32 CheckObjectAgainstMeleeBound(xEnt* cbent, void* cbdata)
             c_outside.r = 255;
             c_outside.g = 255;
             c_outside.b = 0;
-            xFXShineStart((xVec3*)&cbent->model->Mat->pos, 1.0f, 0.5f, 0.01f, 0.1f, 0, &c_inside, &c_outside,
-                          0.1f, 0);
+            xFXShineStart((xVec3*)&cbent->model->Mat->pos, 1.0f, 0.5f, 0.01f, 0.1f, 0, &c_inside,
+                          &c_outside, 0.1f, 0);
         }
 
         if (globals.player.SundaeTimer > 0.0f)
@@ -4360,8 +4434,8 @@ static S32 CheckObjectAgainstMeleeBound(xEnt* cbent, void* cbdata)
                 {
                     meleeColl.optr = cbent;
 
-                    if (zPlatform_PaddleCollide(&meleeColl, (xVec3*)&ent->model->Mat->pos, &tempray.dir,
-                                                worldSpaceNorm))
+                    if (zPlatform_PaddleCollide(&meleeColl, (xVec3*)&ent->model->Mat->pos,
+                                                &tempray.dir, worldSpaceNorm))
                     {
                         hitsomething = 1;
                     }
@@ -4827,69 +4901,69 @@ xAnimTable* zEntPlayer_AnimTable()
     };
 
     static const char* const HIT_STATES[64] = { "Idle01",
-                                          "SlipIdle01",
-                                          "Walk01",
-                                          "Run01",
-                                          "Run02",
-                                          "Run03",
-                                          "SlipRun01",
-                                          "Land01",
-                                          "LandHigh01",
-                                          "LandRun01",
-                                          "Idle02",
-                                          "Idle03",
-                                          "Idle04",
-                                          "Idle05",
-                                          "Idle06",
-                                          "Idle07",
-                                          "Idle08",
-                                          "Idle09",
-                                          "Idle10",
-                                          "Idle11",
-                                          "Idle12",
-                                          "Idle13",
-                                          "Inactive01",
-                                          "Inactive02",
-                                          "Inactive03",
-                                          "Inactive04",
-                                          "Inactive05",
-                                          "Inactive06",
-                                          "Inactive07",
-                                          "Inactive08",
-                                          "Inactive09",
-                                          "Inactive10",
-                                          "TongueStart01",
-                                          "TongueSlide01",
-                                          "TongueJump01",
-                                          "TongueJumpXtra01",
-                                          "TongueDJumpApex01",
-                                          "TongueLand01",
-                                          "JumpStart01",
-                                          "JumpApex01",
-                                          "DJumpStart01",
-                                          "DJumpLift01",
-                                          "Fall01",
-                                          "Bspin01",
-                                          "BbashStart01",
-                                          "BbashAttack01",
-                                          "BbashStrike01",
-                                          "BbounceStart01",
-                                          "BbounceAttack01",
-                                          "BbounceStrike01",
-                                          "BounceStart01",
-                                          "BounceLift01",
-                                          "BounceApex01",
-                                          "Bbowl01",
-                                          "BbowlStart01",
-                                          "BbowlWindup01",
-                                          "BbowlToss01",
-                                          "BbowlRecover01",
-                                          "WallLaunch01",
-                                          "WallFlight01",
-                                          "WallFlight02",
-                                          "WallLand01",
-                                          "WallFall01",
-                                          NULL };
+                                                "SlipIdle01",
+                                                "Walk01",
+                                                "Run01",
+                                                "Run02",
+                                                "Run03",
+                                                "SlipRun01",
+                                                "Land01",
+                                                "LandHigh01",
+                                                "LandRun01",
+                                                "Idle02",
+                                                "Idle03",
+                                                "Idle04",
+                                                "Idle05",
+                                                "Idle06",
+                                                "Idle07",
+                                                "Idle08",
+                                                "Idle09",
+                                                "Idle10",
+                                                "Idle11",
+                                                "Idle12",
+                                                "Idle13",
+                                                "Inactive01",
+                                                "Inactive02",
+                                                "Inactive03",
+                                                "Inactive04",
+                                                "Inactive05",
+                                                "Inactive06",
+                                                "Inactive07",
+                                                "Inactive08",
+                                                "Inactive09",
+                                                "Inactive10",
+                                                "TongueStart01",
+                                                "TongueSlide01",
+                                                "TongueJump01",
+                                                "TongueJumpXtra01",
+                                                "TongueDJumpApex01",
+                                                "TongueLand01",
+                                                "JumpStart01",
+                                                "JumpApex01",
+                                                "DJumpStart01",
+                                                "DJumpLift01",
+                                                "Fall01",
+                                                "Bspin01",
+                                                "BbashStart01",
+                                                "BbashAttack01",
+                                                "BbashStrike01",
+                                                "BbounceStart01",
+                                                "BbounceAttack01",
+                                                "BbounceStrike01",
+                                                "BounceStart01",
+                                                "BounceLift01",
+                                                "BounceApex01",
+                                                "Bbowl01",
+                                                "BbowlStart01",
+                                                "BbowlWindup01",
+                                                "BbowlToss01",
+                                                "BbowlRecover01",
+                                                "WallLaunch01",
+                                                "WallFlight01",
+                                                "WallFlight02",
+                                                "WallLand01",
+                                                "WallFall01",
+                                                NULL };
 
     xAnimTable* animTable = xAnimTableNew("SB", NULL, 0);
 
@@ -5968,7 +6042,8 @@ void zEntPlayer_Init(xEnt* ent, xEntAsset* asset)
         globals.player.sb_models[0]->Data = treedome3;
 
         wettbl = (xAnimTable*)xSTFindAsset(xStrHash("spongebob_bind.ATBL"), NULL);
-        xAnimTable* drytbl = (xAnimTable*)xSTFindAsset(xStrHash("spongebob_bind_treedome.ATBL"), NULL);
+        xAnimTable* drytbl =
+            (xAnimTable*)xSTFindAsset(xStrHash("spongebob_bind_treedome.ATBL"), NULL);
 
         if (wettbl != NULL && drytbl != NULL)
         {
@@ -6450,7 +6525,8 @@ static void zEntPlayer_BoulderVehicleUpdate(xEnt* ent, xScene* sc, F32 dt)
         for (i = collis.dyn_sidx; i < collis.dyn_eidx; i++)
         {
             if ((collis.colls[i].flags & 0x1) && collis.colls[i].optr &&
-                XCOLLIDE_DOWNCAST_OPTR(xEntBoulder*, collis.colls[i].optr)->baseType == eBaseTypeBoulder &&
+                XCOLLIDE_DOWNCAST_OPTR(xEntBoulder*, collis.colls[i].optr)->baseType ==
+                    eBaseTypeBoulder &&
                 (XCOLLIDE_DOWNCAST_OPTR(xEntBoulder*, collis.colls[i].optr)->basset->flags & 0x2))
             {
                 shouldDamagePlayer = XCOLLIDE_DOWNCAST_OPTR(xEntBoulder*, collis.colls[i].optr);
@@ -6949,7 +7025,7 @@ void zEntPlayer_Update(xEnt* ent, xScene* sc, F32 dt)
 
         if (!sShouldBubbleBowl)
         {
-            if (globals.player.ControlOff || !(globals.pad0->on & XPAD_BUTTON_O) ||
+            if (globals.player.ControlOff || !(globals.pad0->on & XPAD_ACTION_BOWL) ||
                 sBubbleBowlTimer > globals.player.g.BubbleBowlTimeDelay)
             {
                 if (sBubbleBowlTimer > globals.player.g.BubbleBowlTimeDelay)
@@ -7071,7 +7147,7 @@ void zEntPlayer_Update(xEnt* ent, xScene* sc, F32 dt)
         }
 
         if (!globals.player.carry.grabbed && !globals.player.ControlOff &&
-            (globals.pad0->pressed & XPAD_BUTTON_O))
+            (globals.pad0->pressed & XPAD_ACTION_PICKUP))
         {
             if (gReticleTarget && sTypeOfTarget == 2)
             {
@@ -7195,11 +7271,9 @@ void zEntPlayer_Update(xEnt* ent, xScene* sc, F32 dt)
 
         xBound slideB;
         slideB.type = XBOUND_TYPE_SPHERE;
-        slideB.sph.center.x =
-            ent->bound.sph.center.x + 1.25f * dt * globals.player.SlideTrackVel.x;
+        slideB.sph.center.x = ent->bound.sph.center.x + 1.25f * dt * globals.player.SlideTrackVel.x;
         slideB.sph.center.y = ent->bound.sph.center.y + 1.25f * dt * ent->frame->vel.y;
-        slideB.sph.center.z =
-            ent->bound.sph.center.z + 1.25f * dt * globals.player.SlideTrackVel.z;
+        slideB.sph.center.z = ent->bound.sph.center.z + 1.25f * dt * globals.player.SlideTrackVel.z;
         slideB.sph.r = ent->bound.sph.r + 0.3f;
 
         xQuickCullForBound(&slideB.qcd, &slideB);
@@ -7436,8 +7510,7 @@ void zEntPlayer_Update(xEnt* ent, xScene* sc, F32 dt)
     }
 
     if (gCurrentPlayer == eCurrentPlayerSpongeBob &&
-        ent->model->Anim->Single->CurrentSpeed == 0.0f &&
-        !ent->model->Anim->Single->Blend->State &&
+        ent->model->Anim->Single->CurrentSpeed == 0.0f && !ent->model->Anim->Single->Blend->State &&
         strcmp(ent->model->Anim->Single->State->Name, "Bspin01") == 0)
     {
         ent->model->Anim->Single->CurrentSpeed = ent->model->Anim->Single->State->Speed;
@@ -7475,12 +7548,11 @@ void zEntPlayer_Update(xEnt* ent, xScene* sc, F32 dt)
 
     globals.player.IsBubbleSpinning = hitting_floor;
 
-    if (!tslide_ground &&
-        (strcmp(ent->model->Anim->Single->State->Name, "BbashAttack01") == 0 ||
-         strcmp(ent->model->Anim->Single->State->Name, "BbashStart01") == 0 ||
-         strcmp(ent->model->Anim->Single->State->Name, "BbashStrike01") == 0 ||
-         (strcmp(ent->model->Anim->Single->State->Name, "BbashMiss01") == 0 &&
-          ent->frame->vel.y > 0.0f)))
+    if (!tslide_ground && (strcmp(ent->model->Anim->Single->State->Name, "BbashAttack01") == 0 ||
+                           strcmp(ent->model->Anim->Single->State->Name, "BbashStart01") == 0 ||
+                           strcmp(ent->model->Anim->Single->State->Name, "BbashStrike01") == 0 ||
+                           (strcmp(ent->model->Anim->Single->State->Name, "BbashMiss01") == 0 &&
+                            ent->frame->vel.y > 0.0f)))
     {
         if (sPlayerCollAdjust <= 0.5f)
         {
@@ -7555,8 +7627,7 @@ void zEntPlayer_Update(xEnt* ent, xScene* sc, F32 dt)
     zGooCollsBegin();
 
     if (globals.player.WallJumpState == k_WALLJUMP_LAUNCH ||
-        globals.player.WallJumpState == k_WALLJUMP_FLIGHT ||
-        strncmp(astate->Name, "Bbash", 5) == 0)
+        globals.player.WallJumpState == k_WALLJUMP_FLIGHT || strncmp(astate->Name, "Bbash", 5) == 0)
     {
         sHackStuckTimer = 0.0f;
     }
@@ -7741,8 +7812,8 @@ void zEntPlayer_Update(xEnt* ent, xScene* sc, F32 dt)
         {
             ent->frame->mat.pos.y -= 0.5f * dt;
 
-            F32 ndotm = globals.player.floor_norm.x * motion.x +
-                        globals.player.floor_norm.z * motion.z;
+            F32 ndotm =
+                globals.player.floor_norm.x * motion.x + globals.player.floor_norm.z * motion.z;
 
             if (ndotm > 0.0f &&
                 (req_motion.x != 0.0f || req_motion.z != 0.0f || surfSlickRatio != 0.0f))
@@ -7783,9 +7854,8 @@ void zEntPlayer_Update(xEnt* ent, xScene* sc, F32 dt)
 
         zEntPlayerCollide(ent, sc, dt);
 
-        U32 stuckforce =
-            (ent->collis->colls[2].flags & 1) || (ent->collis->colls[3].flags & 1) ||
-            (ent->collis->colls[4].flags & 1) || (ent->collis->colls[5].flags & 1);
+        U32 stuckforce = (ent->collis->colls[2].flags & 1) || (ent->collis->colls[3].flags & 1) ||
+                         (ent->collis->colls[4].flags & 1) || (ent->collis->colls[5].flags & 1);
 
         if ((ent->collis->colls[0].flags & 1) ||
             (globals.player.ControlOff & ~CONTROL_OWNER_SPRINGBOARD))
@@ -7903,8 +7973,7 @@ void zEntPlayer_Update(xEnt* ent, xScene* sc, F32 dt)
                 vstart.y += ent->bound.sph.r - ent->bound.sph.r * CATCH_CAPSULE_BIAS;
                 vend = vstart + update_motion;
 
-                xSweptSpherePrepare(&sws, &vstart, &vend,
-                                    ent->bound.sph.r * CATCH_CAPSULE_RAD);
+                xSweptSpherePrepare(&sws, &vstart, &vend, ent->bound.sph.r * CATCH_CAPSULE_RAD);
 
                 if (!xSweptSphereToNonMoving(&sws, globals.sceneCur, ent, ent->collType))
                 {
@@ -7931,8 +8000,7 @@ void zEntPlayer_Update(xEnt* ent, xScene* sc, F32 dt)
                     xSweptSpherePrepare(swscurr, &vstart, &vend,
                                         ent->bound.sph.r * CATCH_CAPSULE_RAD);
 
-                    if (!xSweptSphereToNonMoving(swscurr, globals.sceneCur, ent,
-                                                 ent->collType))
+                    if (!xSweptSphereToNonMoving(swscurr, globals.sceneCur, ent, ent->collType))
                     {
                         if (iter >= 1)
                         {
@@ -8114,8 +8182,8 @@ catchtunnel_done:
 
     if (zcam_bbounce && ent->frame->mat.pos.y > ent->frame->oldmat.pos.y)
     {
-        zCameraTranslate(&globals.camera, 0.0f,
-                         ent->frame->mat.pos.y - ent->frame->oldmat.pos.y, 0.0f);
+        zCameraTranslate(&globals.camera, 0.0f, ent->frame->mat.pos.y - ent->frame->oldmat.pos.y,
+                         0.0f);
     }
 
     PlayerLedgeUpdate(ent, sc, dt);
@@ -8295,8 +8363,7 @@ catchtunnel_done:
     zEntPlayerTSlideUpdate(ent, sc, dt);
     zEntPlayerCollTrigger(ent, sc);
 
-    if (globals.player.RootUp.y != globals.player.RootUpTarget.y ||
-        1.0f != globals.player.RootUp.y)
+    if (globals.player.RootUp.y != globals.player.RootUpTarget.y || 1.0f != globals.player.RootUp.y)
     {
         xVec3 ax;
         xVec3Sub(&ax, &globals.player.RootUpTarget, &globals.player.RootUp);
@@ -8410,8 +8477,7 @@ catchtunnel_done:
         }
 
         wandB.sph.center.x = 0.333f * (ent->model->Mat->pos.x + (a.x + b.x));
-        wandB.sph.center.y =
-            0.05f + (ent->model->Mat->pos.y + globals.player.g.BSpinRadius);
+        wandB.sph.center.y = 0.05f + (ent->model->Mat->pos.y + globals.player.g.BSpinRadius);
         wandB.sph.center.z = 0.333f * (ent->model->Mat->pos.z + (a.z + b.z));
 
         xQuickCullForBound(&wandB.qcd, &wandB);
@@ -8466,8 +8532,8 @@ catchtunnel_done:
             xVec3 tmptran;
             xQuat tmpquat;
 
-            iAnimEval(itemAnim->Data->RawData[0],
-                      ent->model->Anim->Single->Time + 0.03336667f, 1, &tmptran, &tmpquat);
+            iAnimEval(itemAnim->Data->RawData[0], ent->model->Anim->Single->Time + 0.03336667f, 1,
+                      &tmptran, &tmpquat);
 
             xMat4x3 objMat;
             xQuatToMat(&tmpquat, (xMat3x3*)&objMat);
@@ -8559,8 +8625,7 @@ catchtunnel_done:
         {
             if (globals.player.carry.grabbed->baseType == eBaseTypeNPC)
             {
-                ((zNPCCommon*)globals.player.carry.grabbed)
-                    ->SetCarryState((en_NPC_CARRY_STATE)0);
+                ((zNPCCommon*)globals.player.carry.grabbed)->SetCarryState((en_NPC_CARRY_STATE)0);
             }
             else if (!zThrown_KillFruit(globals.player.carry.grabbed))
             {
@@ -8600,8 +8665,7 @@ catchtunnel_done:
                     tgtpos.y = 1.229f;
                     tgtpos.z = -2.0f;
 
-                    xMat4x3Toworld(&tgtpos,
-                                   (xMat4x3*)globals.player.carry.throwTarget->model->Mat,
+                    xMat4x3Toworld(&tgtpos, (xMat4x3*)globals.player.carry.throwTarget->model->Mat,
                                    &tgtpos);
 
                     if (zThrown_LaunchPos(globals.player.carry.grabbed, &tgtpos,
@@ -8619,21 +8683,17 @@ catchtunnel_done:
 
                     if (globals.player.carry.throwTarget->baseType == eBaseTypeButton)
                     {
-                        tempPos.x =
-                            0.95f * globals.player.carry.throwTarget->model->Mat->up.x +
-                            globals.player.carry.throwTarget->model->Mat->pos.x;
-                        tempPos.y =
-                            0.95f * globals.player.carry.throwTarget->model->Mat->up.y +
-                            globals.player.carry.throwTarget->model->Mat->pos.y - 0.5f;
-                        tempPos.z =
-                            0.95f * globals.player.carry.throwTarget->model->Mat->up.z +
-                            globals.player.carry.throwTarget->model->Mat->pos.z;
+                        tempPos.x = 0.95f * globals.player.carry.throwTarget->model->Mat->up.x +
+                                    globals.player.carry.throwTarget->model->Mat->pos.x;
+                        tempPos.y = 0.95f * globals.player.carry.throwTarget->model->Mat->up.y +
+                                    globals.player.carry.throwTarget->model->Mat->pos.y - 0.5f;
+                        tempPos.z = 0.95f * globals.player.carry.throwTarget->model->Mat->up.z +
+                                    globals.player.carry.throwTarget->model->Mat->pos.z;
                     }
                     else
                     {
                         tempPos.x = globals.player.carry.throwTarget->model->Mat->pos.x;
-                        tempPos.y =
-                            globals.player.carry.throwTarget->model->Mat->pos.y + 1.12f;
+                        tempPos.y = globals.player.carry.throwTarget->model->Mat->pos.y + 1.12f;
                         tempPos.z = globals.player.carry.throwTarget->model->Mat->pos.z;
                     }
 
@@ -8719,8 +8779,7 @@ catchtunnel_done:
 
         if (globals.player.HangEnt)
         {
-            tmpMat.pos.y =
-                tmpMat.pos.y + (ent->model->Mat->pos.y + ent->bound.sph.r);
+            tmpMat.pos.y = tmpMat.pos.y + (ent->model->Mat->pos.y + ent->bound.sph.r);
         }
         else
         {
@@ -8731,15 +8790,15 @@ catchtunnel_done:
 
         if (globals.player.HangEnt && globals.player.HangStartLerp < 1.0f)
         {
-            tmpMat.pos.z = globals.player.HangStartLerp *
-                               (tmpMat.pos.z - globals.player.HangStartPos.z) +
-                           globals.player.HangStartPos.z;
-            tmpMat.pos.x = globals.player.HangStartLerp *
-                               (tmpMat.pos.x - globals.player.HangStartPos.x) +
-                           globals.player.HangStartPos.x;
-            tmpMat.pos.y = globals.player.HangStartLerp *
-                               (tmpMat.pos.y - globals.player.HangStartPos.y) +
-                           globals.player.HangStartPos.y;
+            tmpMat.pos.z =
+                globals.player.HangStartLerp * (tmpMat.pos.z - globals.player.HangStartPos.z) +
+                globals.player.HangStartPos.z;
+            tmpMat.pos.x =
+                globals.player.HangStartLerp * (tmpMat.pos.x - globals.player.HangStartPos.x) +
+                globals.player.HangStartPos.x;
+            tmpMat.pos.y =
+                globals.player.HangStartLerp * (tmpMat.pos.y - globals.player.HangStartPos.y) +
+                globals.player.HangStartPos.y;
         }
 
         tmpMat.flags = 0;
@@ -8825,8 +8884,7 @@ catchtunnel_done:
                     }
                     else
                     {
-                        xVec3Copy(&sLasso->tgCenter,
-                                  xBoundCenter(&sLassoInfo->swingTarget->bound));
+                        xVec3Copy(&sLasso->tgCenter, xBoundCenter(&sLassoInfo->swingTarget->bound));
                         xVec3AddScaled(&sLasso->tgCenter,
                                        (xVec3*)&sLassoInfo->swingTarget->model->Mat->up, -0.6f);
                     }
@@ -8932,7 +8990,7 @@ catchtunnel_done:
             }
         }
 
-        if (!globals.player.ControlOff && (globals.pad0->pressed & XPAD_BUTTON_O) &&
+        if (!globals.player.ControlOff && (globals.pad0->pressed & XPAD_ACTION_PICKUP) &&
             !gReticleTarget)
         {
             sTimeToRetarget = 0.0f;
@@ -9022,8 +9080,7 @@ catchtunnel_done:
                             continue;
                         }
 
-                        if (targent->baseType == eBaseTypeNPC &&
-                            !((zNPCCommon*)targent)->CanRope())
+                        if (targent->baseType == eBaseTypeNPC && !((zNPCCommon*)targent)->CanRope())
                         {
                             continue;
                         }
@@ -9130,7 +9187,7 @@ catchtunnel_done:
             sLassoInfo->target = NULL;
             sLassoInfo->swingTarget = NULL;
 
-            if (!globals.player.ControlOff && (globals.pad0->pressed & XPAD_BUTTON_O))
+            if (!globals.player.ControlOff && (globals.pad0->pressed & XPAD_ACTION_PICKUP))
             {
                 if (gReticleTarget)
                 {
@@ -9153,7 +9210,7 @@ catchtunnel_done:
                     }
                 }
             }
-            else if (!globals.player.ControlOff && (globals.pad0->pressed & XPAD_BUTTON_TRIANGLE) &&
+            else if (!globals.player.ControlOff && (globals.pad0->pressed & XPAD_ACTION_SPIN) &&
                      strcmp(ent->model->Anim->Single->State->Name, "LedgeGrab01") != 0 &&
                      !globals.player.IsCoptering && !zEntTeleportBox_playerIn())
             {
@@ -9164,8 +9221,8 @@ catchtunnel_done:
 
     if (ent->model == globals.player.model_patrick &&
         strcmp(ent->model->Anim->Single->State->Name, "Melee01") == 0 &&
-        ent->model->Anim->Single->Time >= 0.1333f &&
-        ent->model->Anim->Single->Time < 0.4f && globals.player.DoMeleeCheck)
+        ent->model->Anim->Single->Time >= 0.1333f && ent->model->Anim->Single->Time < 0.4f &&
+        globals.player.DoMeleeCheck)
     {
         xBound meleeB;
         meleeB.type = XBOUND_TYPE_SPHERE;
@@ -9189,12 +9246,9 @@ catchtunnel_done:
 
     if (dt)
     {
-        tslide_lastrealvel.x =
-            (ent->model->Mat->pos.x - ent->frame->oldmat.pos.x) / dt;
-        tslide_lastrealvel.y =
-            (ent->model->Mat->pos.y - ent->frame->oldmat.pos.y) / dt;
-        tslide_lastrealvel.z =
-            (ent->model->Mat->pos.z - ent->frame->oldmat.pos.z) / dt;
+        tslide_lastrealvel.x = (ent->model->Mat->pos.x - ent->frame->oldmat.pos.x) / dt;
+        tslide_lastrealvel.y = (ent->model->Mat->pos.y - ent->frame->oldmat.pos.y) / dt;
+        tslide_lastrealvel.z = (ent->model->Mat->pos.z - ent->frame->oldmat.pos.z) / dt;
     }
 }
 
@@ -9649,11 +9703,9 @@ static void zEntPlayerUpdateModelSB()
 
         m = model_index[i];
 
-        if ((strcmp(single->State->Name, "BbounceStart01") == 0 &&
-             single->Time >= startTime) ||
+        if ((strcmp(single->State->Name, "BbounceStart01") == 0 && single->Time >= startTime) ||
             strcmp(single->State->Name, "BbounceAttack01") == 0 ||
-            (strcmp(single->State->Name, "BbounceStrike01") == 0 &&
-             single->Time <= strikeTime))
+            (strcmp(single->State->Name, "BbounceStrike01") == 0 && single->Time <= strikeTime))
         {
             xMat4x3Mul((xMat4x3*)m->Mat, (xMat4x3*)&globals.player.ent.model->Mat[bone],
                        (xMat4x3*)globals.player.ent.model->Mat);
@@ -9798,9 +9850,8 @@ void zEntPlayer_Render(zEnt* ent)
             lerp = -0.6f * (single->Time - 0.65f) / (0.85f - 0.65f);
         }
     }
-    else if (blend->State &&
-             (strcmp(blend->State->Name, "SD0_SetDown") == 0 ||
-              strcmp(blend->State->Name, "SD1_SetDown") == 0))
+    else if (blend->State && (strcmp(blend->State->Name, "SD0_SetDown") == 0 ||
+                              strcmp(blend->State->Name, "SD1_SetDown") == 0))
     {
         lerp = -0.6f * (1.0f - single->BlendFactor * single->Tran->BlendRecip);
     }
@@ -10016,20 +10067,20 @@ static void zEntPlayer_Move(xEnt* ent, xScene*, F32 dt, xEntFrame* frame)
 
     if (globals.player.cheat_mode)
     {
-        if (!globals.player.ControlOff && (globals.pad0->on & XPAD_BUTTON_SQUARE))
+        if (!globals.player.ControlOff && (globals.pad0->on & XPAD_BUTTON_NORTH))
         {
             frame->dpos.y +=
-                dt * (7.0f * ((globals.pad0->on & (XPAD_BUTTON_L1 | XPAD_BUTTON_L2 |
-                                                   XPAD_BUTTON_R1 | XPAD_BUTTON_R2)) ?
+                dt * (7.0f * ((globals.pad0->on & (XPAD_BUTTON_LTRIGGER | XPAD_BUTTON_LBUMPER |
+                                                   XPAD_BUTTON_RTRIGGER | XPAD_BUTTON_RBUMPER)) ?
                                   4.68f :
                                   1.56f));
             frame->mode |= 0x2;
         }
-        else if (!globals.player.ControlOff && (globals.pad0->on & XPAD_BUTTON_TRIANGLE))
+        else if (!globals.player.ControlOff && (globals.pad0->on & XPAD_BUTTON_WEST))
         {
             frame->dpos.y -=
-                dt * (7.0f * ((globals.pad0->on & (XPAD_BUTTON_L1 | XPAD_BUTTON_L2 |
-                                                   XPAD_BUTTON_R1 | XPAD_BUTTON_R2)) ?
+                dt * (7.0f * ((globals.pad0->on & (XPAD_BUTTON_LTRIGGER | XPAD_BUTTON_LBUMPER |
+                                                   XPAD_BUTTON_RTRIGGER | XPAD_BUTTON_RBUMPER)) ?
                                   4.68f :
                                   1.56f));
             frame->mode |= 0x2;
@@ -10647,7 +10698,7 @@ static void zEntPlayerJumpUpdate(xEnt* ent, xScene* sc, F32 dt)
                 {
                     globals.player.Jump_HoldTimer = 0.0f;
                 }
-                else if (globals.player.ControlOff || !(globals.pad0->on & XPAD_BUTTON_X))
+                else if (globals.player.ControlOff || !(globals.pad0->on & XPAD_ACTION_JUMP))
                 {
                     globals.player.Jump_HoldTimer = 0.0f;
                     globals.player.Jump_ChangeTimer = 0.0f;
@@ -10673,8 +10724,9 @@ static void zEntPlayerJumpUpdate(xEnt* ent, xScene* sc, F32 dt)
                 else if (globals.player.Jump_ChangeTimer < 0.0f)
                 {
                     lerp = -globals.player.Jump_ChangeTimer / globals.player.s->GravSmooth;
-                    globals.player.Jump_CurrGravity = (1.0f - lerp) * globals.player.s->JumpGravity +
-                                                      lerp * globals.player.g.Gravity;
+                    globals.player.Jump_CurrGravity =
+                        (1.0f - lerp) * globals.player.s->JumpGravity +
+                        lerp * globals.player.g.Gravity;
                 }
             }
 
@@ -11423,10 +11475,9 @@ static S32 cchkSquish;
 
 static void zEntPlayerFloorUpdate(xEnt* ent, xScene* sc, F32 dt)
 {
-    static xVec3 lorigins[4] = { { -0.3f, 0.0f, 0.3f },
-                                 { 0.3f, 0.0f, 0.3f },
-                                 { 0.3f, 0.0f, -0.3f },
-                                 { -0.3f, 0.0f, -0.3f } };
+    static xVec3 lorigins[4] = {
+        { -0.3f, 0.0f, 0.3f }, { 0.3f, 0.0f, 0.3f }, { 0.3f, 0.0f, -0.3f }, { -0.3f, 0.0f, -0.3f }
+    };
 
     xRay3 ray;
     xCollis rcoll;
@@ -11733,9 +11784,8 @@ static void zEntPlayerFloorUpdate(xEnt* ent, xScene* sc, F32 dt)
     {
         frame = ent->frame;
 
-        if (((coll->flags & 0x1) &&
-             (fnorm->y > icos(surfSlideStop) ||
-              (surf && (surf->state || !zSurfaceGetSlide(surf))))) ||
+        if (((coll->flags & 0x1) && (fnorm->y > icos(surfSlideStop) ||
+                                     (surf && (surf->state || !zSurfaceGetSlide(surf))))) ||
             frame->vel.y > 0.0f || surfSlickRatio)
         {
             if (surfSlickRatio)
@@ -11760,8 +11810,7 @@ static void zEntPlayerFloorUpdate(xEnt* ent, xScene* sc, F32 dt)
 
         F32 dot = slidedir.x * req_motion.x + slidedir.z * req_motion.z;
 
-        if (dot < 0.0f &&
-            (globals.player.LastJumpState == 0 || globals.player.LastJumpState == 1))
+        if (dot < 0.0f && (globals.player.LastJumpState == 0 || globals.player.LastJumpState == 1))
         {
             globals.player.Slide = 3;
 
@@ -11892,9 +11941,9 @@ static void zEntPlayerSurfDamageUpdate(xEnt* ent, xScene* sc, F32 dt)
                     {
                         if (globals.player.Health)
                         {
-                            globals.player.DamageTimer = prop->asset->damage_timer
-                                                             ? prop->asset->damage_timer
-                                                             : globals.player.g.DamageTimeSurface;
+                            globals.player.DamageTimer = prop->asset->damage_timer ?
+                                                             prop->asset->damage_timer :
+                                                             globals.player.g.DamageTimeSurface;
                         }
 
                         if (globals.player.Health)
@@ -11902,9 +11951,9 @@ static void zEntPlayerSurfDamageUpdate(xEnt* ent, xScene* sc, F32 dt)
                             if (tslide_ground || coll == ent->collis->colls ||
                                 prop->asset->damage_bounce)
                             {
-                                zEntPlayer_DamageKnockIntoAir(prop->asset->damage_bounce
-                                                                  ? prop->asset->damage_bounce
-                                                                  : globals.player.g.DamageSurfKnock);
+                                zEntPlayer_DamageKnockIntoAir(prop->asset->damage_bounce ?
+                                                                  prop->asset->damage_bounce :
+                                                                  globals.player.g.DamageSurfKnock);
                             }
                             else
                             {
@@ -12220,8 +12269,8 @@ do_bounce:
     }
     else
     {
-        xSndPlay3D(xStrHash("springboard"), 0.77f, 0.0f, 0x80, 0, (const xVec3*)&plat->model->Mat->pos, 0.0f,
-                   (sound_category)0, 0.0f);
+        xSndPlay3D(xStrHash("springboard"), 0.77f, 0.0f, 0x80, 0,
+                   (const xVec3*)&plat->model->Mat->pos, 0.0f, (sound_category)0, 0.0f);
     }
 
     xVec3SMul(&ent->frame->vel, jmpdir, ent->frame->vel.y);
@@ -12975,8 +13024,7 @@ static xEnt* PlayerCollCheckOneVillain(xEnt* ent, xScene* sc, void* data)
             coll->norm.z = 0.0f;
 
             coll->depen.x = 0.0f;
-            coll->depen.y =
-                ent->frame->mat.pos.y + ent->bound.sph.r - p->frame->mat.pos.y;
+            coll->depen.y = ent->frame->mat.pos.y + ent->bound.sph.r - p->frame->mat.pos.y;
             coll->depen.z = 0.0f;
 
             coll->dist = p->bound.sph.r - coll->depen.y;
@@ -13634,8 +13682,8 @@ void zEntPlayerCollTrigger(xEnt* ent, xScene* sc)
                     case eCurrentPlayerSandy:
                         zEntEvent(trig, eEventEnterSandy);
                         break;
-                default:
-                    break;
+                    default:
+                        break;
                     }
                 }
             }
@@ -13705,7 +13753,7 @@ void zEntPlayerCollTrigger(xEnt* ent, xScene* sc)
             }
         }
 
-        if (inside && !globals.player.ControlOff && (globals.pad0->pressed & XPAD_BUTTON_O))
+        if (inside && !globals.player.ControlOff && (globals.pad0->pressed & XPAD_BUTTON_EAST))
         {
             zEntEvent(trig, eEventButtonPressAction);
         }
@@ -14034,13 +14082,16 @@ S32 zEntPlayerEventCB(xBase* from, xBase* to, U32 toEvent, const F32* toParam, x
 
         break;
     case eEventSituationSeeFodder:
-        zEntPlayer_SNDPlayStreamRandom(ePlayerStreamSnd_SeeFodder, ePlayerStreamSnd_SeeFodder, 0.5f);
+        zEntPlayer_SNDPlayStreamRandom(ePlayerStreamSnd_SeeFodder, ePlayerStreamSnd_SeeFodder,
+                                       0.5f);
         break;
     case eEventSituationSeeHammer:
-        zEntPlayer_SNDPlayStreamRandom(ePlayerStreamSnd_SeeHammer, ePlayerStreamSnd_SeeHammer, 0.5f);
+        zEntPlayer_SNDPlayStreamRandom(ePlayerStreamSnd_SeeHammer, ePlayerStreamSnd_SeeHammer,
+                                       0.5f);
         break;
     case eEventSituationSeeTarTar:
-        zEntPlayer_SNDPlayStreamRandom(ePlayerStreamSnd_SeeTarTar, ePlayerStreamSnd_SeeTarTar, 0.5f);
+        zEntPlayer_SNDPlayStreamRandom(ePlayerStreamSnd_SeeTarTar, ePlayerStreamSnd_SeeTarTar,
+                                       0.5f);
         break;
     case eEventSituationSeeGLove:
         zEntPlayer_SNDPlayStreamRandom(ePlayerStreamSnd_SeeGLove, ePlayerStreamSnd_SeeGLove, 0.5f);
@@ -15430,11 +15481,10 @@ void _iAnimSKBAdjustTranslate(iAnimSKBHeader* skb, U32 bone, F32* tranStart, F32
 static void PlayerHackFixBbashMiss(xModelInstance* model)
 {
     static const char* bbstate[4] = { "BbashStart01", "BbashAttack01", "BbashStrike01",
-                                "BbashMiss01" };
-    static F32 bbadjust[4][2] = { { 0.0f, -0.55f },
-                                  { -0.55f, -0.55f },
-                                  { -0.55f, -0.55f },
-                                  { -0.55f, -0.55f } };
+                                      "BbashMiss01" };
+    static F32 bbadjust[4][2] = {
+        { 0.0f, -0.55f }, { -0.55f, -0.55f }, { -0.55f, -0.55f }, { -0.55f, -0.55f }
+    };
     static F32 bbspeed[4] = { 1.0f, 0.96f, 0.96f, 0.92f };
 
     S32 i;
@@ -15492,8 +15542,8 @@ static void PlayerLedgeInit(zLedgeGrabParams* ledge, xModelInstance* model)
     {
         if (!(((iAnimSKBHeader*)grab->Data->RawData[0])->Flags & 0x80000000))
         {
-            ledge->tranCount = _iAnimSKBExtractTranslate(
-                (iAnimSKBHeader*)grab->Data->RawData[0], 1, ledge->tranTable, 60);
+            ledge->tranCount = _iAnimSKBExtractTranslate((iAnimSKBHeader*)grab->Data->RawData[0], 1,
+                                                         ledge->tranTable, 60);
 
             iAnimEval(idle->Data->RawData[0], 0.0f, 0, tran, quat);
             _iAnimSKBAdjustTranslate((iAnimSKBHeader*)grab->Data->RawData[0], 1, (F32*)&tran[1],
@@ -16206,8 +16256,7 @@ U8 zEntPlayer_MinimalUpdate(xEnt* ent, xScene* sc, F32 dt, xVec3& drive_motion)
 
         ent->frame->mat.pos.y -= sink;
 
-        F32 ndotm = globals.player.floor_norm.x * motion.x +
-                    globals.player.floor_norm.z * motion.z;
+        F32 ndotm = globals.player.floor_norm.x * motion.x + globals.player.floor_norm.z * motion.z;
 
         if (ndotm > 0.0f && (req_motion.x != 0.0f || req_motion.z != 0.0f || surfSlickRatio))
         {

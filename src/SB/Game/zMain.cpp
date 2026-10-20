@@ -1122,7 +1122,7 @@ void zMainMemCardSpaceQuery()
             xPadUpdate(globals.currentActivePad, 1.0f / 60);
         }
 
-        if (globals.pad0 && (globals.pad0->pressed & XPAD_BUTTON_TRIANGLE))
+        if (globals.pad0 && (globals.pad0->pressed & XPAD_ACTION_BACK))
         {
             do_chk = 1;
             startupError = eNoError;
@@ -1131,7 +1131,7 @@ void zMainMemCardSpaceQuery()
             fullCard = -1;
             zMainMemCardRenderText("{i:text_retry}", 1);
         }
-        else if (globals.pad0 && (globals.pad0->pressed & XPAD_BUTTON_X))
+        else if (globals.pad0 && (globals.pad0->pressed & XPAD_BUTTON_SOUTH))
         {
             if (startupError != eNoController)
             {
@@ -1141,7 +1141,7 @@ void zMainMemCardSpaceQuery()
             do_chk = 1;
             startupError = eNoError;
         }
-        else if (globals.pad0 && (globals.pad0->pressed & XPAD_BUTTON_O))
+        else if (globals.pad0 && (globals.pad0->pressed & XPAD_BUTTON_EAST))
         {
             switch (startupError)
             {

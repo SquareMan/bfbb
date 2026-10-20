@@ -170,8 +170,7 @@ S32 xPadUpdate(S32 idx, F32 time_passed)
 
         if (p->flags & 0x2)
         {
-            if (p->analog2.x > -50 && p->analog2.x < 50 && p->analog2.y > -50 &&
-                p->analog2.y < 50)
+            if (p->analog2.x > -50 && p->analog2.x < 50 && p->analog2.y > -50 && p->analog2.y < 50)
             {
                 p->ar2d_timer = 0.0f;
             }
@@ -235,7 +234,8 @@ S32 xPadUpdate(S32 idx, F32 time_passed)
 
     if (p->flags & 0x10)
     {
-        if (!(p->on & XPAD_BUTTON_UP) && !(p->on & XPAD_BUTTON_DOWN) && !(p->on & XPAD_BUTTON_LEFT) && !(p->on & XPAD_BUTTON_RIGHT))
+        if (!(p->on & XPAD_BUTTON_UP) && !(p->on & XPAD_BUTTON_DOWN) &&
+            !(p->on & XPAD_BUTTON_LEFT) && !(p->on & XPAD_BUTTON_RIGHT))
         {
             p->d_timer = 0.0f;
         }

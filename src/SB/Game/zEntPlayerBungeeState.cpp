@@ -38,7 +38,6 @@
 #include <cstring>
 #include <types.h>
 
-
 // These structs were used in deadstripped functions.
 // This function is here to force the symbols to be linked.
 void __deadstripped_zEntPlayerBungeeState()
@@ -858,13 +857,13 @@ namespace bungee_state
 
             xEnt& player = globals.player.ent;
             const char* anim_name = player.model->Anim->Single->State->Name;
-            bool found =
-                shared.hook == NULL && globals.player.s->pcType == ePlayer_SB &&
-                (strcmp(anim_name, "JumpStart01") || strcmp(anim_name, "JumpLift01") ||
-                 strcmp(anim_name, "JumpApex01") || strcmp(anim_name, "DJumpStart01") ||
-                 strcmp(anim_name, "DJumpLift01") || strcmp(anim_name, "Fall01") ||
-                 strcmp(anim_name, "FallHigh01")) &&
-                globals.player.cheat_mode == 0 && (globals.player.ControlOff & ~0x4000) == 0;
+            bool found = shared.hook == NULL && globals.player.s->pcType == ePlayer_SB &&
+                         (strcmp(anim_name, "JumpStart01") || strcmp(anim_name, "JumpLift01") ||
+                          strcmp(anim_name, "JumpApex01") || strcmp(anim_name, "DJumpStart01") ||
+                          strcmp(anim_name, "DJumpLift01") || strcmp(anim_name, "Fall01") ||
+                          strcmp(anim_name, "FallHigh01")) &&
+                         globals.player.cheat_mode == 0 &&
+                         (globals.player.ControlOff & ~0x4000) == 0;
 
             shared.hook = NULL;
             if (found)
@@ -966,7 +965,7 @@ namespace bungee_state
             F32 range;
             F32 v;
 
-            if (can_dive && globals.pad0->pressed & XPAD_BUTTON_X && control_lag_timer <= 0.0f &&
+            if (can_dive && globals.pad0->pressed & XPAD_ACTION_JUMP && control_lag_timer <= 0.0f &&
                 !dying && dive_remaining <= 0.0f)
             {
                 has_dived = true;
@@ -1553,13 +1552,16 @@ namespace bungee_state
         }
     }
 
-    bool active() {
+    bool active()
+    {
         return shared.state;
     }
 
-    bool landed() {
+    bool landed()
+    {
         bool ret = false;
-        if (shared.state == 0 && shared.dismount_delay <= 0.0f) {
+        if (shared.state == 0 && shared.dismount_delay <= 0.0f)
+        {
             ret = true;
         }
         return ret;
@@ -1642,31 +1644,62 @@ namespace bungee_state
 
 void bungee_state::insert_animations(xAnimTable& table)
 {
-    xAnimTableNewState(&table, "bungee_bottom_0", 0x10, 0, 1.0f, 0, 0, 0.0f, 0, 0, xAnimDefaultBeforeEnter, 0, 0);
-    xAnimTableNewState(&table, "bungee_top_0", 0x10, 0, 1.0f, 0, 0, 0.0f, 0, 0, xAnimDefaultBeforeEnter, 0, 0);
-    xAnimTableNewState(&table, "bungee_dive_0", 0, 0, 1.0f, 0, 0, 0.0f, 0, 0, xAnimDefaultBeforeEnter, 0, 0);
-    xAnimTableNewState(&table, "bungee_hit_0", 0x20, 0, 1.0f, 0, 0, 0.0f, 0, 0, xAnimDefaultBeforeEnter, 0, 0);
-    xAnimTableNewState(&table, "bungee_mount_0", 0x20, 0, 1.0f, 0, 0, 0.0f, 0, 0, xAnimDefaultBeforeEnter, 0, 0);
-    xAnimTableNewState(&table, "bungee_cycle_0", 0x10, 0, 1.0f, 0, 0, 0.0f, 0, 0, xAnimDefaultBeforeEnter, 0, 0);
-    xAnimTableNewState(&table, "bungee_death_0", 0, 0, 1.0f, 0, 0, 0.0f, 0, 0, xAnimDefaultBeforeEnter, 0, 0);
+    xAnimTableNewState(&table, "bungee_bottom_0", 0x10, 0, 1.0f, 0, 0, 0.0f, 0, 0,
+                       xAnimDefaultBeforeEnter, 0, 0);
+    xAnimTableNewState(&table, "bungee_top_0", 0x10, 0, 1.0f, 0, 0, 0.0f, 0, 0,
+                       xAnimDefaultBeforeEnter, 0, 0);
+    xAnimTableNewState(&table, "bungee_dive_0", 0, 0, 1.0f, 0, 0, 0.0f, 0, 0,
+                       xAnimDefaultBeforeEnter, 0, 0);
+    xAnimTableNewState(&table, "bungee_hit_0", 0x20, 0, 1.0f, 0, 0, 0.0f, 0, 0,
+                       xAnimDefaultBeforeEnter, 0, 0);
+    xAnimTableNewState(&table, "bungee_mount_0", 0x20, 0, 1.0f, 0, 0, 0.0f, 0, 0,
+                       xAnimDefaultBeforeEnter, 0, 0);
+    xAnimTableNewState(&table, "bungee_cycle_0", 0x10, 0, 1.0f, 0, 0, 0.0f, 0, 0,
+                       xAnimDefaultBeforeEnter, 0, 0);
+    xAnimTableNewState(&table, "bungee_death_0", 0, 0, 1.0f, 0, 0, 0.0f, 0, 0,
+                       xAnimDefaultBeforeEnter, 0, 0);
 
-    static const char* start_from = "JumpStart01 JumpLift01 JumpApex01 DJumpStart01 DJumpLift01 Fall01 FallHigh01";
+    static const char* start_from =
+        "JumpStart01 JumpLift01 JumpApex01 DJumpStart01 DJumpLift01 Fall01 FallHigh01";
     static const char* start_to = "bungee_cycle_0";
 
-    shared.anim_tran.start = xAnimTableNewTransition(&table, start_from, start_to, check_anim_start, 0, 0x10, 0, 0.0f, 0.0f, 0, 0, 0.5f, 0);
-    shared.anim_tran.dive_start = xAnimTableNewTransition(&table, "bungee_cycle_0", "bungee_dive_0", 0, 0, 0x10, 0, 0.0f, 0.0f, 0, 0, fixed.dive.time, 0);
-    shared.anim_tran.dive_stop = xAnimTableNewTransition(&table, "bungee_dive_0", "bungee_cycle_0", 0, 0, 0x10, 0, 0.0f, 0.0f, 0, 0, fixed.dive.anim_out_time, 0);
-    shared.anim_tran.top_start = xAnimTableNewTransition(&table, "bungee_cycle_0", "bungee_top_0", 0, 0, 0x10, 0, 0.0f, 0.0f, 0, 0, fixed.top_anim_time, 0);
-    shared.anim_tran.top_stop = xAnimTableNewTransition(&table, "bungee_top_0", "bungee_cycle_0", 0, 0, 0x10, 0, 0.0f, 0.0f, 0, 0, fixed.top_anim_time, 0);
-    shared.anim_tran.bottom_start = xAnimTableNewTransition(&table, "bungee_cycle_0", "bungee_bottom_0", 0, 0, 0x10, 0, 0.0f, 0.0f, 0, 0, fixed.bottom_anim_time, 0);
-    shared.anim_tran.bottom_stop = xAnimTableNewTransition(&table, "bungee_bottom_0", "bungee_cycle_0", 0, 0, 0x10, 0, 0.0f, 0.0f, 0, 0, fixed.bottom_anim_time, 0);
-    shared.anim_tran.hit = xAnimTableNewTransition(&table, "bungee_cycle_0 bungee_dive_0 bungee_top_0 bungee_bottom_0", "bungee_hit_0", 0, 0, 0x10, 0, 0.0f, 0.0f, 0, 0, fixed.hit_anim_time, 0);
-    xAnimTableNewTransition(&table, "bungee_hit_0", "bungee_dive_0", check_anim_hit_to_dive, 0, 0x10, 0, 0.0f, 0.0f, 0, 0, fixed.hit_anim_time, 0);
-    xAnimTableNewTransition(&table, "bungee_hit_0", "bungee_top_0", check_anim_hit_to_top, 0, 0x10, 0, 0.0f, 0.0f, 0, 0, fixed.hit_anim_time, 0);
-    xAnimTableNewTransition(&table, "bungee_hit_0", "bungee_bottom_0", check_anim_hit_to_bottom, 0, 0x10, 0, 0.0f, 0.0f, 0, 0, fixed.hit_anim_time, 0);
-    xAnimTableNewTransition(&table, "bungee_hit_0", "bungee_cycle_0", check_anim_hit_to_cycle, 0, 0x10, 0, 0.0f, 0.0f, 0, 0, fixed.hit_anim_time, 0);
-    xAnimTableNewTransition(&table, "bungee_hit_0", "bungee_death_0", check_anim_hit_to_death, 0, 0x10, 0, 0.0f, 0.0f, 0, 0, fixed.hit_anim_time, 0);
-    shared.anim_tran.stop = xAnimTableNewTransition(&table, "bungee_cycle_0 bungee_dive_0 bungee_top_0 bungee_bottom_0", "Fall01", 0, 0, 0x10, 0, 0.0f, 0.0f, 0, 0, 0.5f, 0);
+    shared.anim_tran.start = xAnimTableNewTransition(&table, start_from, start_to, check_anim_start,
+                                                     0, 0x10, 0, 0.0f, 0.0f, 0, 0, 0.5f, 0);
+    shared.anim_tran.dive_start =
+        xAnimTableNewTransition(&table, "bungee_cycle_0", "bungee_dive_0", 0, 0, 0x10, 0, 0.0f,
+                                0.0f, 0, 0, fixed.dive.time, 0);
+    shared.anim_tran.dive_stop =
+        xAnimTableNewTransition(&table, "bungee_dive_0", "bungee_cycle_0", 0, 0, 0x10, 0, 0.0f,
+                                0.0f, 0, 0, fixed.dive.anim_out_time, 0);
+    shared.anim_tran.top_start =
+        xAnimTableNewTransition(&table, "bungee_cycle_0", "bungee_top_0", 0, 0, 0x10, 0, 0.0f, 0.0f,
+                                0, 0, fixed.top_anim_time, 0);
+    shared.anim_tran.top_stop =
+        xAnimTableNewTransition(&table, "bungee_top_0", "bungee_cycle_0", 0, 0, 0x10, 0, 0.0f, 0.0f,
+                                0, 0, fixed.top_anim_time, 0);
+    shared.anim_tran.bottom_start =
+        xAnimTableNewTransition(&table, "bungee_cycle_0", "bungee_bottom_0", 0, 0, 0x10, 0, 0.0f,
+                                0.0f, 0, 0, fixed.bottom_anim_time, 0);
+    shared.anim_tran.bottom_stop =
+        xAnimTableNewTransition(&table, "bungee_bottom_0", "bungee_cycle_0", 0, 0, 0x10, 0, 0.0f,
+                                0.0f, 0, 0, fixed.bottom_anim_time, 0);
+    shared.anim_tran.hit =
+        xAnimTableNewTransition(&table, "bungee_cycle_0 bungee_dive_0 bungee_top_0 bungee_bottom_0",
+                                "bungee_hit_0", 0, 0, 0x10, 0, 0.0f, 0.0f, 0, 0,
+                                fixed.hit_anim_time, 0);
+    xAnimTableNewTransition(&table, "bungee_hit_0", "bungee_dive_0", check_anim_hit_to_dive, 0,
+                            0x10, 0, 0.0f, 0.0f, 0, 0, fixed.hit_anim_time, 0);
+    xAnimTableNewTransition(&table, "bungee_hit_0", "bungee_top_0", check_anim_hit_to_top, 0, 0x10,
+                            0, 0.0f, 0.0f, 0, 0, fixed.hit_anim_time, 0);
+    xAnimTableNewTransition(&table, "bungee_hit_0", "bungee_bottom_0", check_anim_hit_to_bottom, 0,
+                            0x10, 0, 0.0f, 0.0f, 0, 0, fixed.hit_anim_time, 0);
+    xAnimTableNewTransition(&table, "bungee_hit_0", "bungee_cycle_0", check_anim_hit_to_cycle, 0,
+                            0x10, 0, 0.0f, 0.0f, 0, 0, fixed.hit_anim_time, 0);
+    xAnimTableNewTransition(&table, "bungee_hit_0", "bungee_death_0", check_anim_hit_to_death, 0,
+                            0x10, 0, 0.0f, 0.0f, 0, 0, fixed.hit_anim_time, 0);
+    shared.anim_tran.stop =
+        xAnimTableNewTransition(&table, "bungee_cycle_0 bungee_dive_0 bungee_top_0 bungee_bottom_0",
+                                "Fall01", 0, 0, 0x10, 0, 0.0f, 0.0f, 0, 0, 0.5f, 0);
 }
 
 namespace bungee_state
@@ -1851,11 +1884,11 @@ namespace bungee_state
         void hanging_state_type::start()
         {
             static const tweak_callback vertical_cb = { (void (*)(tweak_info&))on_tweak_vertical };
-            static const tweak_callback horizontal_cb = { (void (*)(tweak_info&))
-                                                              on_tweak_horizontal };
+            static const tweak_callback horizontal_cb = { (
+                void (*)(tweak_info&))on_tweak_horizontal };
             static const tweak_callback camera_cb = { (void (*)(tweak_info&))on_tweak_camera };
-            static const tweak_callback collision_cb = { (void (*)(tweak_info&))
-                                                             on_tweak_collision };
+            static const tweak_callback collision_cb = { (
+                void (*)(tweak_info&))on_tweak_collision };
 
             show_help();
             has_dived = false;
@@ -1936,8 +1969,8 @@ namespace bungee_state
             xDebugAddTweak("Bungee|Hook|Camera Offset Direction",
                            &shared.hook->asset->camera.offset_dir, 0.0f, 360.0f, &camera_cb, this,
                            0);
-            xDebugAddTweak("Bungee|Hook|Camera Turn Speed",
-                           &shared.hook->asset->camera.turn_speed, 0.0f, 1.0f, &camera_cb, this, 0);
+            xDebugAddTweak("Bungee|Hook|Camera Turn Speed", &shared.hook->asset->camera.turn_speed,
+                           0.0f, 1.0f, &camera_cb, this, 0);
             xDebugAddTweak("Bungee|Hook|Camera Velocity Scale",
                            &shared.hook->asset->camera.vel_scale, 0.0f, 1000.0f, &camera_cb, this,
                            0);
@@ -2060,8 +2093,7 @@ namespace bungee_state
 
         state_enum hanging_state_type::update(xScene& s, F32& dt)
         {
-            if (globals.pad0->pressed & XPAD_BUTTON_TRIANGLE && !dying && !detaching &&
-                find_drop_off())
+            if (globals.pad0->pressed & XPAD_ACTION_BACK && !dying && !detaching && find_drop_off())
             {
                 start_detaching();
             }

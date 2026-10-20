@@ -1357,7 +1357,7 @@ static void xEntMotionDebugIPad(xEntMotion* xem)
             *(volatile S16*)(&dbg_idx) = *(volatile U16*)(&dbg_num) - 1;
         }
     }
-    if (gDebugPad->pressed & XPAD_BUTTON_X)
+    if (gDebugPad->pressed & XPAD_BUTTON_SOUTH)
     {
         if (xem->owner != NULL)
         {
@@ -1365,7 +1365,7 @@ static void xEntMotionDebugIPad(xEntMotion* xem)
         }
         xEntMotionReset(xem, g_xSceneCur);
     }
-    if (gDebugPad->pressed & XPAD_BUTTON_SQUARE)
+    if (gDebugPad->pressed & XPAD_BUTTON_NORTH)
     {
         if (xEntMotionIsStopped(xem))
         {

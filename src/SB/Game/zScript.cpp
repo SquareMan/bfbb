@@ -127,7 +127,7 @@ void zScriptUpdate(xBase* obj, xScene* scene, F32 dt)
     }
     else if (script->state == ZSCRIPT_STATE_WAITING)
     {
-        if (globals.pad0 && (globals.pad0->on & XPAD_BUTTON_SQUARE))
+        if (globals.pad0 && (globals.pad0->on & XPAD_BUTTON_NORTH))
         {
             script->state = ZSCRIPT_STATE_RUNNING;
         }

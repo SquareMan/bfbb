@@ -30,11 +30,11 @@ namespace zhud
         static U32 old_max_value[5];
         static xhud::widget* widgets[9];
 
-        static const char* widget_resources[9] = { "HUD_INT_METER_SHINY",   "HUD_INT_METER_SPATULA",
-                                             "HUD_MODEL_SHINY",       "HUD_MODEL_SPATULA",
-                                             "HUD_UNIT_METER_HEALTH", "HUD_INT_METER_PATSSOCK",
-                                             "HUD_MODEL_PATSSOCK",    "HUD_INT_METER_SPECIAL",
-                                             "HUD_MODEL_SPECIAL" };
+        static const char* widget_resources[9] = {
+            "HUD_INT_METER_SHINY", "HUD_INT_METER_SPATULA", "HUD_MODEL_SHINY",
+            "HUD_MODEL_SPATULA",   "HUD_UNIT_METER_HEALTH", "HUD_INT_METER_PATSSOCK",
+            "HUD_MODEL_PATSSOCK",  "HUD_INT_METER_SPECIAL", "HUD_MODEL_SPECIAL"
+        };
         static special_data level_specials[15] = { {},
                                                    { "HUD_MODEL_JF_ANTITODE", 1 },
                                                    { "HUD_MODEL_BB_STEERINGWHEEL", 11 },
@@ -144,9 +144,9 @@ namespace zhud
             widgets[8] = model;
             model->enable();
         }
-        
+
         memset(max_value, 0x0, sizeof(max_value));
-        
+
         value[0] = &globals.player.Health;
         max_value[0] = &globals.player.MaxHealth;
         value[1] = &globals.player.Inv_Shiny;
@@ -154,11 +154,12 @@ namespace zhud
         value[3] = &globals.player.Inv_PatsSock_Total;
         value[4] = &globals.player.Inv_LevelPickups_CurrentLevel;
 
-        for (i = 0; i < 5; i++) 
+        for (i = 0; i < 5; i++)
         {
-            if (widgets[meter_widget_index[i]] != NULL) 
+            if (widgets[meter_widget_index[i]] != NULL)
             {
-                xhud::meter_widget* meter = (xhud::meter_widget*)get_meter_widget(meter_widget_index[i]);
+                xhud::meter_widget* meter =
+                    (xhud::meter_widget*)get_meter_widget(meter_widget_index[i]);
                 if (max_value[i] != 0)
                 {
                     old_max_value[i] = *max_value[i];
@@ -194,8 +195,8 @@ namespace zhud
             zhud::hide();
         }
 
-        if (!globals.player.ControlOff && globals.pad0->pressed & XPAD_BUTTON_Z && !zGameIsPaused() &&
-            globals.sceneCur->sceneID != 'PG12')
+        if (!globals.player.ControlOff && globals.pad0->pressed & XPAD_ACTION_HUD &&
+            !zGameIsPaused() && globals.sceneCur->sceneID != 'PG12')
         {
             zhud::show();
         }
@@ -225,22 +226,22 @@ namespace zhud
             if (another_updated_value)
             {
                 S32 meter_idx = meter_widget_index[i];
-                if (widgets[meter_idx] != NULL) 
+                if (widgets[meter_idx] != NULL)
                 {
                     xhud::meter_widget* meter = (xhud::meter_widget*)get_meter_widget(meter_idx);
                     if (max_value[i] != 0)
                     {
                         old_max_value[i] = *max_value[i];
                         meter->max_value = (F32)old_max_value[i];
-                    }     
-                    
+                    }
+
                     old_value[i] = *value[i];
                     meter->set_value((F32)old_value[i]);
 
                     hiding[i] = 0;
                     ping_widget(*meter);
 
-                    if (model_widget_index[i] != -1) 
+                    if (model_widget_index[i] != -1)
                     {
                         ping_widget(*get_model_widget(model_widget_index[i]));
                     }

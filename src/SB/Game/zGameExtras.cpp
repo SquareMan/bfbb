@@ -244,10 +244,10 @@ S32 EGG_check_ExtrasFlags(EGGItem*)
 }
 
 // These defines make the cheat inputs easier to read
-#define Y XPAD_BUTTON_SQUARE
-#define X XPAD_BUTTON_O
-#define L1 XPAD_BUTTON_L1
-#define R1 XPAD_BUTTON_R1
+#define Y XPAD_BUTTON_NORTH
+#define X XPAD_ACTION_OPTIONS
+#define L1 XPAD_BUTTON_LTRIGGER
+#define R1 XPAD_BUTTON_RTRIGGER
 
 // 21 cheats
 // These symbols weren't actually defined as static. They are global in the object file.
@@ -408,7 +408,7 @@ void zGameCheats(float dt)
         return;
     }
 
-    AddToCheatPressed(globals.pad0->pressed & (XPAD_BUTTON_SQUARE | XPAD_BUTTON_O));
+    AddToCheatPressed(globals.pad0->pressed & (Y | X));
 
     S32 match = 0;
     sCheatTimer = 0.3f;
@@ -457,7 +457,8 @@ void GEC_CheatFlagToggle(S32 bit)
     g_flg_chEnabled ^= bit;
 }
 
-void deadstripped(const char** out) {
+void deadstripped(const char** out)
+{
     out[0] = "HB01";
 }
 

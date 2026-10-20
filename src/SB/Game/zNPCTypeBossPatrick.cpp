@@ -1125,7 +1125,7 @@ void zNPCBPatrick::Process(xScene* xscn, F32 dt)
     {
         this->frozenTimer -= dt;
 
-        if (globals.pad0->pressed & XPAD_BUTTON_X)
+        if (globals.pad0->pressed & XPAD_BUTTON_SOUTH)
         {
             this->frozenTimer -= 0.175f;
             this->shakeAmp = 0.025f;
@@ -1208,8 +1208,7 @@ void zNPCBPatrick::Process(xScene* xscn, F32 dt)
                 }
 
                 xVec3SMulBy(&partDir, 1.0f / maxDist);
-                xVec3Sub(&toPlayer, &globals.player.ent.bound.sph.center,
-                         &this->parList[i]->m_pos);
+                xVec3Sub(&toPlayer, &globals.player.ent.bound.sph.center, &this->parList[i]->m_pos);
 
                 F32 currSize = xVec3Dot(&partDir, &toPlayer);
 
@@ -1259,8 +1258,7 @@ void zNPCBPatrick::Process(xScene* xscn, F32 dt)
 
                 xVec3Sub(&delta, &globals.player.ent.bound.sph.center, &snowPos);
 
-                if (xVec3Length2(&delta) <
-                    globals.player.ent.bound.sph.r + currSize * currSize)
+                if (xVec3Length2(&delta) < globals.player.ent.bound.sph.r + currSize * currSize)
                 {
                     this->frozenTimer = 4.0f;
 
@@ -1335,8 +1333,8 @@ void zNPCBPatrick::Process(xScene* xscn, F32 dt)
                         }
                         else
                         {
-                            this->newsfish->SpeakStart(
-                                sNFComment[NF_SB_FRIGID_RECEPTION].soundID, 0, -1);
+                            this->newsfish->SpeakStart(sNFComment[NF_SB_FRIGID_RECEPTION].soundID,
+                                                       0, -1);
                             this->nfFlags |= 2;
                         }
                     }
@@ -1472,8 +1470,7 @@ void zNPCBPatrick::Process(xScene* xscn, F32 dt)
                         this->glob[0].flags |= 8;
                         xVec3Init(&this->glob[0].norm, 0.0f, 1.0f, 0.0f);
                         this->glob[0].conv = XCOLLIDE_DOWNCAST_OPTR(zPlatform*, colls.optr);
-                        xVec3SMul(&this->glob[0].convVel,
-                                  &this->glob[0].conv->bound.mat->right,
+                        xVec3SMul(&this->glob[0].convVel, &this->glob[0].conv->bound.mat->right,
                                   this->glob[0].conv->passet->cb.speed);
                     }
                     else
@@ -1577,13 +1574,12 @@ damage_done:
 
             if (globals.player.Health == 1 && this->round == 2)
             {
-                this->newsfish->SpeakStart(sNFComment[NF_SANDY_BECOME_BANANA_SPLIT].soundID, 0,
-                                           -1);
+                this->newsfish->SpeakStart(sNFComment[NF_SANDY_BECOME_BANANA_SPLIT].soundID, 0, -1);
             }
             else if (touchDamage && !(picker & 0x3000))
             {
-                this->newsfish->SpeakStart(
-                    sNFComment[NF_CLOSE_ENCOUNTERS_PAINFUL_KIND].soundID, 0, -1);
+                this->newsfish->SpeakStart(sNFComment[NF_CLOSE_ENCOUNTERS_PAINFUL_KIND].soundID, 0,
+                                           -1);
             }
             else if ((picker & 0x1f) <= 10)
             {
@@ -3550,8 +3546,7 @@ S32 zNPCGoalBossPatSpin::Process(en_trantype* trantype, F32 dt, void* ctxt, xSce
                 xVec3Copy(&glob->lastPos, &glob->path.initPos);
                 xVec3Copy(&glob->path.initVel, &dir);
                 xVec3Normalize(&glob->path.initVel, &glob->path.initVel);
-                xVec3SMul(&globVel, &glob->path.initVel,
-                          xVec3Dot(&glob->path.initVel, &this->vel));
+                xVec3SMul(&globVel, &glob->path.initVel, xVec3Dot(&glob->path.initVel, &this->vel));
 
                 glob->path.initVel.x *= 15.0f;
                 glob->path.initVel.y += 5.0f;
@@ -3648,8 +3643,7 @@ S32 zNPCGoalBossPatSpin::Process(en_trantype* trantype, F32 dt, void* ctxt, xSce
             }
             else if (pat->round == 3 && this->timeInGoal > 10.0f)
             {
-                F32 facing =
-                    xVec3Dot((xVec3*)&pat->frame->mat.pos, (xVec3*)&pat->model->Mat->at);
+                F32 facing = xVec3Dot((xVec3*)&pat->frame->mat.pos, (xVec3*)&pat->model->Mat->at);
 
                 if (pat->frame->mat.pos.x > 0.8f * pat->arenaExtent.x ||
                     pat->frame->mat.pos.x < 0.8f * -pat->arenaExtent.x ||
@@ -3760,13 +3754,13 @@ S32 zNPCGoalBossPatSpin::Process(en_trantype* trantype, F32 dt, void* ctxt, xSce
                     {
                         if ((picker & 0x1f) <= 10)
                         {
-                            pat->newsfish->SpeakStart(sNFComment[NF_AND_ROBOT_IS_DOWN_A].soundID,
-                                                      0, -1);
+                            pat->newsfish->SpeakStart(sNFComment[NF_AND_ROBOT_IS_DOWN_A].soundID, 0,
+                                                      -1);
                         }
                         else if ((picker & 0x1f) <= 20)
                         {
-                            pat->newsfish->SpeakStart(sNFComment[NF_AND_ROBOT_IS_DOWN_B].soundID,
-                                                      0, -1);
+                            pat->newsfish->SpeakStart(sNFComment[NF_AND_ROBOT_IS_DOWN_B].soundID, 0,
+                                                      -1);
                         }
                         else
                         {
@@ -3781,8 +3775,7 @@ S32 zNPCGoalBossPatSpin::Process(en_trantype* trantype, F32 dt, void* ctxt, xSce
 
                     if (!(nf & 0x80))
                     {
-                        pat->newsfish->SpeakStart(sNFComment[NF_SB_HAS_OPPORTUNITY].soundID, 0,
-                                                  -1);
+                        pat->newsfish->SpeakStart(sNFComment[NF_SB_HAS_OPPORTUNITY].soundID, 0, -1);
                         pat->nfFlags |= 0x80;
                     }
                     else if (!(nf & 0x100))

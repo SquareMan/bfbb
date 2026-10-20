@@ -101,7 +101,6 @@ void xCameraRotate(xCamera* cam, const xVec3& v, F32 roll, F32 time, F32 accel, 
 // Declared in zCameraFly.h, which this TU does not include.
 U32 zCameraFlyProcessStopEvent();
 
-
 namespace
 {
     F32 GetCurrentPitch();
@@ -292,7 +291,7 @@ static S32 zCameraFlyUpdate(xCamera* cam, F32 dt)
     xQuat quats[2];
     xQuat qresult;
 
-    if ((globals.pad0->pressed & (XPAD_BUTTON_X | XPAD_BUTTON_SQUARE)) && zcam_flytime > gSkipTimeFlythrough)
+    if ((globals.pad0->pressed & XPAD_ACTION_SKIP) && zcam_flytime > gSkipTimeFlythrough)
     {
         zcam_flytime = 0.033333335f * zcam_flysize;
     }
@@ -864,7 +863,7 @@ void zCameraUpdate(xCamera* cam, F32 dt)
 
     button = globals.pad0->pressed;
 
-    if (button & XPAD_BUTTON_Z)
+    if (button & XPAD_ACTION_ZOOM)
     {
         if (input_enabled && !(zcam_near & 0x2))
         {
@@ -990,10 +989,8 @@ void zCameraUpdate(xCamera* cam, F32 dt)
 
     if (dt > 1e-5f && cam->tgt_mat != NULL && cam->tgt_omat != NULL && vertical_lerp < 0.9999f)
     {
-        F32 velx =
-            (cam->tgt_mat->pos.x - cam->tgt_omat->pos.x - tran_accum.x) / dt;
-        F32 velz =
-            (cam->tgt_mat->pos.z - cam->tgt_omat->pos.z - tran_accum.z) / dt;
+        F32 velx = (cam->tgt_mat->pos.x - cam->tgt_omat->pos.x - tran_accum.x) / dt;
+        F32 velz = (cam->tgt_mat->pos.z - cam->tgt_omat->pos.z - tran_accum.z) / dt;
         F32 camx = cam->tgt_mat->pos.x - cam->mat.pos.x;
         F32 camz = cam->tgt_mat->pos.z - cam->mat.pos.z;
         F32 cammag = xsqrt(SQR(camx) + SQR(camz));
@@ -1018,8 +1015,7 @@ void zCameraUpdate(xCamera* cam, F32 dt)
             }
         }
 
-        if (zcam_overrot_tmr > zcam_overrot_tstart && cammag > 1.2f &&
-            velmag > zcam_overrot_velmin)
+        if (zcam_overrot_tmr > zcam_overrot_tstart && cammag > 1.2f && velmag > zcam_overrot_velmin)
         {
             camz /= cammag;
             velz /= velmag;

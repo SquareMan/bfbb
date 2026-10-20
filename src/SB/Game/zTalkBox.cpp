@@ -86,35 +86,35 @@ namespace
         {
             trigger(eEventPadPressSelect);
         }
-        if ((pressed & XPAD_BUTTON_R1) != 0)
+        if ((pressed & XPAD_BUTTON_RTRIGGER) != 0)
         {
             trigger(eEventPadPressR1);
         }
-        if ((pressed & XPAD_BUTTON_R2) != 0)
+        if ((pressed & XPAD_BUTTON_RBUMPER) != 0)
         {
             trigger(eEventPadPressR2);
         }
-        if ((pressed & XPAD_BUTTON_L1) != 0)
+        if ((pressed & XPAD_BUTTON_LTRIGGER) != 0)
         {
             trigger(eEventPadPressL1);
         }
-        if ((pressed & XPAD_BUTTON_L2) != 0)
+        if ((pressed & XPAD_BUTTON_LBUMPER) != 0)
         {
             trigger(eEventPadPressL2);
         }
-        if ((pressed & XPAD_BUTTON_X) != 0)
+        if ((pressed & XPAD_BUTTON_SOUTH) != 0)
         {
             trigger(eEventPadPressX);
         }
-        if ((pressed & XPAD_BUTTON_O) != 0)
+        if ((pressed & XPAD_BUTTON_EAST) != 0)
         {
             trigger(eEventPadPressO);
         }
-        if ((pressed & XPAD_BUTTON_SQUARE) != 0)
+        if ((pressed & XPAD_BUTTON_NORTH) != 0)
         {
             trigger(eEventPadPressSquare);
         }
-        if ((pressed & XPAD_BUTTON_TRIANGLE) != 0)
+        if ((pressed & XPAD_BUTTON_EAST) != 0)
         {
             trigger(eEventPadPressTriangle);
         }
@@ -1849,41 +1849,42 @@ namespace
             switch (shared.wait.query)
             {
             case Q_YESNO:
-                if (*pressed & XPAD_BUTTON_X)
+                if (*pressed & XPAD_BUTTON_SOUTH)
                 {
-                    *pressed &= ~XPAD_BUTTON_X;
+                    *pressed &= ~XPAD_BUTTON_SOUTH;
                     this->answer_yes = true;
-                    return (state_enum)2;
+                    return STATE_NEXT;
                 }
-                if (*pressed & XPAD_BUTTON_SQUARE)
+                if (*pressed & XPAD_BUTTON_NORTH)
                 {
-                    *pressed &= ~XPAD_BUTTON_SQUARE;
-                    return (state_enum)2;
+                    *pressed &= ~XPAD_BUTTON_NORTH;
+                    return STATE_NEXT;
                 }
                 break;
             case Q_SKIP:
             default:
-                if (*pressed & XPAD_BUTTON_X)
+                if (*pressed & XPAD_BUTTON_SOUTH)
                 {
-                    *pressed &= ~XPAD_BUTTON_X;
-                    return (state_enum)2;
+                    *pressed &= ~XPAD_BUTTON_SOUTH;
+                    return STATE_NEXT;
                 }
                 break;
             }
         }
 
-        if (shared.allow_quit && (*pressed & XPAD_BUTTON_TRIANGLE) && shared.quit_ready && (*pressed & XPAD_BUTTON_TRIANGLE))
+        if (shared.allow_quit && (*pressed & XPAD_ACTION_BACK) && shared.quit_ready &&
+            (*pressed & XPAD_ACTION_BACK))
         {
             shared.quitting = true;
-            *pressed &= ~XPAD_BUTTON_TRIANGLE;
-            return (state_enum)2;
+            *pressed &= ~XPAD_ACTION_BACK;
+            return STATE_NEXT;
         }
 
         if (shared.wait.type.sound)
         {
             if (!shared.sounds.playing(-1, true))
             {
-                return (state_enum)2;
+                return STATE_NEXT;
             }
         }
 
@@ -1892,11 +1893,11 @@ namespace
             if (shared.wait_event_mask & shared.wait.event_mask)
             {
                 shared.wait_event_mask &= ~shared.wait.event_mask;
-                return (state_enum)2;
+                return STATE_NEXT;
             }
         }
 
-        return (state_enum)3;
+        return STATE_WAIT;
     }
     static bool trigger_jot(const xtextbox::jot& j)
     {

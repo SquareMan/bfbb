@@ -237,7 +237,7 @@ S32 zNPCGoalPlayerNear::Process(en_trantype* trantype, F32 dt, void* updCtxt, xS
 
     if (talk_font != NULL && talk_font->NPCIsTheLocker(npc) && talk_font->IsVisible())
     {
-        if (globals.pad0->pressed & XPAD_BUTTON_R1)
+        if (globals.pad0->pressed & XPAD_ACTION_INTERACT)
         {
             zNPCMsg_SendMsg(NPC_MID_TALKSTART, npc->id);
         }

@@ -35,10 +35,7 @@
 
 #include <stdio.h>
 
-const static basic_rect<F32> screen_bounds =
-{
-    0.0f, 0.0f, 1.0f, 1.0f
-};
+const static basic_rect<F32> screen_bounds = { 0.0f, 0.0f, 1.0f, 1.0f };
 
 // Retail puts this at the head of zGame.cpp's .sbss (0x803CB7A0), not in
 // zMain.o, which is where our source had it.
@@ -76,9 +73,8 @@ void xCameraFXUpdate(xCamera* cam, F32 dt);
 void xCameraFXEnd(xCamera* cam);
 
 #ifdef GAMECUBE
-extern "C"
-{
-    void RwGameCubeSetMinRetraceCount(RwUInt8 count);
+extern "C" {
+void RwGameCubeSetMinRetraceCount(RwUInt8 count);
 }
 #endif
 
@@ -92,65 +88,12 @@ U32 startPressed = -1;
 iColor_tag black = { 0x00, 0x00, 0x00, 0xFF };
 iColor_tag clear = { 0x00, 0x00, 0x00, 0x00 };
 
-const char* soaklevels_gameorder[] =
-{
-	"HB02",
-    "HB01",
-    "HB03",
-    "HB04",
-    "JF01",
-    "JF02",
-    "JF03",
-    "JF04",
-    "JF01",
-    "BB01",
-    "BB02",
-    "BB03",
-    "BB04",
-    "GL01",
-    "GL02",
-    "GL03",
-    "B101",
-    "HB01",
-    "HB05",
-    "HB06",
-    "HB09",
-    "BC01",
-    "BC02",
-    "BC03",
-    "BC04",
-    "BC05",
-    "HB09",
-    "RB01",
-    "RB02",
-    "RB03",
-    "HB09",
-    "SM01",
-    "SM02",
-    "SM03",
-    "SM04",
-    "B201",
-    "HB01",
-    "DB01",
-    "DB02",
-    "DB03",
-    "DB04",
-    "DB06",
-    "KF01",
-    "KF02",
-    "KF04",
-    "KF05",
-    "GY01",
-    "GY02",
-    "GY03",
-    "GY04",
-    "HB07",
-    "HB08",
-    "B302",
-    "B303",
-    "HB10",
-    "PG12",
-	NULL
+const char* soaklevels_gameorder[] = {
+    "HB02", "HB01", "HB03", "HB04", "JF01", "JF02", "JF03", "JF04", "JF01", "BB01", "BB02", "BB03",
+    "BB04", "GL01", "GL02", "GL03", "B101", "HB01", "HB05", "HB06", "HB09", "BC01", "BC02", "BC03",
+    "BC04", "BC05", "HB09", "RB01", "RB02", "RB03", "HB09", "SM01", "SM02", "SM03", "SM04", "B201",
+    "HB01", "DB01", "DB02", "DB03", "DB04", "DB06", "KF01", "KF02", "KF04", "KF05", "GY01", "GY02",
+    "GY03", "GY04", "HB07", "HB08", "B302", "B303", "HB10", "PG12", NULL
 };
 
 const char** soaklevels = soaklevels_gameorder;
@@ -192,65 +135,65 @@ static U32 PickNextSoak()
 
     switch (soakdir)
     {
-        case SOAK_FOR:
-            name = soaklevels[soakidx];
-            soakidx++;
-            if (*(volatile S32*)(&soakidx) < soakcnt)
-            {
-                break;
-            }
-            if (justwrap != 0)
-            {
-                soakidx = 0;
-            }
-            else
-            {
-                soakidx = soakcnt - 2;
-                soakdir = SOAK_BACK;
-            }
+    case SOAK_FOR:
+        name = soaklevels[soakidx];
+        soakidx++;
+        if (*(volatile S32*)(&soakidx) < soakcnt)
+        {
             break;
-        case SOAK_BACK:
-            name = soaklevels[soakidx];
-            soakidx--;
-            if (*(volatile S32*)(&soakidx) >= 0)
-            {
-                break;
-            }
-            if (justwrap != 0)
-            {
-                soakidx = soakcnt - 1;
-            }
-            else
-            {
-                soakidx = 0;
-                soakdir = SOAK_RAND;
-            }
+        }
+        if (justwrap != 0)
+        {
+            soakidx = 0;
+        }
+        else
+        {
+            soakidx = soakcnt - 2;
+            soakdir = SOAK_BACK;
+        }
+        break;
+    case SOAK_BACK:
+        name = soaklevels[soakidx];
+        soakidx--;
+        if (*(volatile S32*)(&soakidx) >= 0)
+        {
             break;
-        // SOAK_RAND shares the default block.  That is what produces the target's
-        // duplicated `b default` in the dispatch: CW builds the {0,1,2} search
-        // tree, finds the >=2 subtree is just `b default`, retargets the `bge`
-        // straight at default and leaves the orphaned `b` behind.  Without this
-        // label the phantom branch cannot be reproduced (99.363% -> 100%).
-        case SOAK_RAND:
-        default:
-            if (globals.sceneCur != NULL)
-            {
-                tag = globals.sceneCur->sceneID;
-            }
-            else
-            {
-                tag = 0;
-            }
+        }
+        if (justwrap != 0)
+        {
+            soakidx = soakcnt - 1;
+        }
+        else
+        {
+            soakidx = 0;
+            soakdir = SOAK_RAND;
+        }
+        break;
+    // SOAK_RAND shares the default block.  That is what produces the target's
+    // duplicated `b default` in the dispatch: CW builds the {0,1,2} search
+    // tree, finds the >=2 subtree is just `b default`, retargets the `bge`
+    // straight at default and leaves the orphaned `b` behind.  Without this
+    // label the phantom branch cannot be reproduced (99.363% -> 100%).
+    case SOAK_RAND:
+    default:
+        if (globals.sceneCur != NULL)
+        {
+            tag = globals.sceneCur->sceneID;
+        }
+        else
+        {
+            tag = 0;
+        }
 
-            S32 scoobydoobydoo = tag;
+        S32 scoobydoobydoo = tag;
 
-            while (scoobydoobydoo == globals.sceneCur->sceneID)
-            {
-                name = (char *)xUtil_select(soaklevels, soakcnt, 0);
-                scoobydoobydoo = name[0] << 24 | name[1] << 16 | name[2] << 8 | name[3];
-            }
+        while (scoobydoobydoo == globals.sceneCur->sceneID)
+        {
+            name = (char*)xUtil_select(soaklevels, soakcnt, 0);
+            scoobydoobydoo = name[0] << 24 | name[1] << 16 | name[2] << 8 | name[3];
+        }
 
-            break;
+        break;
     }
 
     char useme[5] = {};
@@ -330,7 +273,7 @@ void zGameSetup()
     gGameWhereAmI = eGameWhere_SetupScene;
     zSceneSetup();
     gGameWhereAmI = eGameWhere_SetupZFX;
-	RpWorld* world = globals.sceneCur->env->geom->world;
+    RpWorld* world = globals.sceneCur->env->geom->world;
     xModel_SceneEnter(world);
     zFX_SceneEnter(world);
     gGameWhereAmI = eGameWhere_SetupPlayer;
@@ -623,9 +566,8 @@ void zGameLoop()
 
             if ((gTrcPad[0].state != TRC_PadInserted) && (gBusStopIsRunning == 0) &&
                 (oob_state::IsPlayerInControl() ||
-                 (globals.player.ControlOff &
-                  (CONTROL_OWNER_OOB | CONTROL_OWNER_TALK_BOX | CONTROL_OWNER_TAXI |
-                   CONTROL_OWNER_TELEPORT_BOX))) &&
+                 (globals.player.ControlOff & (CONTROL_OWNER_OOB | CONTROL_OWNER_TALK_BOX |
+                                               CONTROL_OWNER_TAXI | CONTROL_OWNER_TELEPORT_BOX))) &&
                 (globals.dontShowPadMessageDuringLoadingOrCutScene == 0))
             {
                 globals.dontShowPadMessageDuringLoadingOrCutScene = 1;
@@ -662,7 +604,8 @@ static S32 zGameLoopContinue()
 {
     if (gGameMode == eGameMode_Game)
     {
-        return gGameState == eGameState_Play || gGameState == eGameState_GameOver || gGameState == eGameState_GameStats;
+        return gGameState == eGameState_Play || gGameState == eGameState_GameOver ||
+               gGameState == eGameState_GameStats;
     }
     else
     {
@@ -775,43 +718,37 @@ static void zGame_HackPostPortalAutoSaveDraw()
 {
     U32 i;
     RwCamera* ccam;
-	RwCamera* cam;
+    RwCamera* cam;
     RwRaster* rast;
     char str[2048];
-    RwTexture* tex; 
+    RwTexture* tex;
     RwRGBA bg = {};
-	
+
     cam = RwCameraGetCurrentCamera();
     if (cam != NULL)
     {
         RwCameraEndUpdate(cam);
     }
-	
+
     sprintf(str, "{font=0}{i:MNU4 AUTO SAVE TXT}");
-	
-    ccam = (RwCamera *)iCameraCreate(640, 480, 0);
-	
-    xtextbox tb = xtextbox::create
-	(
-	    xfont::create
-		(
-		    1, NSCREENX(19.0f), NSCREENY(22.0f), 0.0f,
-			xColorFromRGBA(0xFF, 0xE6, 0x00, 0xFF), 
-			screen_bounds
-		),
-		screen_bounds, 0, 0.0f, 0.0f, 0.0f, 0.0f
-	);
-	
+
+    ccam = (RwCamera*)iCameraCreate(640, 480, 0);
+
+    xtextbox tb =
+        xtextbox::create(xfont::create(1, NSCREENX(19.0f), NSCREENY(22.0f), 0.0f,
+                                       xColorFromRGBA(0xFF, 0xE6, 0x00, 0xFF), screen_bounds),
+                         screen_bounds, 0, 0.0f, 0.0f, 0.0f, 0.0f);
+
     tb.flags |= 2;
     tb.bounds.assign(0.0f, 0.4125f, 1.0f, 0.25f);
     tb.bounds.contract(0.025f);
     tb.set_text(str);
-    tb.bounds.h  = tb.yextent(true);
+    tb.bounds.h = tb.yextent(true);
     tb.bounds.y = -((tb.bounds.h * 0.5f) - 0.5f);
-	tb.font.clip = tb.bounds;
+    tb.font.clip = tb.bounds;
     tb.font.clip.expand(0.025f);
     F32 yextent = tb.yextent(true);
-	
+
     for (i = 0; i < 2; i++)
     {
         RwCameraClear(ccam, &bg, rwCAMERACLEARZ | rwCAMERACLEARIMAGE);
@@ -825,12 +762,12 @@ static void zGame_HackPostPortalAutoSaveDraw()
         {
             rast = NULL;
         }
-		
-        zGame_HackDrawCard(0.0f,   0.0f,   320.0f, 240.0f, rast);
-        zGame_HackDrawCard(320.0f, 0.0f,   320.0f, 240.0f, rast);
-        zGame_HackDrawCard(0.0f,   240.0f, 320.0f, 240.0f, rast);
+
+        zGame_HackDrawCard(0.0f, 0.0f, 320.0f, 240.0f, rast);
+        zGame_HackDrawCard(320.0f, 0.0f, 320.0f, 240.0f, rast);
+        zGame_HackDrawCard(0.0f, 240.0f, 320.0f, 240.0f, rast);
         zGame_HackDrawCard(320.0f, 240.0f, 320.0f, 240.0f, rast);
-		
+
         tex = (RwTexture*)xSTFindAsset(xStrHash("ui_savinggame"), NULL);
         if (tex == NULL)
         {
@@ -852,7 +789,7 @@ static void zGame_HackPostPortalAutoSaveDraw()
             render_fill_rect(tb.font.clip, xColorFromRGBA(0x00, 0x00, 0x00, 0xFF));
             tb.render(true);
         }
-		
+
         RwCameraEndUpdate(ccam);
         RwCameraShowRaster(ccam, NULL, 1);
     }
@@ -904,16 +841,16 @@ static void zGameUpdateMode()
         {
             switch (zGameOkToPause())
             {
-                case 0:
-                    xTRCReset();
-                    startPressed = 1;
-                    break;
-                case 1:
-                    zGamePause();
-                    break;
-                case 2:
-                    zGameStall();
-                    break;
+            case 0:
+                xTRCReset();
+                startPressed = 1;
+                break;
+            case 1:
+                zGamePause();
+                break;
+            case 2:
+                zGameStall();
+                break;
             }
         }
         else
@@ -936,18 +873,21 @@ static void zGameUpdateMode()
         // byteswap.  The target's `or r31, r5, r3` / `or r3, r7, r0` pin it:
         // nextSceneID is the plain big-endian sceneID ([+0][+1][+2][+3]) and the
         // value compared against globals.sceneCur->sceneID is the full byteswap.
-        U32 d = *(char *)((int)&passet->sceneID + 3);
-        U32 c = *(char *)((int)&passet->sceneID + 0);
-        U32 b = *(char *)((int)&passet->sceneID + 2);
-        U32 a = *(char *)((int)&passet->sceneID + 1);
+        U32 d = *(char*)((int)&passet->sceneID + 3);
+        U32 c = *(char*)((int)&passet->sceneID + 0);
+        U32 b = *(char*)((int)&passet->sceneID + 2);
+        U32 a = *(char*)((int)&passet->sceneID + 1);
 
-        U32 x = (((b << 8) & 0xff00) | (((c << 24) & 0xff000000) | ((a << 16) & 0x00ffffff)) & 0xffff00ff);
-        U32 y = (((a << 8) & 0xff00) | (((d << 24) & 0xff000000) | ((b << 16) & 0x00ffffff)) & 0xffff00ff);
+        U32 x = (((b << 8) & 0xff00) |
+                 (((c << 24) & 0xff000000) | ((a << 16) & 0x00ffffff)) & 0xffff00ff);
+        U32 y = (((a << 8) & 0xff00) |
+                 (((d << 24) & 0xff000000) | ((b << 16) & 0x00ffffff)) & 0xffff00ff);
 
         nextSceneID = d | x;
         x = c | y;
 
-        if ((g_hiphopReloadHIP != 0) || ((g_hiphopForcePortal != 0) || (x != globals.sceneCur->sceneID)))
+        if ((g_hiphopReloadHIP != 0) ||
+            ((g_hiphopForcePortal != 0) || (x != globals.sceneCur->sceneID)))
         {
             sPlayerMarkerStartID = passet->assetMarkerID;
             sPlayerMarkerStartCamID = passet->assetCameraID;
@@ -973,23 +913,23 @@ static void zGameUpdateMode()
             if (gWaitingToAutoSave != 0)
             {
                 zGame_HackPostPortalAutoSaveDraw();
-				
+
                 zSaveLoadPreAutoSave(1);
                 if (zSaveLoad_DoAutoSave() < 0)
                 {
-                    sendTo = (xBase *)zSceneFindObject(xStrHash("MNU4 AUTO SAVE FAILED"));
+                    sendTo = (xBase*)zSceneFindObject(xStrHash("MNU4 AUTO SAVE FAILED"));
                     if (sendTo != NULL)
                     {
                         zEntEvent(sendTo, eEventVisible);
                     }
                 }
-				
-                sendTo = (xBase *)zSceneFindObject(xStrHash("SAVING GAME ICON UI"));
+
+                sendTo = (xBase*)zSceneFindObject(xStrHash("SAVING GAME ICON UI"));
                 if (sendTo != NULL)
                 {
                     zEntEvent(sendTo, eEventInvisible);
                 }
-				
+
                 zSaveLoadPreAutoSave(0);
                 gWaitingToAutoSave = 0;
             }
@@ -1011,32 +951,34 @@ static void zGameUpdateMode()
                 sPlayerMarkerStartID = 0;
             }
         }
-		
+
         if (gSoak != 0)
         {
-            sendTo = (xBase *)zSceneGetObject(eBaseTypeCamera, 0);
+            sendTo = (xBase*)zSceneGetObject(eBaseTypeCamera, 0);
             sPlayerMarkerStartCamID = sendTo->id;
         }
         else
         {
-            sendTo = (xBase *)zSceneFindObject(sPlayerMarkerStartCamID);
+            sendTo = (xBase*)zSceneFindObject(sPlayerMarkerStartCamID);
             if (sendTo == NULL)
             {
                 xSTAssetName(sPlayerMarkerStartCamID);
-                sendTo = (xBase *)zSceneGetObject(eBaseTypeCamera, 0);
+                sendTo = (xBase*)zSceneGetObject(eBaseTypeCamera, 0);
                 sPlayerMarkerStartCamID = sendTo->id;
                 xSTAssetName(sendTo->id);
             }
         }
-		
+
         gGameWhereAmI = eGameWhere_ModeStoreCheckpoint;
         if (sendTo != NULL)
         {
-            zEntPlayer_StoreCheckPoint(&globals.player.ent.frame->mat.pos, globals.player.ent.frame->rot.angle, sPlayerMarkerStartCamID);
+            zEntPlayer_StoreCheckPoint(&globals.player.ent.frame->mat.pos,
+                                       globals.player.ent.frame->rot.angle,
+                                       sPlayerMarkerStartCamID);
         }
-		
+
         sPlayerMarkerStartCamID = 0;
-		
+
         if (gPendingPlayer != eCurrentPlayerCount)
         {
             gCurrentPlayer = gPendingPlayer;
@@ -1137,14 +1079,14 @@ void zGameScreenTransitionBegin()
         if (DirectionalLight != NULL)
         {
             RwRGBAReal col;
-			col.red = col.green = col.blue = 1.0f;
-			col.alpha = 0.0f;
+            col.red = col.green = col.blue = 1.0f;
+            col.alpha = 0.0f;
             RpLightSetColor(DirectionalLight, &col);
             RwFrame* frame = RwFrameCreate();
             RpLightSetFrame(DirectionalLight, frame);
             RwBBox box;
-			box.sup.z = box.sup.y = box.sup.x =  10000.0f;
-			box.inf.z = box.inf.y = box.inf.x = -10000.0f;
+            box.sup.z = box.sup.y = box.sup.x = 10000.0f;
+            box.inf.z = box.inf.y = box.inf.x = -10000.0f;
             World = RpWorldCreate(&box);
             RpWorldAddCamera(World, sGameScreenTransCam);
             gGameWhereAmI = eGameWhere_TransitionSnapShot;
@@ -1196,9 +1138,9 @@ void zGameScreenTransitionUpdate(F32 percentComplete, CChar* msg, U8* rgba)
     RwRGBA back_col = { 0x00, 0x00, 0x00, 0xFF };
     if (rgba != NULL)
     {
-        back_col.red   = rgba[0];
+        back_col.red = rgba[0];
         back_col.green = rgba[1];
-        back_col.blue  = rgba[2];
+        back_col.blue = rgba[2];
         back_col.alpha = rgba[3];
     }
 
@@ -1264,21 +1206,21 @@ void zGameScreenTransitionUpdate(F32 percentComplete, CChar* msg, U8* rgba)
 
     switch ((loadMeter / 0x19) % 5)
     {
-        case 0:
-            strcpy(meter, "   ");
-            break;
-        case 1:
-            strcpy(meter, ".  ");
-            break;
-        case 2:
-            strcpy(meter, ".. ");
-            break;
-        case 3:
-            strcpy(meter, "...");
-            break;
-        case 4:
-            loadMeter = 0;
-            break;
+    case 0:
+        strcpy(meter, "   ");
+        break;
+    case 1:
+        strcpy(meter, ".  ");
+        break;
+    case 2:
+        strcpy(meter, ".. ");
+        break;
+    case 3:
+        strcpy(meter, "...");
+        break;
+    case 4:
+        loadMeter = 0;
+        break;
     }
 
     loadMeter++;
@@ -1338,9 +1280,9 @@ void zGameSetupPlayer()
     xEntAsset* asset = (xEntAsset*)xSTFindAssetByType('PLYR', xSTAssetCountByType('PLYR') - 1, 0);
     U32 size;
     xMarkerAsset* m;
-	
+
     asset->baseType = eBaseTypePlayer;
-	
+
     if (sPortalling != 0)
     {
         if (sPlayerStartAngle > -1e8f)
@@ -1349,30 +1291,30 @@ void zGameSetupPlayer()
         }
         sPortalling = 0;
     }
-	
+
     asset->ang.y = 0.0f;
     asset->ang.z = 0.0f;
     gGameWhereAmI = eGameWhere_SetupPlayerInit;
     zEntPlayer_Init(&globals.player.ent, asset);
-	
+
     if (sPlayerMarkerStartID != 0)
     {
-        m = (xMarkerAsset *)xSTFindAsset(sPlayerMarkerStartID, &size);
+        m = (xMarkerAsset*)xSTFindAsset(sPlayerMarkerStartID, &size);
         if (m != NULL)
         {
-            xVec3Copy((xVec3 *)&globals.player.ent.frame->mat.pos,    &m->pos);
-            xVec3Copy((xVec3 *)&globals.player.ent.frame->oldmat.pos, &m->pos);
-            xVec3Copy((xVec3 *)&globals.player.ent.model->Mat->pos,   &m->pos);
+            xVec3Copy((xVec3*)&globals.player.ent.frame->mat.pos, &m->pos);
+            xVec3Copy((xVec3*)&globals.player.ent.frame->oldmat.pos, &m->pos);
+            xVec3Copy((xVec3*)&globals.player.ent.model->Mat->pos, &m->pos);
             xCameraSetTargetMatrix(&globals.camera, xEntGetFrame(&globals.player.ent));
         }
         sPlayerMarkerStartID = 0;
     }
-	
+
     gGameWhereAmI = eGameWhere_SetupPlayerCamera;
     zCameraReset(&globals.camera);
-    zEntPlayer_StoreCheckPoint(&globals.player.ent.frame->mat.pos, globals.player.ent.frame->rot.angle, globals.camera.id);
+    zEntPlayer_StoreCheckPoint(&globals.player.ent.frame->mat.pos,
+                               globals.player.ent.frame->rot.angle, globals.camera.id);
     gGameWhereAmI = eGameWhere_SetupPlayerEnd;
-	
 }
 
 void zGameStats_Init()

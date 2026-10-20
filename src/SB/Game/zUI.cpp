@@ -519,44 +519,44 @@ void zUI_PreUpdate(_zUI* ent, xScene*, F32)
                     ui->uiButton |= XPAD_BUTTON_SELECT;
                 }
 
-                if (pad->pressed & XPAD_BUTTON_R1)
+                if (pad->pressed & XPAD_BUTTON_RTRIGGER)
                 {
-                    ui->uiButton |= XPAD_BUTTON_R1;
+                    ui->uiButton |= XPAD_BUTTON_RTRIGGER;
                 }
 
-                if (pad->pressed & XPAD_BUTTON_R2)
+                if (pad->pressed & XPAD_BUTTON_RBUMPER)
                 {
-                    ui->uiButton |= XPAD_BUTTON_R2;
+                    ui->uiButton |= XPAD_BUTTON_RBUMPER;
                 }
 
-                if (pad->pressed & XPAD_BUTTON_L1)
+                if (pad->pressed & XPAD_BUTTON_LTRIGGER)
                 {
-                    ui->uiButton |= XPAD_BUTTON_L1;
+                    ui->uiButton |= XPAD_BUTTON_LTRIGGER;
                 }
 
-                if (pad->pressed & XPAD_BUTTON_L2)
+                if (pad->pressed & XPAD_BUTTON_LBUMPER)
                 {
-                    ui->uiButton |= XPAD_BUTTON_L2;
+                    ui->uiButton |= XPAD_BUTTON_LBUMPER;
                 }
 
-                if (pad->pressed & XPAD_BUTTON_X)
+                if (pad->pressed & XPAD_BUTTON_SOUTH)
                 {
-                    ui->uiButton |= XPAD_BUTTON_X;
+                    ui->uiButton |= XPAD_BUTTON_SOUTH;
                 }
 
-                if (pad->pressed & XPAD_BUTTON_O)
+                if (pad->pressed & XPAD_BUTTON_EAST)
                 {
-                    ui->uiButton |= XPAD_BUTTON_O;
+                    ui->uiButton |= XPAD_BUTTON_EAST;
                 }
 
-                if (pad->pressed & XPAD_BUTTON_SQUARE)
+                if (pad->pressed & XPAD_BUTTON_NORTH)
                 {
-                    ui->uiButton |= XPAD_BUTTON_SQUARE;
+                    ui->uiButton |= XPAD_BUTTON_NORTH;
                 }
 
-                if (pad->pressed & XPAD_BUTTON_TRIANGLE)
+                if (pad->pressed & XPAD_BUTTON_WEST)
                 {
-                    ui->uiButton |= XPAD_BUTTON_TRIANGLE;
+                    ui->uiButton |= XPAD_BUTTON_WEST;
                 }
 
                 if (ui->uiButton)
@@ -574,8 +574,9 @@ void zUI_PreUpdate(_zUI* ent, xScene*, F32)
                     xTRCReset();
                 }
             }
-            else if (pad->pressed & XPAD_BUTTON_START && (ui->asset->id == xStrHash("MNU3 PRESS START UIF") ||
-                                            ui->asset->id == xStrHash("MNU3 PRESS START 02 UIF")))
+            else if (pad->pressed & XPAD_BUTTON_START &&
+                     (ui->asset->id == xStrHash("MNU3 PRESS START UIF") ||
+                      ui->asset->id == xStrHash("MNU3 PRESS START 02 UIF")))
             {
                 globals.currentActivePad = i;
 
@@ -630,37 +631,37 @@ void zUI_Update(_zUI* ent, xScene*, F32 dt)
         {
             zEntEvent(ent, ent, eEventPadPressSelect);
         }
-        else if (ent->uiButton & XPAD_BUTTON_R1)
+        else if (ent->uiButton & XPAD_BUTTON_RTRIGGER)
         {
             zEntEvent(ent, ent, eEventPadPressR1);
-            ent->uiButton = XPAD_BUTTON_R1;
+            ent->uiButton = XPAD_BUTTON_RTRIGGER;
         }
-        else if (ent->uiButton & XPAD_BUTTON_R2)
+        else if (ent->uiButton & XPAD_BUTTON_RBUMPER)
         {
             zEntEvent(ent, ent, eEventPadPressR2);
-            ent->uiButton = XPAD_BUTTON_R2;
+            ent->uiButton = XPAD_BUTTON_RBUMPER;
         }
-        else if (ent->uiButton & XPAD_BUTTON_L1)
+        else if (ent->uiButton & XPAD_BUTTON_LTRIGGER)
         {
             zEntEvent(ent, ent, eEventPadPressL1);
         }
-        else if (ent->uiButton & XPAD_BUTTON_L2)
+        else if (ent->uiButton & XPAD_BUTTON_LBUMPER)
         {
             zEntEvent(ent, ent, eEventPadPressL2);
         }
-        else if (ent->uiButton & XPAD_BUTTON_X)
+        else if (ent->uiButton & XPAD_BUTTON_SOUTH)
         {
             zEntEvent(ent, ent, eEventPadPressX);
         }
-        else if (ent->uiButton & XPAD_BUTTON_O)
+        else if (ent->uiButton & XPAD_ACTION_OPTIONS)
         {
             zEntEvent(ent, ent, eEventPadPressO);
         }
-        else if (ent->uiButton & XPAD_BUTTON_TRIANGLE)
+        else if (ent->uiButton & XPAD_ACTION_BACK)
         {
             zEntEvent(ent, ent, eEventPadPressTriangle);
         }
-        else if (ent->uiButton & XPAD_BUTTON_SQUARE)
+        else if (ent->uiButton & XPAD_BUTTON_NORTH)
         {
             zEntEvent(ent, ent, eEventPadPressSquare);
         }
@@ -1930,7 +1931,7 @@ void zUI_ScenePortalUpdate()
                     xEntHide(sTakeTaxi);
                 }
 
-                if (select->uiButton & XPAD_BUTTON_X && xEntIsVisible(sConfirmation) &&
+                if (select->uiButton & XPAD_BUTTON_SOUTH && xEntIsVisible(sConfirmation) &&
                     sWorld[i].task[j].portal.passet &&
                     (sWorld[i].task[j].counter->count > 0 || globals.player.g.CheatAlwaysPortal))
                 {
@@ -1944,7 +1945,7 @@ void zUI_ScenePortalUpdate()
 
                     gPendingPlayer = sWorldInfo[i].taskInfo[j].player;
                 }
-                else if (select->uiButton & XPAD_BUTTON_X && !xEntIsVisible(sConfirmation) &&
+                else if (select->uiButton & XPAD_BUTTON_SOUTH && !xEntIsVisible(sConfirmation) &&
                          sWorld[i].task[j].portal.passet &&
                          (sWorld[i].task[j].counter->count > 0 ||
                           globals.player.g.CheatAlwaysPortal))
