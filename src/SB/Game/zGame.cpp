@@ -791,7 +791,7 @@ static void zGame_HackPostPortalAutoSaveDraw()
         }
 
         RwCameraEndUpdate(ccam);
-        RwCameraShowRaster(ccam, NULL, 1);
+        RwCameraShowRaster(ccam, NULL, rwRASTERFLIPWAITVSYNC);
     }
 
     iCameraDestroy(ccam);
@@ -1240,7 +1240,7 @@ void zGameScreenTransitionUpdate(F32 percentComplete, CChar* msg, U8* rgba)
         gGameWhereAmI = eGameWhere_TransitionCameraEnd;
         RwCameraEndUpdate(sGameScreenTransCam);
         gGameWhereAmI = eGameWhere_TransitionCameraShowRaster;
-        RwCameraShowRaster(sGameScreenTransCam, NULL, 1);
+        RwCameraShowRaster(sGameScreenTransCam, NULL, rwRASTERFLIPWAITVSYNC);
     }
 
     gGameWhereAmI = eGameWhere_TransitionUpdateEnd;

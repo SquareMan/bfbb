@@ -310,6 +310,7 @@ constexpr RwUInt32 rwRASTERFORMATPAL8 = rw::Raster::PAL8;
 constexpr RwUInt32 rwRASTERFORMATPAL4 = rw::Raster::PAL4;
 constexpr RwUInt32 rwRASTERFORMATMIPMAP = rw::Raster::MIPMAP;
 
+constexpr RwUInt32 rwRASTERFLIPWAITVSYNC = rw::Raster::FLIPWAITVSYNCH;
 inline RwRaster* RwRasterCreate(RwInt32 width, RwInt32 height, RwInt32 depth, RwInt32 flags)
 {
     return rw::Raster::create(width, height, depth, flags);

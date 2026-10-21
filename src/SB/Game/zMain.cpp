@@ -952,7 +952,7 @@ void zMainFirstScreen(S32 mode)
         }
 
         RwCameraEndUpdate(cam);
-        RwCameraShowRaster(cam, NULL, 1);
+        RwCameraShowRaster(cam, NULL, rwRASTERFLIPWAITVSYNC);
     }
 
     vbl = 180;
@@ -1247,7 +1247,7 @@ static void zMainMemCardQueryPost(S32 needed, S32 available, S32 neededFiles, S3
     RwCameraBeginUpdate(cam);
     render_mem_card_no_space(needed, available, neededFiles, unk0 != 0);
     RwCameraEndUpdate(cam);
-    RwCameraShowRaster(cam, NULL, 1);
+    RwCameraShowRaster(cam, NULL, rwRASTERFLIPWAITVSYNC);
     iCameraDestroy(cam);
 }
 
@@ -1262,7 +1262,7 @@ void zMainMemCardRenderText(const char* a, bool enabled)
     RwCameraBeginUpdate(cam);
     RenderText(a, enabled);
     RwCameraEndUpdate(cam);
-    RwCameraShowRaster(cam, NULL, 1);
+    RwCameraShowRaster(cam, NULL, rwRASTERFLIPWAITVSYNC);
     iCameraDestroy(cam);
 }
 
