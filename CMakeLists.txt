@@ -60,9 +60,40 @@ target_sources(librwc
     src/librwc/src/rpcollis.cpp
 )
 
+# ------------------------ dear imgui ---------------------
+# Vendored at src/imgui with RenderWare backend taken from librw
+add_library(imgui STATIC)
+
+target_sources(imgui
+    PUBLIC
+    FILE_SET headers TYPE HEADERS
+    BASE_DIRS src/imgui/
+    FILES
+    src/imgui/imconfig.h
+    src/imgui/imgui_impl_rw.h
+    src/imgui/imgui_impl_sdl3.h
+    src/imgui/imgui_internal.h
+    src/imgui/imgui.h
+    src/imgui/imstb_rectpack.h
+    src/imgui/imstb_textedit.h
+    src/imgui/imstb_truetype.h
+
+    FILES
+    PRIVATE
+    src/imgui/imgui.cpp
+    src/imgui/imgui_draw.cpp
+    src/imgui/imgui_tables.cpp
+    src/imgui/imgui_widgets.cpp
+    src/imgui/imgui_demo.cpp
+    src/imgui/imgui_impl_rw.cpp
+    src/imgui/imgui_impl_sdl3.cpp
+)
+target_link_libraries(imgui PUBLIC librw SDL3::SDL3)
+target_compile_options(imgui PRIVATE -Wno-everything)
+
 # ----------------- Main Game Executable ------------------
 add_executable(bfbb)
-target_link_libraries(bfbb PUBLIC librwc SDL3::SDL3 SDL3_mixer::SDL3_mixer)
+target_link_libraries(bfbb PUBLIC librwc SDL3::SDL3 SDL3_mixer::SDL3_mixer imgui)
 # FIXME: This should be removable after getting the build fully linking and removing the dependency on gc headers
 # silence warning from RenderWare macros doing cursed enum stuff
 target_compile_options(bfbb PRIVATE -Wno-deprecated-enum-enum-conversion)

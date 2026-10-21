@@ -1,9 +1,11 @@
+#include "imgui_internal.h"
 #include <Windows.h>
 
 #include "iSystem.h"
 
 #include <cstdio>
 #include <cstdlib>
+#include <cstring>
 #include <rwcore.h>
 #include <rpcollbsptree.h>
 #include <rpptank.h>
@@ -27,11 +29,16 @@
 #include <SDL3/SDL_error.h>
 #include "SDL3/SDL_events.h"
 #include "SDL3/SDL_init.h"
+#include <SDL3/SDL_log.h>
 #include <SDL3/SDL_main.h>
-#include "SDL3/SDL_messagebox.h"
+#include <SDL3/SDL_storage.h>
 #include <SDL3/SDL_time.h>
 #include <SDL3/SDL_timer.h>
 #include <SDL3/SDL_video.h>
+
+#include <imgui.h>
+#include <imgui_impl_sdl3.h>
+#include <imgui_impl_rw.h>
 
 static SDL_Window* sWindow = NULL;
 
@@ -53,6 +60,7 @@ void iVSync()
     SDL_Event event;
     while (SDL_PollEvent(&event))
     {
+        ImGui_ImplSDL3_ProcessEvent(&event);
         switch (event.type)
         {
         case SDL_EVENT_WINDOW_CLOSE_REQUESTED:
@@ -121,8 +129,54 @@ static void RenderWareExit()
 }
 
 static std::binary_semaphore semWaitForAssetPath{ 0 };
+static char sAssetsFolder[1024] = { 0 };
 
-void AssetPathSelectedCallback(void* userdata, const char* const* filelist, int filter)
+static void imguiStyle()
+{
+    ImGuiIO& io = ImGui::GetIO();
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;
+
+    ImGui::GetStyle().FrameRounding = 6.0f;
+}
+
+static RwCamera* sImguiCamera = NULL;
+static void imguiInit()
+{
+    assert(sImguiCamera == NULL);
+
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGui_ImplSDL3_InitForOther(sWindow);
+    ImGui_ImplRW_Init();
+
+    // TODO: Set this to the SDL pref directory
+    ImGui::GetIO().IniFilename = NULL;
+
+    imguiStyle();
+
+    sImguiCamera = RwCameraCreate();
+    RwCameraSetFrame(sImguiCamera, RwFrameCreate());
+    sImguiCamera->frameBuffer = RwRasterCreate(640, 480, 1, rwRASTERTYPECAMERA);
+}
+
+static void imguiExit()
+{
+    assert(sImguiCamera != NULL);
+
+    RwRasterDestroy(sImguiCamera->frameBuffer);
+    sImguiCamera->frameBuffer = NULL;
+    RwFrameDestroy(sImguiCamera->getFrame());
+    sImguiCamera->setFrame(NULL);
+    RwCameraDestroy(sImguiCamera);
+    sImguiCamera = NULL;
+
+    ImGui_ImplRW_Shutdown();
+    ImGui_ImplSDL3_Shutdown();
+    ImGui::Shutdown();
+}
+
+static void AssetPathSelectedCallback(void* userdata, const char* const* filelist, int filter)
 {
     if (filelist == NULL)
     {
@@ -130,22 +184,69 @@ void AssetPathSelectedCallback(void* userdata, const char* const* filelist, int 
         return;
     }
 
-    const char* assets_folder = filelist[0];
-    printf("Assets Folder: %s\n", assets_folder);
-    // TODO: Cross platformify this
-    SetCurrentDirectory(assets_folder);
+    const char* dir = filelist[0];
+    if (dir != NULL)
+    {
+        strncpy(sAssetsFolder, dir, 1024);
+        sAssetsFolder[1023] = NULL;
+        printf("Assets Folder: %s\n", sAssetsFolder);
+        // TODO: Cross platformify this
+        SetCurrentDirectory(sAssetsFolder);
+    }
     semWaitForAssetPath.release();
+}
+
+static void prelaunchLoop()
+{
+    RwRGBA clear = { 0, 0, 0, 255 };
+    while (true)
+    {
+        iVSync();
+        ImGui_ImplSDL3_NewFrame();
+        ImGui_ImplRW_NewFrame();
+        ImGui::NewFrame();
+
+        RwCameraClear(sImguiCamera, &clear, rwCAMERACLEARIMAGE);
+        RwCameraBeginUpdate(sImguiCamera);
+
+        const ImGuiViewport* viewport = ImGui::GetMainViewport();
+        ImGui::SetNextWindowSize(viewport->Size);
+        ImGui::SetNextWindowPos(ImVec2{ viewport->Pos.x, viewport->Pos.y });
+        ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0);
+        ImGui::Begin("Prelaunch", NULL,
+                     ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoMove |
+                         ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoBringToFrontOnFocus);
+        ImGui::PopStyleVar();
+
+        if (sAssetsFolder[0] == NULL)
+        {
+            if (ImGui::Button("Select Asset Path"))
+            {
+                // TODO: Cache this to avoid alerting every time we start the game
+                SDL_ShowOpenFolderDialog(AssetPathSelectedCallback, NULL, NULL, NULL, false);
+                semWaitForAssetPath.acquire();
+            }
+            ImGui::SetItemTooltip("You must provide a path to an extracted Xbox iso to play.");
+        }
+        else
+        {
+            if (ImGui::Button("Play"))
+                break;
+        }
+        ImGui::SameLine();
+        ImGui::Text("%s", sAssetsFolder);
+
+        ImGui::End();
+
+        ImGui::Render();
+        ImGui_ImplRW_RenderDrawLists(ImGui::GetDrawData());
+        RwCameraEndUpdate(sImguiCamera);
+        RwCameraShowRaster(sImguiCamera, NULL, rwRASTERFLIPWAITVSYNC);
+    }
 }
 
 void iSystemInit(U32 options)
 {
-    // TODO: Cache this to avoid alerting every time we start the game
-    SDL_ShowSimpleMessageBox(
-        SDL_MESSAGEBOX_INFORMATION, "Setup",
-        "Press OK to open a folder picker and select the path to your extracted Xbox ISO", NULL);
-    SDL_ShowOpenFolderDialog(AssetPathSelectedCallback, NULL, NULL, NULL, false);
-    semWaitForAssetPath.acquire();
-
     SDL_SetAppMetadata("SpongeBob SquarePants: Battle for Bikini Bottom", "PC Port", "");
     SDL_Init(SDL_INIT_GAMEPAD | SDL_INIT_AUDIO);
     // Note: SDL_RunApp seems to do some necessary setup on some platforms
@@ -169,6 +270,9 @@ void iSystemInit(U32 options)
     RenderWareInit();
     xMathInit();
     xMath3Init();
+
+    imguiInit();
+    prelaunchLoop();
 }
 
 void iSystemExit()
@@ -181,6 +285,8 @@ void iSystemExit()
     iFileExit();
     iTimeExit();
     xMemExit();
+
+    imguiExit();
     SDL_Quit();
 }
 
