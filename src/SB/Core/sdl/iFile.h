@@ -17,6 +17,7 @@ struct SDL_IOStream;
 struct tag_iFile
 {
     SDL_IOStream* io;
+    void* mem;
     U32 size;
     S32 asynckey;
 };

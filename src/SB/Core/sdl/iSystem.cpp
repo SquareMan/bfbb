@@ -3,6 +3,7 @@
 
 #include "iSystem.h"
 
+#include <cmath>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
@@ -12,6 +13,7 @@
 
 #include "xDebug.h"
 #include "xFX.h"
+#include "xIni.h"
 #include "xPad.h"
 #include "xSnd.h"
 #include "xShadow.h"
@@ -24,17 +26,7 @@
 #include <immintrin.h>
 #include <semaphore>
 #include <synchapi.h>
-#define SDL_MAIN_HANDLED 1
-#include "SDL3/SDL_dialog.h"
-#include <SDL3/SDL_error.h>
-#include "SDL3/SDL_events.h"
-#include "SDL3/SDL_init.h"
-#include <SDL3/SDL_log.h>
-#include <SDL3/SDL_main.h>
-#include <SDL3/SDL_storage.h>
-#include <SDL3/SDL_time.h>
-#include <SDL3/SDL_timer.h>
-#include <SDL3/SDL_video.h>
+#include <SDL3/SDL.h>
 
 #include <imgui.h>
 #include <imgui_impl_sdl3.h>
@@ -44,6 +36,8 @@ static SDL_Window* sWindow = NULL;
 
 static iTime sLastFrameStartTime = 0;
 static iTime targetFrameTime = SDL_NS_PER_SECOND / 60;
+
+BackendConfig gBackendConfig = { 0 };
 
 void iVSync()
 {
@@ -72,6 +66,69 @@ void iVSync()
             // TODO: Respond to inputs from inactive gamepads and switching the active gamepad to that one.
             iPadInit();
         }
+    }
+}
+
+static void sdlInit()
+{
+    SDL_SetAppMetadata("SpongeBob SquarePants: Battle for Bikini Bottom", "PC Port", "");
+    SDL_Init(SDL_INIT_GAMEPAD | SDL_INIT_AUDIO);
+    sWindow = SDL_CreateWindow("Battle for Bikini Bottom", 640, 480, 0);
+    if (sWindow == NULL)
+    {
+        SDL_Log("Failed to create window: %s", SDL_GetError());
+        exit(1);
+    }
+}
+
+static void sdlExit()
+{
+    SDL_DestroyWindow(sWindow);
+    sWindow = NULL;
+    SDL_Quit();
+}
+
+static void backendConfigInit()
+{
+    auto storage = SDL_OpenUserStorage("bfbbdecomp", "Battle For Bikini Bottom", 0);
+    if (storage != NULL)
+    {
+        static char buf[1024] = { 0 };
+        Uint64 len;
+        if (SDL_GetStorageFileSize(storage, "settings.ini", &len) && len <= sizeof(buf) &&
+            SDL_ReadStorageFile(storage, "settings.ini", buf, len))
+        {
+            xIniFile* ini = xIniParse(buf, len);
+            gBackendConfig.assetPath = SDL_strdup(xIniGetString(ini, "assetPath", ""));
+            gBackendConfig.skipPrelaunch = xIniGetInt(ini, "skipPrelaunch", 0);
+            xIniDestroy(ini);
+        }
+        SDL_CloseStorage(storage);
+    }
+}
+
+static void backendConfigDeinit()
+{
+    if (gBackendConfig.assetPath != NULL)
+    {
+        SDL_free((void*)gBackendConfig.assetPath);
+        gBackendConfig.assetPath = NULL;
+    }
+}
+
+static void backendConfigPersist()
+{
+    auto storage = SDL_OpenUserStorage("bfbbdecomp", "Battle For Bikini Bottom", 0);
+    if (storage != NULL)
+    {
+        static char buf[1024] = { 0 };
+        int n = snprintf(buf, sizeof(buf), R"([backend]
+assetPath = %s
+skipPrelaunch = %d)",
+                         gBackendConfig.assetPath, gBackendConfig.skipPrelaunch);
+        n = MIN(n, sizeof(buf));
+        SDL_WriteStorageFile(storage, "settings.ini", buf, n);
+        SDL_CloseStorage(storage);
     }
 }
 
@@ -128,9 +185,6 @@ static void RenderWareExit()
     rw::Engine::term();
 }
 
-static std::binary_semaphore semWaitForAssetPath{ 0 };
-static char sAssetsFolder[1024] = { 0 };
-
 static void imguiStyle()
 {
     ImGuiIO& io = ImGui::GetIO();
@@ -176,24 +230,71 @@ static void imguiExit()
     ImGui::Shutdown();
 }
 
+static std::binary_semaphore semWaitForAssetPath{ 0 };
 static void AssetPathSelectedCallback(void* userdata, const char* const* filelist, int filter)
 {
     if (filelist == NULL)
     {
-        printf("Could not open folder picker: %s\n", SDL_GetError());
+        SDL_Log("Could not open folder picker: %s\n", SDL_GetError());
         return;
     }
 
     const char* dir = filelist[0];
     if (dir != NULL)
     {
-        strncpy(sAssetsFolder, dir, 1024);
-        sAssetsFolder[1023] = NULL;
-        printf("Assets Folder: %s\n", sAssetsFolder);
-        // TODO: Cross platformify this
-        SetCurrentDirectory(sAssetsFolder);
+        // We can safely directly update this here in this callback as long as we are using the semaphore for sync
+        if (gBackendConfig.assetPath != NULL)
+        {
+            SDL_free((void*)gBackendConfig.assetPath);
+        }
+        gBackendConfig.assetPath = SDL_strdup(dir);
+        SDL_Log("Assets Folder Selected: %s\n", gBackendConfig.assetPath);
     }
     semWaitForAssetPath.release();
+}
+
+static void promptForNewAssetDirectory()
+{
+    SDL_ShowOpenFolderDialog(AssetPathSelectedCallback, NULL, NULL, NULL, false);
+    semWaitForAssetPath.acquire();
+    backendConfigPersist();
+}
+
+static void imguiMarqueeText(const char* text)
+{
+    float remainingWidth = ImGui::GetContentRegionAvail().x;
+    ImVec2 size = ImGui::CalcTextSize(text);
+
+    if (remainingWidth < size.x)
+    {
+        ImGuiID id = ImGui::GetID(text);
+        ImGui::PushID(id);
+
+        // Poor man's marquee text effect. Bounce between beginning and end of text. The easing function could be nicer
+        ImGuiWindow* window = ImGui::GetCurrentWindow();
+        ImGui::SetCursorPosY(window->DC.CursorPos.y + window->DC.CurrLineTextBaseOffset);
+        ImVec2 cursor = ImGui::GetCursorScreenPos();
+        ImGui::Dummy({ remainingWidth, size.y });
+
+        // Note: This never gets cleaned up. Our UI is dead simple so it probably doesn't matter much now.
+        ImGuiStorage* storage = ImGui::GetStateStorage();
+        float time = storage->GetFloat(id, 0.0f);
+        float maxOffset = remainingWidth - size.x;
+        float offset = std::lerp(maxOffset, 0, (cos(time * 0.47f) + 1) / 2.0f);
+        time += ImGui::GetIO().DeltaTime;
+        storage->SetFloat(id, time);
+
+        ImGui::PushClipRect(cursor, { cursor.x + remainingWidth, cursor.y + size.y }, true);
+        ImGui::GetWindowDrawList()->AddText({ cursor.x + offset, cursor.y },
+                                            ImGui::GetColorU32(ImGuiCol_Text), text);
+        ImGui::PopClipRect();
+
+        ImGui::PopID();
+    }
+    else
+    {
+        ImGui::Text("%s", text);
+    }
 }
 
 static void prelaunchLoop()
@@ -218,23 +319,45 @@ static void prelaunchLoop()
                          ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoBringToFrontOnFocus);
         ImGui::PopStyleVar();
 
-        if (sAssetsFolder[0] == NULL)
+        if (gBackendConfig.assetPath == NULL)
         {
-            if (ImGui::Button("Select Asset Path"))
-            {
-                // TODO: Cache this to avoid alerting every time we start the game
-                SDL_ShowOpenFolderDialog(AssetPathSelectedCallback, NULL, NULL, NULL, false);
-                semWaitForAssetPath.acquire();
-            }
+            ImGui::BeginDisabled();
+            ImGui::Button("Play");
             ImGui::SetItemTooltip("You must provide a path to an extracted Xbox iso to play.");
+            ImGui::EndDisabled();
+
+            if (ImGui::SameLine(); ImGui::Button("Select Asset Path"))
+            {
+                promptForNewAssetDirectory();
+            }
         }
         else
         {
-            if (ImGui::Button("Play"))
-                break;
+            {
+                ImGui::Text("Disk Ready:");
+                ImGui::SameLine();
+
+                imguiMarqueeText(gBackendConfig.assetPath);
+            }
+
+            {
+                if (ImGui::Button("Play"))
+                    break;
+
+                if (ImGui::SameLine(); ImGui::Button("Change Asset Path"))
+                {
+                    promptForNewAssetDirectory();
+                }
+            }
+
+            bool skipPrelaunch = gBackendConfig.skipPrelaunch;
+            ImGui::Checkbox("Skip Prelaunch", &skipPrelaunch);
+            if (skipPrelaunch != (bool)gBackendConfig.skipPrelaunch)
+            {
+                gBackendConfig.skipPrelaunch = skipPrelaunch;
+                backendConfigPersist();
+            }
         }
-        ImGui::SameLine();
-        ImGui::Text("%s", sAssetsFolder);
 
         ImGui::End();
 
@@ -247,23 +370,10 @@ static void prelaunchLoop()
 
 void iSystemInit(U32 options)
 {
-    SDL_SetAppMetadata("SpongeBob SquarePants: Battle for Bikini Bottom", "PC Port", "");
-    SDL_Init(SDL_INIT_GAMEPAD | SDL_INIT_AUDIO);
-    // Note: SDL_RunApp seems to do some necessary setup on some platforms
-    // It doesn't seem like win32 is one of those platforms, but not calling it here
-    // might give us issues int the future.
-    // I'm not sure if it's valid to call SDL_RunApp with a callback that immediately returns or not
-    SDL_SetMainReady();
-    sWindow = SDL_CreateWindow("Battle for Bikini Bottom", 640, 480, 0);
-    if (sWindow == NULL)
-    {
-        printf("Failed to create window: %s", SDL_GetError());
-        exit(1);
-    }
+    sdlInit();
 
     xDebugInit();
     xMemInit();
-    iFileInit();
     iTimeInit();
     xPadInit();
     xSndInit();
@@ -271,8 +381,13 @@ void iSystemInit(U32 options)
     xMathInit();
     xMath3Init();
 
+    backendConfigInit();
     imguiInit();
-    prelaunchLoop();
+    if (gBackendConfig.assetPath == NULL || !gBackendConfig.skipPrelaunch)
+    {
+        prelaunchLoop();
+    }
+    iFileInit();
 }
 
 void iSystemExit()
@@ -287,7 +402,8 @@ void iSystemExit()
     xMemExit();
 
     imguiExit();
-    SDL_Quit();
+    backendConfigDeinit();
+    sdlExit();
 }
 
 const char* months[] = {

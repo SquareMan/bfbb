@@ -4,6 +4,14 @@
 #include "rwplcore.h"
 #include <types.h>
 
+struct BackendConfig
+{
+    const char* assetPath;
+    S32 skipPrelaunch;
+};
+
+extern BackendConfig gBackendConfig;
+
 #define iSystemPaceFrame() iVSync()
 
 struct RwMemoryFunctions* psGetMemoryFunctions();

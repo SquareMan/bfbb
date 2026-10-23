@@ -1,6 +1,8 @@
+#include "rwplcore.h"
 #include <macros.h>
 
 #include "iFile.h"
+#include "iSystem.h"
 
 #include "xFile.h"
 
@@ -9,9 +11,12 @@
 
 #include <immintrin.h>
 #include <Windows.h>
+#include "SDL3/SDL_error.h"
+#include <SDL3/SDL_filesystem.h>
 #include <SDL3/SDL_iostream.h>
 #include <SDL3/SDL_log.h>
-#include <SDL3/SDL_filesystem.h>
+#include "SDL3/SDL_messagebox.h"
+#include "SDL3/SDL_storage.h"
 
 struct file_queue_entry
 {
@@ -22,19 +27,31 @@ struct file_queue_entry
     U32 asynckey;
 };
 
-file_queue_entry file_queue[4];
+static file_queue_entry file_queue[4];
+static SDL_Storage* sAssetStorage = NULL;
 
 void iFileInit()
 {
     memset(file_queue, 0, sizeof(file_queue));
-    for (S32 i = 0; i < 4; i++)
+    for (S32 i = 0; i < ARRAY_SIZE(file_queue); i++)
     {
         file_queue[i].stat = IFILE_RDSTAT_NOOP;
+    }
+
+    sAssetStorage = SDL_OpenTitleStorage(gBackendConfig.assetPath, 0);
+    if (sAssetStorage == NULL)
+    {
+        SDL_Log("Failed to open asset directory \"%s\": %s", gBackendConfig.assetPath,
+                SDL_GetError());
+        SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error!", "Failed to open asset directory!",
+                                 NULL);
+        exit(1);
     }
 }
 
 void iFileExit()
 {
+    SDL_CloseStorage(sAssetStorage);
 }
 
 U32* iFileLoad(const char* name, U32* buffer, U32* size)
@@ -42,10 +59,7 @@ U32* iFileLoad(const char* name, U32* buffer, U32* size)
     tag_xFile file;
     iFileOpen(name, IFILE_OPEN_READ, &file);
 
-    SDL_PathInfo info;
-    SDL_GetPathInfo(name, &info);
-
-    U32 bufSize = ALIGN_NEXT(info.size, 32);
+    U32 bufSize = ALIGN_NEXT(file.ps.size, 32);
 
     if (buffer == NULL)
     {
@@ -69,37 +83,21 @@ U32 iFileOpen(const char* name, S32 flags, tag_xFile* file)
     tag_iFile* ps = &file->ps;
     SDL_PathInfo info = {};
 
-    if (!SDL_GetPathInfo(name, &info))
+    if (!SDL_GetStoragePathInfo(sAssetStorage, name, &info))
     {
-        SDL_Log("Cannot open file \"%s\": Does not exist\n", name);
+        SDL_Log("Cannot open file \"%s\": %s", name, SDL_GetError());
         return 1;
     }
 
     ps->size = (U32)info.size;
-
-    const char* mode;
-    switch (flags)
+    ps->mem = RwMalloc(info.size);
+    if (!SDL_ReadStorageFile(sAssetStorage, name, ps->mem, info.size))
     {
-    case IFILE_OPEN_WRITE:
-        mode = "rw";
-        break;
-    case 0:
-    case IFILE_OPEN_READ:
-        mode = "rb";
-        break;
-    default:
-        assert(false && "IFILE OPEN MODE not specified");
-        return 1;
-    };
-
-    SDL_IOStream* io = SDL_IOFromFile(name, mode);
-    file->ps.io = io;
-
-    if (io == NULL)
-    {
-        SDL_Log("Failed to open file \"%s\": %s", name, SDL_GetError());
-        return 1;
+        SDL_Log("Failed to read file \"%s\": %s", name, SDL_GetError());
     }
+
+    file->ps.io = SDL_IOFromMem(ps->mem, info.size);
+    assert(file->ps.io != NULL);
 
     return 0;
 }
@@ -218,6 +216,8 @@ U32 iFileClose(tag_xFile* file)
         SDL_Log("Failed to close file: %s", SDL_GetError());
         return 1;
     }
+    RwFree(file->ps.mem);
+    file->ps.mem = NULL;
     return 0;
 }
 
@@ -244,8 +244,7 @@ void iFileSetPath(const char* path)
 
 U32 iFileFind(const char* name, tag_xFile* file)
 {
-    SDL_PathInfo info;
-    return SDL_GetPathInfo(name, &info) ? 0 : 1;
+    return iFileOpen(name, 0, file);
 }
 
 void iFileGetInfo(tag_xFile* file, U32* addr, U32* length)
