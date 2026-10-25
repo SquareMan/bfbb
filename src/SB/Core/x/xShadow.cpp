@@ -129,14 +129,14 @@ static S32 SetupShadow()
     S32 res = 256;
 #ifdef PC_PORT
     res *= gBackendConfig.shadowRes;
-#endif
-
+#else
     // Continuously halve res until it is less than or
     // equal to either display width or height.
     // On GCN, this routine normally won't happen,
     // as we're already below both dimensions.
     for (; (res > iSystemScreenWidth()) || (res > iSystemScreenHeight()); res >>= 1)
         ;
+#endif
 
     ShadowCamera = ShadowCameraCreatePersp(res);
     if (ShadowCamera == NULL)

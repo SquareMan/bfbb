@@ -429,6 +429,7 @@ static void shadowResSelector()
                 gBackendConfig.shadowRes = sShadowReses[i].res;
                 backendConfigPersist();
             }
+            ImGui::SetItemTooltip("%dx%d", 256 * sShadowReses[i].res, 256 * sShadowReses[i].res);
 
             // Set the initial focus when opening the combo (scrolling + keyboard navigation focus)
             if (isSelected)
