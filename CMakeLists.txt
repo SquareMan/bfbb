@@ -134,7 +134,6 @@ set(PLATFORM_SOURCES
     src/SB/core/sdl/iSystem.cpp
     src/SB/core/sdl/iTime.cpp
     src/SB/core/sdl/iTRC.cpp
-    src/SB/core/sdl/ngcrad3d.cpp
 )
 target_sources(bfbb
     PUBLIC
@@ -391,8 +390,6 @@ target_sources(bfbb
     src/SB/core/sdl/iSystem.h
     src/SB/core/sdl/iTime.h
     src/SB/core/sdl/iTRC.h
-    src/SB/core/sdl/ngcrad3d.c
-    src/SB/core/sdl/ngcrad3d.h
 
     PRIVATE
     src/SB/Game/zActionLine.cpp
