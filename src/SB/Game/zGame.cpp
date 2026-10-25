@@ -230,7 +230,7 @@ void zGameInit(U32 theSceneID)
     g_hiphopReloadHIP = 0;
     g_hiphopForcePortal = 0;
     gGameWhereAmI = eGameWhere_InitCamera;
-    xCameraInit(&globals.camera, 640, 480);
+    xCameraInit(&globals.camera, iSystemScreenWidth(), iSystemScreenHeight());
     zCameraReset(&globals.camera);
     xCameraSetScene(&globals.camera, globals.sceneCur);
     gGameWhereAmI = eGameWhere_InitMusic;
@@ -732,7 +732,7 @@ static void zGame_HackPostPortalAutoSaveDraw()
 
     sprintf(str, "{font=0}{i:MNU4 AUTO SAVE TXT}");
 
-    ccam = (RwCamera*)iCameraCreate(640, 480, 0);
+    ccam = (RwCamera*)iCameraCreate(iSystemScreenWidth(), iSystemScreenHeight(), 0);
 
     xtextbox tb =
         xtextbox::create(xfont::create(1, NSCREENX(19.0f), NSCREENY(22.0f), 0.0f,
@@ -1072,7 +1072,7 @@ void zGameScreenTransitionBegin()
     gGameWhereAmI = eGameWhere_TransitionBegin;
     zGameSetOstrich(eGameOstrich_Loading);
     globals.dontShowPadMessageDuringLoadingOrCutScene = '\0';
-    sGameScreenTransCam = iCameraCreate(640, 480, 0);
+    sGameScreenTransCam = iCameraCreate(iSystemScreenWidth(), iSystemScreenHeight(), 0);
     if (sGameScreenTransCam != NULL)
     {
         DirectionalLight = RpLightCreate(rpLIGHTDIRECTIONAL);
@@ -1176,15 +1176,15 @@ void zGameScreenTransitionUpdate(F32 percentComplete, CChar* msg, U8* rgba)
             RwIm2DVertexSetRGBA(&vx[0], bgr, bgg, bgb, bga);
             RwIm2DVertexSetUV(&vx[0], bgu1, bgv1);
 
-            RwIm2DVertexSetPos(&vx[1], 0.0f, 480.0f, z);
+            RwIm2DVertexSetPos(&vx[1], 0.0f, iSystemScreenHeightF(), z);
             RwIm2DVertexSetRGBA(&vx[1], bgr, bgg, bgb, bga);
             RwIm2DVertexSetUV(&vx[1], bgu1, bgv2);
 
-            RwIm2DVertexSetPos(&vx[2], 640.0f, 0.0f, z);
+            RwIm2DVertexSetPos(&vx[2], iSystemScreenWidthF(), 0.0f, z);
             RwIm2DVertexSetRGBA(&vx[2], bgr, bgg, bgb, bga);
             RwIm2DVertexSetUV(&vx[2], bgu2, bgv1);
 
-            RwIm2DVertexSetPos(&vx[3], 640.0f, 480.0f, z);
+            RwIm2DVertexSetPos(&vx[3], iSystemScreenWidthF(), iSystemScreenHeightF(), z);
             RwIm2DVertexSetRGBA(&vx[3], bgr, bgg, bgb, bga);
             RwIm2DVertexSetUV(&vx[3], bgu2, bgv2);
 

@@ -1,5 +1,6 @@
 #include "iCamera.h"
 
+#include "rwcore.h"
 #include "xShadow.h"
 
 #include "iScrFX.h"
@@ -96,6 +97,26 @@ void iCameraDestroy(RwCamera* camera)
 
 void iCameraBegin(RwCamera* cam, S32 clear)
 {
+#ifdef PC_PORT
+    // NOTE: This isn't necessarily exactly what we want to do.
+    // Any cameras with raster sizes not intended to match the screen would be resized by this.
+    // Luckily it seems this path is never reached for those cases (shadow render code doesn't call this).
+    F32 screenWidth = iSystemScreenWidth();
+    F32 screenHeight = iSystemScreenHeight();
+    if (cam->frameBuffer && screenWidth != cam->frameBuffer->width ||
+        screenHeight != cam->frameBuffer->height)
+    {
+        cam->frameBuffer->width = screenWidth;
+        cam->frameBuffer->height = screenHeight;
+    }
+
+    if (cam->zBuffer && screenWidth != cam->zBuffer->width || screenHeight != cam->zBuffer->height)
+    {
+        cam->zBuffer->width = screenWidth;
+        cam->zBuffer->height = screenHeight;
+    }
+#endif
+
     if (clear)
     {
         if (xglobals->fog.type != rwFOGTYPENAFOGTYPE)
@@ -223,7 +244,22 @@ void iCameraSetFOV(RwCamera* cam, F32 fov)
 {
     RwV2d vw;
 
-    vw.y = 0.75f * (vw.x = itan(PI * (0.5f * fov) / 180.0f));
+    vw.y =
+        (iSystemScreenHeightF() / (F32)iSystemScreenWidthF()) * (vw.x = itan(DEG2RAD(0.5f * fov)));
+
+#ifdef PC_PORT
+    // The game specifies fov values as horizontal FOV, however for gameplay purposes,
+    // It is much beter to keep the vertical size consistent, so we need to convert it.
+    F32 origInvAspect = (480.0f / 640.0f);
+    F32 newInvAspect = (iSystemScreenHeightF() / iSystemScreenWidthF());
+
+    if (origInvAspect != newInvAspect)
+    {
+        F32 correctionFactor = (origInvAspect / newInvAspect);
+        vw.x *= correctionFactor;
+        vw.y *= correctionFactor;
+    }
+#endif
 
     RwCameraSetViewWindow(cam, &vw);
 }
@@ -368,15 +404,15 @@ void iCameraSetFogRenderStates()
     }
     else
     {
-        #ifdef WITH_LIBRW
-        // hmmm, this one's odd. RwRGBA is defined in RGBA order in RW and librw, but it seems that 
+#ifdef WITH_LIBRW
+        // hmmm, this one's odd. RwRGBA is defined in RGBA order in RW and librw, but it seems that
         // actual RW wanted BGRA for fogcolor. librw unpacks this int in RGBA order instead
         bite_me = (pFogParams->fogcolor.alpha << 24) | (pFogParams->fogcolor.blue << 16) |
                   (pFogParams->fogcolor.green << 8) | pFogParams->fogcolor.red;
-        #else
+#else
         bite_me = (pFogParams->fogcolor.alpha << 24) | (pFogParams->fogcolor.red << 16) |
                   (pFogParams->fogcolor.green << 8) | pFogParams->fogcolor.blue;
-        #endif
+#endif
 
         RwRenderStateSet(rwRENDERSTATEFOGENABLE, (void*)TRUE);
         RwRenderStateSet(rwRENDERSTATEFOGTYPE, (void*)pFogParams->type);

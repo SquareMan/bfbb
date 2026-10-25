@@ -39,8 +39,7 @@
 static const basic_rect<F32> screen_bounds = { 0, 0, 1, 1 };
 
 // SLOP: Needs to be in header
-template<>
-basic_rect<F32>& basic_rect<F32>::scale(F32 x, F32 y, F32 w, F32 h)
+template <> basic_rect<F32>& basic_rect<F32>::scale(F32 x, F32 y, F32 w, F32 h)
 {
     this->x *= x;
     this->y *= y;
@@ -49,14 +48,12 @@ basic_rect<F32>& basic_rect<F32>::scale(F32 x, F32 y, F32 w, F32 h)
     return *this;
 }
 
-template<>
-basic_rect<F32>& basic_rect<F32>::scale(F32 x, F32 y)
+template <> basic_rect<F32>& basic_rect<F32>::scale(F32 x, F32 y)
 {
     return scale(x, y, x, y);
 }
 
-template<>
-basic_rect<F32>& basic_rect<F32>::assign(F32 x, F32 y, F32 w, F32 h)
+template <> basic_rect<F32>& basic_rect<F32>::assign(F32 x, F32 y, F32 w, F32 h)
 {
     this->x = x;
     this->y = y;
@@ -65,14 +62,12 @@ basic_rect<F32>& basic_rect<F32>::assign(F32 x, F32 y, F32 w, F32 h)
     return *this;
 }
 
-template<>
-bool basic_rect<F32>::empty() const
+template <> bool basic_rect<F32>::empty() const
 {
     return (w <= 0.0f || h <= 0.0f);
 }
 
-template<>
-void basic_rect<F32>::clip(basic_rect<F32>& a, basic_rect<F32>& b) const
+template <> void basic_rect<F32>::clip(basic_rect<F32>& a, basic_rect<F32>& b) const
 {
     F32 bwaw = b.w / a.w;
     F32 bwah = b.h / a.h;
@@ -118,8 +113,7 @@ void basic_rect<F32>::clip(basic_rect<F32>& a, basic_rect<F32>& b) const
     }
 }
 
-template<>
-void basic_rect<F32>::set_bounds(F32 x1, F32 y1, F32 x2, F32 y2)
+template <> void basic_rect<F32>::set_bounds(F32 x1, F32 y1, F32 x2, F32 y2)
 {
     x = x1;
     w = x2 - x1;
@@ -127,8 +121,7 @@ void basic_rect<F32>::set_bounds(F32 x1, F32 y1, F32 x2, F32 y2)
     h = y2 - y1;
 }
 
-template<>
-void basic_rect<F32>::get_bounds(F32& x1, F32& y1, F32& x2, F32& y2) const
+template <> void basic_rect<F32>::get_bounds(F32& x1, F32& y1, F32& x2, F32& y2) const
 {
     F32 tx = x;
     F32 ty = y;
@@ -141,9 +134,7 @@ void basic_rect<F32>::get_bounds(F32& x1, F32& y1, F32& x2, F32& y2) const
     y2 = by;
 }
 
-
-template<>
-basic_rect<F32>& basic_rect<F32>::operator|=(const basic_rect<F32>& other)
+template <> basic_rect<F32>& basic_rect<F32>::operator|=(const basic_rect<F32>& other)
 {
     F32 x1, y1, x2, y2;
     F32 _x1, _y1, _x2, _y2;
@@ -175,16 +166,14 @@ basic_rect<F32>& basic_rect<F32>::operator|=(const basic_rect<F32>& other)
 
     return *this;
 }
-template<>
-basic_rect<F32>& basic_rect<F32>::move(F32 x, F32 y)
+template <> basic_rect<F32>& basic_rect<F32>::move(F32 x, F32 y)
 {
     this->x += x;
     this->y += y;
     return *this;
 }
 
-template<>
-basic_rect<F32>& basic_rect<F32>::scale(F32 s)
+template <> basic_rect<F32>& basic_rect<F32>::scale(F32 s)
 {
     return scale(s, s, s, s);
 }
@@ -592,7 +581,7 @@ namespace
 
         RwIm2DVertex* vert = &vert_buffer[vert_buffer_used];
 
-        r.scale(640.0f, 480.0f);
+        r.scale(iSystemScreenWidthF(), iSystemScreenHeightF());
 
         set_vert(vert[0], r.x, r.y, rt.x, rt.y, color);
         set_vert(vert[1], r.x, r.y + r.h, rt.x, rt.y + rt.h, color);
@@ -3533,7 +3522,8 @@ namespace
 {
     xVec2 get_texture_size(RwRaster& raster)
     {
-        const xVec2 vec = { raster.width / 640.0f, raster.height / 480.0f };
+        const xVec2 vec = { raster.width / iSystemScreenWidthF(),
+                            raster.height / iSystemScreenHeightF() };
         return vec;
     }
 
@@ -3803,7 +3793,7 @@ void render_fill_rect(const basic_rect<F32>& bounds, iColor_tag color)
         RwIm2DVertex vert[4];
         basic_rect<F32> r = bounds;
 
-        r.scale(640.0f, 480.0f);
+        r.scale(iSystemScreenWidthF(), iSystemScreenHeightF());
 
         set_rect_verts(vert, r.x, r.y, r.w, r.h, color, rcz, nsz);
         RwIm2DRenderPrimitive(rwPRIMTYPETRISTRIP, vert, 4);
@@ -3831,7 +3821,6 @@ namespace
         RwIm2DVertexSetRecipCameraZ(&vert, rcz);
     }
 } // namespace
-
 
 xVec2& xVec2::assign(F32 x, F32 y)
 {

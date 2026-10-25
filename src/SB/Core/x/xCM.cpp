@@ -6,6 +6,8 @@
 #include "xShadow.h"
 #include "xVec3.h"
 
+#include "iSystem.h"
+
 #include <rwplcore.h>
 #include <stdio.h>
 #include <types.h>
@@ -176,10 +178,10 @@ static U32 xCMrender(F32 time, xCreditsData* data)
                     if (tex->texture != NULL)
                         RwRenderStateSet(rwRENDERSTATETEXTURERASTER, tex->texture->raster);
 
-                    F32 x0 = 640.0f * tex->x;
-                    F32 y0 = 480.0f * tex->y;
-                    F32 x1 = 640.0f * (tex->x + tex->w);
-                    F32 y1 = 480.0f * (tex->y + tex->h);
+                    F32 x0 = iSystemScreenWidthF() * tex->x;
+                    F32 y0 = iSystemScreenHeightF() * tex->y;
+                    F32 x1 = iSystemScreenWidthF() * (tex->x + tex->w);
+                    F32 y1 = iSystemScreenHeightF() * (tex->y + tex->h);
                     Im2DRenderQuad(x0, y0, x1, y1, 0.0f, 1000000.0f, 0.5f);
                     xprintf("tex %6.2f,%6.2f - %6.2f,%6.2f\n", x0, y0, x1, y1);
                     break;

@@ -37,7 +37,28 @@ static SDL_Window* sWindow = NULL;
 static iTime sLastFrameStartTime = 0;
 static iTime targetFrameTime = SDL_NS_PER_SECOND / 60;
 
-BackendConfig gBackendConfig = { 0 };
+BackendConfig gBackendConfig = { NULL, FALSE, FALSE, 640, 480 };
+
+static void backendConfigPersist()
+{
+    auto storage = SDL_OpenUserStorage("bfbbdecomp", "Battle For Bikini Bottom", 0);
+    if (storage != NULL)
+    {
+        static char buf[1024] = { 0 };
+        int n = snprintf(buf, sizeof(buf), R"([backend]
+assetPath = %s
+skipPrelaunch = %d
+fullscreen = %d
+windowWidth = %d
+windowHeight = %d)",
+                         gBackendConfig.assetPath, gBackendConfig.skipPrelaunch,
+                         gBackendConfig.fullscreen, gBackendConfig.windowWidth,
+                         gBackendConfig.windowHeight);
+        n = MIN(n, sizeof(buf));
+        SDL_WriteStorageFile(storage, "settings.ini", buf, n);
+        SDL_CloseStorage(storage);
+    }
+}
 
 void iVSync()
 {
@@ -61,10 +82,19 @@ void iVSync()
             // TODO: Graceful shutdown
             iSystemExit();
             exit(0);
+            break;
+        case SDL_EVENT_WINDOW_RESIZED:
+            if (SDL_GetWindowFlags(sWindow) & SDL_WINDOW_FULLSCREEN)
+                break;
+            gBackendConfig.windowWidth = event.window.data1;
+            gBackendConfig.windowHeight = event.window.data2;
+            backendConfigPersist();
+            break;
         case SDL_EVENT_GAMEPAD_ADDED:
         case SDL_EVENT_GAMEPAD_REMOVED:
             // TODO: Respond to inputs from inactive gamepads and switching the active gamepad to that one.
             iPadInit();
+            break;
         }
     }
 }
@@ -73,7 +103,14 @@ static void sdlInit()
 {
     SDL_SetAppMetadata("SpongeBob SquarePants: Battle for Bikini Bottom", "PC Port", "");
     SDL_Init(SDL_INIT_GAMEPAD | SDL_INIT_AUDIO);
-    sWindow = SDL_CreateWindow("Battle for Bikini Bottom", 640, 480, 0);
+
+    SDL_WindowFlags windowFlags = SDL_WINDOW_RESIZABLE;
+    if (gBackendConfig.fullscreen)
+    {
+        windowFlags |= SDL_WINDOW_FULLSCREEN;
+    }
+    sWindow = SDL_CreateWindow("Battle for Bikini Bottom", gBackendConfig.windowWidth,
+                               gBackendConfig.windowHeight, windowFlags);
     if (sWindow == NULL)
     {
         SDL_Log("Failed to create window: %s", SDL_GetError());
@@ -100,7 +137,10 @@ static void backendConfigInit()
         {
             xIniFile* ini = xIniParse(buf, len);
             gBackendConfig.assetPath = SDL_strdup(xIniGetString(ini, "assetPath", ""));
-            gBackendConfig.skipPrelaunch = xIniGetInt(ini, "skipPrelaunch", 0);
+            gBackendConfig.skipPrelaunch = xIniGetInt(ini, "skipPrelaunch", FALSE);
+            gBackendConfig.fullscreen = xIniGetInt(ini, "fullscreen", FALSE);
+            gBackendConfig.windowWidth = xIniGetInt(ini, "windowWidth", 640);
+            gBackendConfig.windowHeight = xIniGetInt(ini, "windowHeight", 480);
             xIniDestroy(ini);
         }
         SDL_CloseStorage(storage);
@@ -113,22 +153,6 @@ static void backendConfigDeinit()
     {
         SDL_free((void*)gBackendConfig.assetPath);
         gBackendConfig.assetPath = NULL;
-    }
-}
-
-static void backendConfigPersist()
-{
-    auto storage = SDL_OpenUserStorage("bfbbdecomp", "Battle For Bikini Bottom", 0);
-    if (storage != NULL)
-    {
-        static char buf[1024] = { 0 };
-        int n = snprintf(buf, sizeof(buf), R"([backend]
-assetPath = %s
-skipPrelaunch = %d)",
-                         gBackendConfig.assetPath, gBackendConfig.skipPrelaunch);
-        n = MIN(n, sizeof(buf));
-        SDL_WriteStorageFile(storage, "settings.ini", buf, n);
-        SDL_CloseStorage(storage);
     }
 }
 
@@ -147,11 +171,14 @@ static RwTexture* TextureRead(const RwChar* name, const RwChar* maskName)
     return asset;
 }
 
-static void RenderWareInit()
+static void RenderWareInitEngine()
 {
     // TODO: setup memfuncs
     rw::Engine::init(NULL);
+}
 
+static void RenderWareInit()
+{
     rw::registerMeshPlugin();
     RpCollisionPluginAttach();
     RpWorldPluginAttach();
@@ -211,7 +238,8 @@ static void imguiInit()
 
     sImguiCamera = RwCameraCreate();
     RwCameraSetFrame(sImguiCamera, RwFrameCreate());
-    sImguiCamera->frameBuffer = RwRasterCreate(640, 480, 1, rwRASTERTYPECAMERA);
+    sImguiCamera->frameBuffer =
+        RwRasterCreate(iSystemScreenWidth(), iSystemScreenHeight(), 1, rwRASTERTYPECAMERA);
 }
 
 static void imguiExit()
@@ -297,6 +325,69 @@ static void imguiMarqueeText(const char* text)
     }
 }
 
+struct WindowSize
+{
+    const char* disp;
+    S32 width;
+    S32 height;
+};
+
+#define WINDOWSIZE(_w, _h) { #_w "x" #_h, _w, _h }
+
+static WindowSize sWindowSizes[] = {
+    // 4:3
+    WINDOWSIZE(640, 480),
+    WINDOWSIZE(1280, 960),
+    WINDOWSIZE(1920, 1440),
+    // 16:9
+    WINDOWSIZE(1280, 720),
+    WINDOWSIZE(1920, 1080),
+    WINDOWSIZE(2560, 1440),
+    WINDOWSIZE(3840, 2160),
+};
+
+static void windowSizeSelector()
+{
+    SDL_Rect r;
+    SDL_GetDisplayUsableBounds(SDL_GetDisplayForWindow(sWindow), &r);
+
+    S32 selectedSize = -1;
+    for (S32 i = 0; i < ARRAY_SIZE(sWindowSizes); i++)
+    {
+        if (sWindowSizes[i].width == gBackendConfig.windowWidth &&
+            sWindowSizes[i].height == gBackendConfig.windowHeight)
+        {
+            selectedSize = i;
+            break;
+        }
+    }
+
+    ImGui::BeginDisabled(SDL_GetWindowFlags(sWindow) & SDL_WINDOW_FULLSCREEN);
+    if (ImGui::BeginCombo("Window Size", selectedSize >= 0 ? sWindowSizes[selectedSize].disp : ""))
+    {
+        for (S32 i = 0; i < ARRAY_SIZE(sWindowSizes); i++)
+        {
+            if (sWindowSizes[i].width > r.w || sWindowSizes[i].height > r.h)
+            {
+                continue;
+            }
+            bool isSelected = i == selectedSize;
+            if (ImGui::Selectable(sWindowSizes[i].disp))
+            {
+                SDL_SetWindowSize(sWindow, sWindowSizes[i].width, sWindowSizes[i].height);
+            }
+            if (isSelected)
+            {
+                ImGui::SetItemDefaultFocus();
+            }
+        }
+
+        ImGui::EndCombo();
+    }
+    ImGui::SetItemTooltip("Only for non-fullscreen windows");
+    ImGui::EndDisabled();
+}
+
 static void prelaunchLoop()
 {
     RwRGBA clear = { 0, 0, 0, 255 };
@@ -307,9 +398,6 @@ static void prelaunchLoop()
         ImGui_ImplRW_NewFrame();
         ImGui::NewFrame();
 
-        RwCameraClear(sImguiCamera, &clear, rwCAMERACLEARIMAGE);
-        RwCameraBeginUpdate(sImguiCamera);
-
         const ImGuiViewport* viewport = ImGui::GetMainViewport();
         ImGui::SetNextWindowSize(viewport->Size);
         ImGui::SetNextWindowPos(ImVec2{ viewport->Pos.x, viewport->Pos.y });
@@ -319,7 +407,7 @@ static void prelaunchLoop()
                          ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoBringToFrontOnFocus);
         ImGui::PopStyleVar();
 
-        if (gBackendConfig.assetPath == NULL)
+        if (gBackendConfig.assetPath == NULL || gBackendConfig.assetPath[0] == 0)
         {
             ImGui::BeginDisabled();
             ImGui::Button("Play");
@@ -336,32 +424,63 @@ static void prelaunchLoop()
             {
                 ImGui::Text("Disk Ready:");
                 ImGui::SameLine();
-
                 imguiMarqueeText(gBackendConfig.assetPath);
-            }
 
-            {
                 if (ImGui::Button("Play"))
                     break;
-
                 if (ImGui::SameLine(); ImGui::Button("Change Asset Path"))
                 {
                     promptForNewAssetDirectory();
                 }
             }
 
-            bool skipPrelaunch = gBackendConfig.skipPrelaunch;
-            ImGui::Checkbox("Skip Prelaunch", &skipPrelaunch);
-            if (skipPrelaunch != (bool)gBackendConfig.skipPrelaunch)
             {
-                gBackendConfig.skipPrelaunch = skipPrelaunch;
-                backendConfigPersist();
+                ImGui::Spacing();
+                ImGui::Spacing();
+                ImGui::Text("Video Settings - EXPERIMENTAL");
+                ImGui::SetItemTooltip(
+                    "Using resolutions other than 640x480 is currently experimental.");
+                ImGui::Separator();
+
+                windowSizeSelector();
+
+                if (ImGui::Button("Toggle Fullscreen"))
+                {
+                    gBackendConfig.fullscreen = !gBackendConfig.fullscreen;
+                    SDL_SetWindowFullscreen(sWindow, gBackendConfig.fullscreen);
+                    backendConfigPersist();
+                }
+                ImGui::SetItemTooltip("Fullscreen always renders at screen resolution");
+            }
+
+            {
+                ImGui::SetCursorPosY(ImGui::GetContentRegionMax().y - ImGui::GetTextLineHeight());
+                bool skipPrelaunch = gBackendConfig.skipPrelaunch;
+                ImGui::Checkbox("Skip Prelaunch", &skipPrelaunch);
+                ImGui::SetItemTooltip(
+                    "WARNING: Currently not possible to revert this without editing settings.ini manually.\nSkip this menu when starting the game in the future and use saved options.");
+                if (skipPrelaunch != (bool)gBackendConfig.skipPrelaunch)
+                {
+                    gBackendConfig.skipPrelaunch = skipPrelaunch;
+                    backendConfigPersist();
+                }
             }
         }
 
         ImGui::End();
-
         ImGui::Render();
+
+        if (sImguiCamera->frameBuffer->width != iSystemScreenWidth() ||
+            sImguiCamera->frameBuffer->height != iSystemScreenHeight())
+        {
+            RwRasterDestroy(sImguiCamera->frameBuffer);
+            sImguiCamera->frameBuffer =
+                RwRasterCreate(iSystemScreenWidth(), iSystemScreenHeight(), 1, rwRASTERTYPECAMERA);
+        }
+
+        RwCameraClear(sImguiCamera, &clear, rwCAMERACLEARIMAGE);
+        RwCameraBeginUpdate(sImguiCamera);
+
         ImGui_ImplRW_RenderDrawLists(ImGui::GetDrawData());
         RwCameraEndUpdate(sImguiCamera);
         RwCameraShowRaster(sImguiCamera, NULL, rwRASTERFLIPWAITVSYNC);
@@ -370,6 +489,8 @@ static void prelaunchLoop()
 
 void iSystemInit(U32 options)
 {
+    RenderWareInitEngine();
+    backendConfigInit();
     sdlInit();
 
     xDebugInit();
@@ -381,7 +502,6 @@ void iSystemInit(U32 options)
     xMathInit();
     xMath3Init();
 
-    backendConfigInit();
     imguiInit();
     if (gBackendConfig.assetPath == NULL || !gBackendConfig.skipPrelaunch)
     {
@@ -497,4 +617,18 @@ U32 iGetCurrFormattedTime(char* input)
     *input++ = '\0';
 
     return input - start;
+}
+
+S32 iSystemScreenWidth()
+{
+    S32 w, h;
+    SDL_GetWindowSize(sWindow, &w, &h);
+    return w;
+}
+
+S32 iSystemScreenHeight()
+{
+    S32 w, h;
+    SDL_GetWindowSize(sWindow, &w, &h);
+    return h;
 }

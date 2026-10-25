@@ -19,6 +19,7 @@
 #include "xTRC.h"
 
 #include "iMath.h"
+#include "iSystem.h"
 
 #include <stdlib.h>
 #include <string.h>
@@ -814,8 +815,8 @@ void zUI_Render(xEnt* ent)
                 U8 g = 0xFF;
                 U8 b = 0xFF;
                 U8 a = 0xFF;
-                F32 w = 640.0f;
-                F32 h = 480.0f;
+                F32 w = iSystemScreenWidthF();
+                F32 h = iSystemScreenHeightF();
 
                 F32 u1 = ui->sasset->uva[0];
                 F32 v1 = ui->sasset->uva[1];
@@ -829,6 +830,13 @@ void zUI_Render(xEnt* ent)
                 F32 y1 = h * ui->sasset->pos.y / h;
                 F32 x2 = w * (ui->sasset->pos.x + ui->sasset->dim[0]) / w;
                 F32 y2 = h * (ui->sasset->pos.y + ui->sasset->dim[1]) / h;
+
+#ifdef PC_PORT
+                x1 *= iSystemScreenWidthF() / 640.0f;
+                x2 *= iSystemScreenWidthF() / 640.0f;
+                y1 *= iSystemScreenHeightF() / 480.0f;
+                y2 *= iSystemScreenHeightF() / 480.0f;
+#endif
 
                 F32 z = RwIm2DGetNearScreenZ();
                 F32 cz = z;

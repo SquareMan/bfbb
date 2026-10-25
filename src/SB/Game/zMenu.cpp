@@ -65,7 +65,7 @@ void zMenuInit(U32 theSceneID)
     iTimeGet();
     xrand();
     zSceneInit(theSceneID, 0);
-    xCameraInit(&globals.camera, 0x280, 0x1e0);
+    xCameraInit(&globals.camera, iSystemScreenWidth(), iSystemScreenHeight());
     zCameraReset(&globals.camera);
     xCameraSetScene(&globals.camera, globals.sceneCur);
     zMusicInit();

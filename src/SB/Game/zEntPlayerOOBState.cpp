@@ -12,6 +12,8 @@
 #include "xScrFx.h"
 #include "zSaveLoad.h"
 
+#include "iSystem.h"
+
 #include <rwcore.h>
 #include <types.h>
 #include <rwplcore.h>
@@ -47,7 +49,6 @@ void __deadstripped_zEntPlayerOOBState2()
 {
     const char _792[0x10] = {};
 }
-
 
 namespace oob_state
 {
@@ -253,12 +254,13 @@ namespace oob_state
             F32 rcz = RwIm2DGetFarScreenZ();
 
             RwIm2DVertex vert[4];
-            set_rect_verts((RwIm2DVertex*)vert, 0.0f, 0.0f, 640.0f, 480.0f, color, rcz, nsz);
+            set_rect_verts((RwIm2DVertex*)vert, 0.0f, 0.0f, iSystemScreenWidthF(),
+                           iSystemScreenHeightF(), color, rcz, nsz);
             RwIm2DRenderPrimitive(rwPRIMTYPETRISTRIP, (RwIm2DVertex*)vert, 4);
         }
 
-        static void set_rect_verts(RwIm2DVertex* verts, F32 x, F32 y, F32 w, F32 h,
-                                   iColor_tag c, F32 rcz, F32 nsz)
+        static void set_rect_verts(RwIm2DVertex* verts, F32 x, F32 y, F32 w, F32 h, iColor_tag c,
+                                   F32 rcz, F32 nsz)
         {
             set_rect_vert(verts[0], x, y, rcz, c, nsz);
             set_rect_vert(verts[1], x, y + h, rcz, c, nsz);
@@ -266,8 +268,7 @@ namespace oob_state
             set_rect_vert(verts[3], x + w, y + h, rcz, c, nsz);
         }
 
-        static void set_rect_vert(RwIm2DVertex& vert, F32 x, F32 y, F32 z, iColor_tag c,
-                                  F32 rcz)
+        static void set_rect_vert(RwIm2DVertex& vert, F32 x, F32 y, F32 z, iColor_tag c, F32 rcz)
         {
             RwIm2DVertexSetPos(&vert, x, y, z);
             RwIm2DVertexSetRGBA(&vert, c.r, c.g, c.b, c.a);
@@ -400,13 +401,13 @@ void oob_state::init()
 
     static in_state_type in_state;
     shared.states[0] = &in_state;
-    
+
     static out_state_type out_state;
     shared.states[1] = &out_state;
-    
+
     static grab_state_type grab_state;
     shared.states[2] = &grab_state;
-    
+
     static drop_state_type drop_state;
     shared.states[3] = &drop_state;
 
@@ -775,7 +776,8 @@ namespace oob_state
 
             if (assume_player_is_stupid())
             {
-                shared.tutorial->start_talk(xStrHash("out_of_bounds_txt"), (ztalkbox::callback*)&cb, NULL);
+                shared.tutorial->start_talk(xStrHash("out_of_bounds_txt"), (ztalkbox::callback*)&cb,
+                                            NULL);
                 return SS_TUTORIAL;
             }
 
@@ -847,7 +849,7 @@ namespace oob_state
         grab_state_type::tutorial_callback::tutorial_callback(grab_state_type& owner) : owner(owner)
         {
         }
-        
+
         out_state_type::out_state_type() : state_type(STATE_OUT)
         {
         }
@@ -856,13 +858,9 @@ namespace oob_state
         {
         }
 
-        void state_type::start()
-        {
-        };
+        void state_type::start() {};
 
-        void state_type::stop()
-        {
-        };
+        void state_type::stop() {};
     } // namespace
 } // namespace oob_state
 
@@ -900,7 +898,6 @@ U8 oob_state::update(xScene& scene, F32 dt)
         shared.state = shared.states[newtype];
         shared.state->start();
     }
-
 
     return shared.control;
 }
@@ -951,7 +948,7 @@ void oob_state::fx_render()
         render_fade();
         render_ghost();
     }
-    
+
     if (shared.render_hand && shared.model != NULL)
     {
         render_hand();
@@ -1007,8 +1004,7 @@ namespace oob_state
             shared.control = 0;
         };
 
-        void in_state_type::stop()
-        {
+        void in_state_type::stop() {
 
         };
 
@@ -1072,13 +1068,13 @@ namespace oob_state
                     return STATE_GRAB;
                 }
             }
-            else 
+            else
             {
                 if (!globals.player.JumpState)
                 {
                     shared.reset_time = 0.0f;
                 }
-                
+
                 shared.reset_time -= dt;
                 if (shared.reset_time <= 0.0f)
                 {
@@ -1100,7 +1096,7 @@ namespace oob_state
             shared.flags |= 0x4;
             shared.vertical = xabs(fixed.in_loc.y - fixed.out_loc.y) > 0.01f;
             shared.control = TRUE;
-            
+
             this->move_substate = shared.model != NULL ? SS_REORIENT : SS_INVALID;
             this->reorient_time = fixed.reorient_time;
 
@@ -1193,12 +1189,12 @@ namespace oob_state
         {
             this->player_start = globals.player.cp.pos;
             this->move_substate = shared.model != NULL ? SS_MOVING_IN : SS_INVALID;
-            
+
             shared.vel = fixed.drop.in_vel;
             shared.accel = 0.0f;
             shared.loc.x = fixed.out_loc.x;
             shared.loc.y = fixed.out_loc.y;
-            
+
             this->fade_substate = SS_START_FADE_IN;
             this->fade_start_time = fixed.drop.fade_start_time;
             this->fade_time = fixed.drop.fade_time;
@@ -1210,7 +1206,7 @@ namespace oob_state
             globals.player.ControlOffTimer = FLOAT_MAX;
             xScrFxStopFade();
             zCameraDisableInput();
-            
+
             xModelInstance& m = *p.model;
             xEntFrame& f = *p.frame;
 
@@ -1227,8 +1223,10 @@ namespace oob_state
             set_camera(true);
             globals.camera.tgt_omat = &shared_target;
             globals.camera.tgt_mat = &shared_target;
-            xCameraMove(&globals.camera, 0x20, fixed.cam_dist, fixed.cam_height, PI + globals.player.cp.rot, 0.0f, 0.0f, 0.0f);
-            xCameraLookYPR(&globals.camera, 0x0, globals.player.cp.rot, fixed.cam_pitch, 0.0f, 0.0f, 0.0f, 0.0f);
+            xCameraMove(&globals.camera, 0x20, fixed.cam_dist, fixed.cam_height,
+                        PI + globals.player.cp.rot, 0.0f, 0.0f, 0.0f);
+            xCameraLookYPR(&globals.camera, 0x0, globals.player.cp.rot, fixed.cam_pitch, 0.0f, 0.0f,
+                           0.0f, 0.0f);
         }
 
         void drop_state_type::stop()
@@ -1237,7 +1235,7 @@ namespace oob_state
             globals.player.ControlOffTimer = 1.0f;
 
             reset_camera();
-            
+
             shared.render_hand = FALSE;
             shared.fade_alpha = 1.0f;
             shared.flags &= ~0x4;

@@ -8,11 +8,18 @@ struct BackendConfig
 {
     const char* assetPath;
     S32 skipPrelaunch;
+    S32 fullscreen;
+    S32 windowWidth;
+    S32 windowHeight;
 };
 
 extern BackendConfig gBackendConfig;
 
 #define iSystemPaceFrame() iVSync()
+S32 iSystemScreenWidth();
+S32 iSystemScreenHeight();
+#define iSystemScreenWidthF() ((F32)iSystemScreenWidth())
+#define iSystemScreenHeightF() ((F32)iSystemScreenHeight())
 
 struct RwMemoryFunctions* psGetMemoryFunctions();
 

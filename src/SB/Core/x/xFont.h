@@ -298,6 +298,8 @@ struct xtextbox::layout
 
 void render_fill_rect(const basic_rect<F32>& bounds, iColor_tag color);
 
+// PC PORT: Since assets were authored against 640x480, leave this unchanged
+// to keep the relative position unchanged
 inline F32 NSCREENX(F32 scale)
 {
     return (1.0f / 640) * scale;

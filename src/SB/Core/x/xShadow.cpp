@@ -17,6 +17,8 @@
 #include "zEnt.h"
 #include "zGlobals.h"
 
+#include "iSystem.h"
+
 #include <types.h>
 #include <stdlib.h>
 #include <string.h>
@@ -124,7 +126,7 @@ static S32 SetupShadow()
     // equal to either display width or height.
     // On GCN, this routine normally won't happen,
     // as we're already below both dimensions.
-    for (; (res > 640) || (res > 480); res >>= 1)
+    for (; (res > iSystemScreenWidth()) || (res > iSystemScreenHeight()); res >>= 1)
         ;
 
     ShadowCamera = ShadowCameraCreatePersp(res);

@@ -6,6 +6,10 @@
 #include <dolphin.h>
 
 #define iSystemPaceFrame()
+#define iSystemScreenWidth() 640
+#define iSystemScreenHeight() 480
+#define iSystemScreenWidthF() 640.0f
+#define iSystemScreenHeightF() 480.0f
 
 extern "C" {
 void* malloc(U32 __size);
