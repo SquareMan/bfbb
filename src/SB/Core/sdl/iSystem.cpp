@@ -1,15 +1,10 @@
-#include "imgui_internal.h"
 #include <Windows.h>
-
-#include "iSystem.h"
-
-#include <cmath>
-#include <cstdio>
-#include <cstdlib>
-#include <cstring>
+#include <macros.h>
 #include <rwcore.h>
 #include <rpcollbsptree.h>
 #include <rpptank.h>
+
+#include "iSystem.h"
 
 #include "xDebug.h"
 #include "xFX.h"
@@ -22,6 +17,11 @@
 #include "iFile.h"
 #include "iSystem.h"
 
+#include <cmath>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
+
 // Seems that <wchar.h> uses sse2 intrinsics which aren't included by default?
 #include <immintrin.h>
 #include <semaphore>
@@ -29,6 +29,7 @@
 #include <SDL3/SDL.h>
 
 #include <imgui.h>
+#include <imgui_internal.h>
 #include <imgui_impl_sdl3.h>
 #include <imgui_impl_rw.h>
 
@@ -45,15 +46,19 @@ static void backendConfigPersist()
     if (storage != NULL)
     {
         static char buf[1024] = { 0 };
-        int n = snprintf(buf, sizeof(buf), R"([backend]
+        const char* fileTemplate = &R"(
+[backend]
 assetPath = %s
 skipPrelaunch = %d
 fullscreen = %d
 windowWidth = %d
-windowHeight = %d)",
-                         gBackendConfig.assetPath, gBackendConfig.skipPrelaunch,
-                         gBackendConfig.fullscreen, gBackendConfig.windowWidth,
-                         gBackendConfig.windowHeight);
+windowHeight = %d
+shadowRes = %d)"[1];
+
+        int n = snprintf(buf, sizeof(buf), fileTemplate, gBackendConfig.assetPath,
+                         gBackendConfig.skipPrelaunch, gBackendConfig.fullscreen,
+                         gBackendConfig.windowWidth, gBackendConfig.windowHeight,
+                         gBackendConfig.shadowRes);
         n = MIN(n, sizeof(buf));
         SDL_WriteStorageFile(storage, "settings.ini", buf, n);
         SDL_CloseStorage(storage);
@@ -141,6 +146,7 @@ static void backendConfigInit()
             gBackendConfig.fullscreen = xIniGetInt(ini, "fullscreen", FALSE);
             gBackendConfig.windowWidth = xIniGetInt(ini, "windowWidth", 640);
             gBackendConfig.windowHeight = xIniGetInt(ini, "windowHeight", 480);
+            gBackendConfig.shadowRes = xIniGetInt(ini, "shadowRes", 1);
             xIniDestroy(ini);
         }
         SDL_CloseStorage(storage);
@@ -175,10 +181,6 @@ static void RenderWareInitEngine()
 {
     // TODO: setup memfuncs
     rw::Engine::init(NULL);
-}
-
-static void RenderWareInit()
-{
     rw::registerMeshPlugin();
     RpCollisionPluginAttach();
     RpWorldPluginAttach();
@@ -187,7 +189,10 @@ static void RenderWareInit()
     rw::registerMatFXPlugin();
     rw::registerUserDataPlugin();
     RpPTankPluginAttach();
+}
 
+static void RenderWareInit()
+{
     SDL_PropertiesID props = SDL_GetWindowProperties(sWindow);
     HWND hWnd = (HWND)SDL_GetPointerProperty(props, SDL_PROP_WINDOW_WIN32_HWND_POINTER, NULL);
 
@@ -198,9 +203,6 @@ static void RenderWareInit()
     rw::Engine::start();
 
     rw::Texture::readCB = TextureRead;
-
-    xShadowInit();
-    xFXInit();
     rw::Texture::setMipmapping(true);
     rw::Texture::setAutoMipmapping(true);
 }
@@ -255,7 +257,7 @@ static void imguiExit()
 
     ImGui_ImplRW_Shutdown();
     ImGui_ImplSDL3_Shutdown();
-    ImGui::Shutdown();
+    ImGui::DestroyContext();
 }
 
 static std::binary_semaphore semWaitForAssetPath{ 0 };
@@ -346,24 +348,39 @@ static WindowSize sWindowSizes[] = {
     WINDOWSIZE(3840, 2160),
 };
 
+struct ShadowRes
+{
+    const char* disp;
+    S32 res;
+};
+
+#define SHADOWRES(_res) { "x" #_res, _res }
+
+static ShadowRes sShadowReses[] = {
+    SHADOWRES(1),
+    SHADOWRES(2),
+    SHADOWRES(4),
+    SHADOWRES(8),
+};
+
 static void windowSizeSelector()
 {
     SDL_Rect r;
     SDL_GetDisplayUsableBounds(SDL_GetDisplayForWindow(sWindow), &r);
 
-    S32 selectedSize = -1;
+    S32 selectedIdx = -1;
     for (S32 i = 0; i < ARRAY_SIZE(sWindowSizes); i++)
     {
         if (sWindowSizes[i].width == gBackendConfig.windowWidth &&
             sWindowSizes[i].height == gBackendConfig.windowHeight)
         {
-            selectedSize = i;
+            selectedIdx = i;
             break;
         }
     }
 
     ImGui::BeginDisabled(SDL_GetWindowFlags(sWindow) & SDL_WINDOW_FULLSCREEN);
-    if (ImGui::BeginCombo("Window Size", selectedSize >= 0 ? sWindowSizes[selectedSize].disp : ""))
+    if (ImGui::BeginCombo("Window Size", selectedIdx >= 0 ? sWindowSizes[selectedIdx].disp : ""))
     {
         for (S32 i = 0; i < ARRAY_SIZE(sWindowSizes); i++)
         {
@@ -371,9 +388,10 @@ static void windowSizeSelector()
             {
                 continue;
             }
-            bool isSelected = i == selectedSize;
-            if (ImGui::Selectable(sWindowSizes[i].disp))
+            const bool isSelected = (i == selectedIdx);
+            if (ImGui::Selectable(sWindowSizes[i].disp, isSelected))
             {
+                //  config size is set and persisted by SDL event loop
                 SDL_SetWindowSize(sWindow, sWindowSizes[i].width, sWindowSizes[i].height);
             }
             if (isSelected)
@@ -386,6 +404,40 @@ static void windowSizeSelector()
     }
     ImGui::SetItemTooltip("Only for non-fullscreen windows");
     ImGui::EndDisabled();
+}
+
+static void shadowResSelector()
+{
+    S32 selectedIdx = -1;
+    for (S32 i = 0; i < ARRAY_SIZE(sShadowReses); i++)
+    {
+        if (gBackendConfig.shadowRes == sShadowReses[i].res)
+        {
+            selectedIdx = i;
+            break;
+        }
+    }
+
+    if (ImGui::BeginCombo("Shadow Resolution",
+                          selectedIdx >= 0 ? sShadowReses[selectedIdx].disp : ""))
+    {
+        for (S32 i = 0; i < ARRAY_SIZE(sShadowReses); i++)
+        {
+            const bool isSelected = (selectedIdx == i);
+            if (ImGui::Selectable(sShadowReses[i].disp, isSelected))
+            {
+                gBackendConfig.shadowRes = sShadowReses[i].res;
+                backendConfigPersist();
+            }
+
+            // Set the initial focus when opening the combo (scrolling + keyboard navigation focus)
+            if (isSelected)
+            {
+                ImGui::SetItemDefaultFocus();
+            }
+        }
+        ImGui::EndCombo();
+    }
 }
 
 static void prelaunchLoop()
@@ -443,6 +495,7 @@ static void prelaunchLoop()
                 ImGui::Separator();
 
                 windowSizeSelector();
+                shadowResSelector();
 
                 if (ImGui::Button("Toggle Fullscreen"))
                 {
@@ -489,25 +542,26 @@ static void prelaunchLoop()
 
 void iSystemInit(U32 options)
 {
+    xMemInit();
+    iTimeInit();
     RenderWareInitEngine();
     backendConfigInit();
     sdlInit();
-
-    xDebugInit();
-    xMemInit();
-    iTimeInit();
-    xPadInit();
-    xSndInit();
     RenderWareInit();
-    xMathInit();
-    xMath3Init();
-
     imguiInit();
     if (gBackendConfig.assetPath == NULL || !gBackendConfig.skipPrelaunch)
     {
         prelaunchLoop();
     }
+
     iFileInit();
+    xShadowInit();
+    xFXInit();
+    xDebugInit();
+    xPadInit();
+    xSndInit();
+    xMathInit();
+    xMath3Init();
 }
 
 void iSystemExit()

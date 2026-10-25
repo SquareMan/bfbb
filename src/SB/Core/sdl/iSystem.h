@@ -11,6 +11,7 @@ struct BackendConfig
     S32 fullscreen;
     S32 windowWidth;
     S32 windowHeight;
+    S32 shadowRes;
 };
 
 extern BackendConfig gBackendConfig;

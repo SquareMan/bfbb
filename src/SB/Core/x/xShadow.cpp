@@ -41,7 +41,9 @@ U32 gShadowFlags;
 F32 gShadowObjectRadius;
 static S32 shadow_ent_count;
 static S32 sShadowCollJSP;
+#ifdef GAMECUBE
 static RwRaster* gc_saveraster;
+#endif
 static xEnt* sEntSelf;
 static xShadowMgr* sMgrList;
 static S32 sMgrCount;
@@ -74,7 +76,6 @@ void xShadowRenderWorld(xVec3* center, F32 radius, F32 max_dist);
 void xShadowRender(xVec3* center, F32 radius, F32 max_dist);
 void xShadow_ListAdd(xEnt* ent);
 void xShadowManager_Add(xEnt* ent);
-static void GCSaveFrameBuffer();
 static RwCamera* ShadowCameraSetSpherePersp(RwCamera* camera, RwV3d* center, F32 radius);
 int Im2DRenderQuad(float x1, float y1, float x2, float y2, float z, float recipCamZ,
                    float uvOffset);
@@ -82,12 +83,17 @@ int Im2DRenderQuad(float x1, float y1, float x2, float y2, float z, float recipC
 static RwCamera* ShadowCameraUpdate(RwCamera* shadowCamera, void* model, void (*renderCB)(void*),
                                     xVec3* center, F32 radius, S32 shadowMode);
 static void InvertRaster(RwCamera* shadowCamera);
+#ifdef GAMECUBE
+static void GCSaveFrameBuffer();
 static void GCRestoreFrameBuffer();
+#endif
 
 void xShadowInit()
 {
     xShadowCameraCreate();
+#ifdef GAMECUBE
     gc_saveraster = RwRasterCreate(256, 256, 32, rwRASTERFORMAT8888 | rwRASTERTYPETEXTURE);
+#endif
     shadow_ent_count = 0;
     ShadowLight = RpLightCreate(1);
     RpLightSetColor(ShadowLight, &ShadowLightColor);
@@ -121,6 +127,9 @@ void xShadowSetLight(xVec3* target_pos, xVec3* in_vec, F32 dst_cast)
 static S32 SetupShadow()
 {
     S32 res = 256;
+#ifdef PC_PORT
+    res *= gBackendConfig.shadowRes;
+#endif
 
     // Continuously halve res until it is less than or
     // equal to either display width or height.
@@ -155,7 +164,7 @@ void xShadowSetWorld(RpWorld* world)
 U32 xShadowCameraCreate()
 {
     U32 setup = SetupShadow();
-    return ((-setup | setup) >> 0x1f);
+    return setup != 0;
 }
 
 void xShadowCameraUpdate(void* model, void (*renderCB)(void*), xVec3* center, float radius,
@@ -758,9 +767,9 @@ static RwCamera* ShadowCameraUpdate(RwCamera* shadowCamera, void* model, void (*
         RwCameraEndUpdate(camera);
     }
 
+#ifdef GAMECUBE
     GCSaveFrameBuffer();
 
-#ifdef GAMECUBE
     // ???
     // This causes the right and bottom edge of the shadow texture not to be cleared,
     // In practice this results in those edges always end up being considered "in shadow" for every other shadow
@@ -808,7 +817,9 @@ static RwCamera* ShadowCameraUpdate(RwCamera* shadowCamera, void* model, void (*
         iCameraFrustumPlanes(camera, globals.camera.frustplane);
     }
 
+#ifdef GAMECUBE
     GCRestoreFrameBuffer();
+#endif
     RwRenderStateSet(rwRENDERSTATEFOGENABLE, (void*)fogstate);
 
     return shadowCamera;
@@ -879,7 +890,7 @@ static S32 CmpShadowMgr(const void* a, const void* b)
 
 static RwRaster* ShadowRasterCreate(S32 res)
 {
-    return RwRasterCreate(res, res, 0, 5);
+    return RwRasterCreate(res, res, 0, rwRASTERTYPECAMERATEXTURE);
 }
 
 static RpCollisionTriangle* ShadowRenderTriangleCB(RpIntersection* isx, RpWorldSector* sector,
@@ -1057,11 +1068,10 @@ static S32 ShadowRender(RwCamera* shadowCamera, RwRaster* shadowRast, RpIntersec
     return 1;
 }
 
+#ifdef GAMECUBE
 void GCSaveFrameBuffer()
 {
-#ifdef GAMECUBE
     RwGameCubeCameraTextureFlush(gc_saveraster, 0);
-#endif
 }
 
 static void GCRestoreFrameBuffer()
@@ -1076,13 +1086,14 @@ static void GCRestoreFrameBuffer()
     RwRenderStateSet(rwRENDERSTATETEXTUREFILTER, (void*)1);
     RwRenderStateSet(rwRENDERSTATETEXTURERASTER, gc_saveraster);
 
-    Im2DRenderQuad(0.0f, 0.0f, 256.0f, 256.0f, RwIm2DGetFarScreenZ(), recipCamZ, 0.001953125f);
+    Im2DRenderQuad(0.0f, 0.0f, 256.0f, 256.0f, RwIm2DGetFarScreenZ(), recipCamZ, 1 / 512.0f);
 
     RwRenderStateSet(rwRENDERSTATEZTESTENABLE, (void*)1);
     RwRenderStateSet(rwRENDERSTATEZWRITEENABLE, (void*)1);
     RwRenderStateSet(rwRENDERSTATESRCBLEND, (void*)5);
     RwRenderStateSet(rwRENDERSTATEDESTBLEND, (void*)6);
 }
+#endif
 
 static RwCamera* ShadowCameraCreatePersp(S32 param)
 {
