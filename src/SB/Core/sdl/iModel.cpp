@@ -322,7 +322,8 @@ void iModelAnimMatrices(RpAtomic* model, xQuat* quat, xVec3* tran, RwMatrix* mat
         matrixStack[0].pos.z = 0.0f;
         matrixStack[0].pos.y = 0.0f;
         matrixStack[0].pos.x = 0.0f;
-        matrixStack[0].flags |= rwMATRIXINTERNALIDENTITY | rwMATRIXTYPEORTHONORMAL;
+        matrixStack[0].flags |= static_cast<rw::uint32>(rwMATRIXINTERNALIDENTITY) |
+                                static_cast<rw::uint>(rwMATRIXTYPEORTHONORMAL);
 
         // non-volatile registers are acting up and their instructions
         // are being scheduled weirdly
