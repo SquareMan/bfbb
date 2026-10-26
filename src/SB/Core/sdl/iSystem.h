@@ -30,4 +30,7 @@ void iSystemExit();
 U32 iGetCurrFormattedDate(char* input);
 U32 iGetCurrFormattedTime(char* input);
 
+void imguiNewFrame();
+void imguiRender();
+
 #endif

@@ -57,6 +57,14 @@ void zAssetShutdown();
 #include "iTime.h"
 #include "xstransvc.h"
 
+#ifdef PC_PORT
+#include <imgui.h>
+#include <imgui_impl_rw.h>
+#include <imgui_impl_sdl3.h>
+#include <immintrin.h>
+#include <SDL3/SDL_gamepad.h>
+#endif
+
 static const basic_rect<F32> screen_bounds = { 0.0f, 0.0f, 1.0f, 1.0f };
 
 zGlobals globals;
@@ -950,6 +958,21 @@ void zMainFirstScreen(S32 mode)
             tb.bounds.y = 0.5f - 0.5f * tb.bounds.h;
             tb.render(1);
         }
+
+#ifdef PC_PORT
+        imguiNewFrame();
+
+        ImGui::Begin("ControlsToast", NULL,
+                     ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoMove);
+        ImGui::Text("Open the prelaunch UI again later with \"%s\" or \"%s\" button",
+                    SDL_GetGamepadStringForButton(SDL_GAMEPAD_BUTTON_BACK),
+                    SDL_GetGamepadStringForButton(SDL_GAMEPAD_BUTTON_GUIDE));
+        ImGui::SetWindowPos({ (ImGui::GetMainViewport()->Size.x - ImGui::GetItemRectSize().x) / 2,
+                              ImGui::GetStyle().WindowPadding.y });
+        ImGui::End();
+
+        imguiRender();
+#endif
 
         RwCameraEndUpdate(cam);
         RwCameraShowRaster(cam, NULL, rwRASTERFLIPWAITVSYNC);

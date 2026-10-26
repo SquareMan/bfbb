@@ -4,6 +4,8 @@
 #include <rpcollbsptree.h>
 #include <rpptank.h>
 
+#include "zGlobals.h"
+
 #include "iSystem.h"
 
 #include "xDebug.h"
@@ -35,6 +37,7 @@
 
 #include <borealis/version.h>
 
+static bool sSystemInitialized = false;
 static SDL_Window* sWindow = NULL;
 
 static iTime sLastFrameStartTime = 0;
@@ -67,6 +70,7 @@ shadowRes = %d)"[1];
     }
 }
 
+static void renderPrelaunch(bool* shouldExit);
 void iVSync()
 {
     iTime elapsedTime = iTimeGet() - sLastFrameStartTime;
@@ -76,6 +80,13 @@ void iVSync()
         SDL_DelayPrecise(remainingTime);
     }
     sLastFrameStartTime = iTimeGet();
+
+    ImGuiContext* ctx = ImGui::GetCurrentContext();
+    if (ctx->FrameCount != 0 && ctx->FrameCountEnded < ctx->FrameCount)
+    {
+        ImGui::EndFrame();
+    }
+    imguiNewFrame();
 
     // Pump the event queue. Maybe we this should be done somewhere else but this seems to be our only
     // entry point from the game code
@@ -103,6 +114,22 @@ void iVSync()
             iPadInit();
             break;
         }
+    }
+
+    static bool hide = true;
+    if (globals.pad0 &&
+        (globals.pad0->pressed & XPAD_BUTTON_GUIDE || globals.pad0->pressed & XPAD_BUTTON_SELECT))
+    {
+        hide = !hide;
+    }
+    if (!hide)
+    {
+        if (ImGui::IsKeyPressed(ImGuiKey_GamepadFaceRight, 0))
+        {
+            hide = !hide;
+        }
+        ImGui::SetNextWindowBgAlpha(0.92f);
+        renderPrelaunch(&hide);
     }
 }
 
@@ -261,6 +288,19 @@ static void imguiExit()
     ImGui_ImplRW_Shutdown();
     ImGui_ImplSDL3_Shutdown();
     ImGui::DestroyContext();
+}
+
+void imguiNewFrame()
+{
+    ImGui_ImplSDL3_NewFrame();
+    ImGui_ImplRW_NewFrame();
+    ImGui::NewFrame();
+}
+
+void imguiRender()
+{
+    ImGui::Render();
+    ImGui_ImplRW_RenderDrawLists(ImGui::GetDrawData());
 }
 
 static std::binary_semaphore semWaitForAssetPath{ 0 };
@@ -444,93 +484,102 @@ static void shadowResSelector()
     }
 }
 
-static void prelaunchLoop()
+static void renderPrelaunch(bool* shouldExit)
 {
-    RwRGBA clear = { 0, 0, 0, 255 };
-    while (true)
+    const ImGuiViewport* viewport = ImGui::GetMainViewport();
+    ImGui::SetNextWindowSize(viewport->Size);
+    ImGui::SetNextWindowPos(ImVec2{ viewport->Pos.x, viewport->Pos.y });
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0);
+    ImGui::Begin("Prelaunch", NULL,
+                 ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoMove |
+                     ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoSavedSettings |
+                     ImGuiWindowFlags_NoBringToFrontOnFocus);
+    ImGui::PopStyleVar();
+
+    if (gBackendConfig.assetPath == NULL || gBackendConfig.assetPath[0] == 0)
     {
-        iVSync();
-        ImGui_ImplSDL3_NewFrame();
-        ImGui_ImplRW_NewFrame();
-        ImGui::NewFrame();
+        ImGui::BeginDisabled();
+        ImGui::Button("Play");
+        ImGui::SetItemTooltip("You must provide a path to an extracted Xbox iso to play.");
+        ImGui::EndDisabled();
 
-        const ImGuiViewport* viewport = ImGui::GetMainViewport();
-        ImGui::SetNextWindowSize(viewport->Size);
-        ImGui::SetNextWindowPos(ImVec2{ viewport->Pos.x, viewport->Pos.y });
-        ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0);
-        ImGui::Begin("Prelaunch", NULL,
-                     ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoMove |
-                         ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoBringToFrontOnFocus);
-        ImGui::PopStyleVar();
-
-        if (gBackendConfig.assetPath == NULL || gBackendConfig.assetPath[0] == 0)
+        if (ImGui::SameLine(); ImGui::Button("Select Asset Path"))
         {
-            ImGui::BeginDisabled();
-            ImGui::Button("Play");
-            ImGui::SetItemTooltip("You must provide a path to an extracted Xbox iso to play.");
-            ImGui::EndDisabled();
+            promptForNewAssetDirectory();
+        }
+    }
+    else
+    {
+        {
+            ImGui::Text("Disk Ready:");
+            ImGui::SameLine();
+            imguiMarqueeText(gBackendConfig.assetPath);
 
-            if (ImGui::SameLine(); ImGui::Button("Select Asset Path"))
+            if (ImGui::Button("Play"))
+            {
+                *shouldExit = true;
+            }
+            ImGui::BeginDisabled(sSystemInitialized);
+            if (ImGui::SameLine(); ImGui::Button("Change Asset Path"))
             {
                 promptForNewAssetDirectory();
             }
+            ImGui::EndDisabled();
         }
-        else
+
         {
+            ImGui::Spacing();
+            ImGui::Spacing();
+            ImGui::Text("Video Settings - EXPERIMENTAL");
+            ImGui::SetItemTooltip(
+                "Using resolutions other than 640x480 is currently experimental.");
+            ImGui::Separator();
+
+            if (ImGui::Button("Toggle Fullscreen"))
             {
-                ImGui::Text("Disk Ready:");
-                ImGui::SameLine();
-                imguiMarqueeText(gBackendConfig.assetPath);
-
-                if (ImGui::Button("Play"))
-                    break;
-                if (ImGui::SameLine(); ImGui::Button("Change Asset Path"))
-                {
-                    promptForNewAssetDirectory();
-                }
+                gBackendConfig.fullscreen = !gBackendConfig.fullscreen;
+                SDL_SetWindowFullscreen(sWindow, gBackendConfig.fullscreen);
+                backendConfigPersist();
             }
+            ImGui::SetItemTooltip("Fullscreen always renders at screen resolution");
 
-            {
-                ImGui::Spacing();
-                ImGui::Spacing();
-                ImGui::Text("Video Settings - EXPERIMENTAL");
-                ImGui::SetItemTooltip(
-                    "Using resolutions other than 640x480 is currently experimental.");
-                ImGui::Separator();
+            F32 spacing = ImGui::GetStyle().ItemInnerSpacing.x;
+            ImGui::PushItemWidth(ImGui::CalcItemWidth() - ImGui::GetItemRectSize().x - spacing);
+            ImGui::SameLine(0, spacing);
+            windowSizeSelector();
+            ImGui::PopItemWidth();
 
-                if (ImGui::Button("Toggle Fullscreen"))
-                {
-                    gBackendConfig.fullscreen = !gBackendConfig.fullscreen;
-                    SDL_SetWindowFullscreen(sWindow, gBackendConfig.fullscreen);
-                    backendConfigPersist();
-                }
-                ImGui::SetItemTooltip("Fullscreen always renders at screen resolution");
-
-                F32 spacing = ImGui::GetStyle().ItemInnerSpacing.x;
-                ImGui::PushItemWidth(ImGui::CalcItemWidth() - ImGui::GetItemRectSize().x - spacing);
-                ImGui::SameLine(0, spacing);
-                windowSizeSelector();
-                ImGui::PopItemWidth();
-
-                shadowResSelector();
-            }
-
-            {
-                ImGui::SetCursorPosY(ImGui::GetContentRegionMax().y - ImGui::GetTextLineHeight());
-                bool skipPrelaunch = gBackendConfig.skipPrelaunch;
-                ImGui::Checkbox("Skip Prelaunch", &skipPrelaunch);
-                ImGui::SetItemTooltip(
-                    "WARNING: Currently not possible to revert this without editing settings.ini manually.\nSkip this menu when starting the game in the future and use saved options.");
-                if (skipPrelaunch != (bool)gBackendConfig.skipPrelaunch)
-                {
-                    gBackendConfig.skipPrelaunch = skipPrelaunch;
-                    backendConfigPersist();
-                }
-            }
+            shadowResSelector();
         }
 
-        ImGui::End();
-        ImGui::Render();
+        {
+            ImGui::SetCursorPosY(ImGui::GetContentRegionMax().y - ImGui::GetTextLineHeight() -
+                                 ImGui::GetStyle().FramePadding.y -
+                                 ImGui::GetStyle().ItemSpacing.y);
+            bool skipPrelaunch = gBackendConfig.skipPrelaunch;
+            ImGui::Checkbox("Skip Prelaunch", &skipPrelaunch);
+            ImGui::SetItemTooltip(
+                "Skip this menu when starting the game in the future and use saved options.");
+            if (skipPrelaunch != (bool)gBackendConfig.skipPrelaunch)
+            {
+                gBackendConfig.skipPrelaunch = skipPrelaunch;
+                backendConfigPersist();
+            }
+        }
+    }
+
+    ImGui::End();
+}
+
+static void prelaunchLoop()
+{
+    RwRGBA clear = { 0, 0, 0, 255 };
+    bool exitPrelaunch = false;
+    while (!exitPrelaunch)
+    {
+        iVSync();
+
+        renderPrelaunch(&exitPrelaunch);
 
         if (sImguiCamera->frameBuffer->width != iSystemScreenWidth() ||
             sImguiCamera->frameBuffer->height != iSystemScreenHeight())
@@ -543,7 +592,8 @@ static void prelaunchLoop()
         RwCameraClear(sImguiCamera, &clear, rwCAMERACLEARIMAGE);
         RwCameraBeginUpdate(sImguiCamera);
 
-        ImGui_ImplRW_RenderDrawLists(ImGui::GetDrawData());
+        imguiRender();
+
         RwCameraEndUpdate(sImguiCamera);
         RwCameraShowRaster(sImguiCamera, NULL, rwRASTERFLIPWAITVSYNC);
     }
@@ -571,6 +621,7 @@ void iSystemInit(U32 options)
     xSndInit();
     xMathInit();
     xMath3Init();
+    sSystemInitialized = true;
 }
 
 void iSystemExit()
@@ -587,6 +638,7 @@ void iSystemExit()
     imguiExit();
     backendConfigDeinit();
     sdlExit();
+    sSystemInitialized = false;
 }
 
 const char* months[] = {

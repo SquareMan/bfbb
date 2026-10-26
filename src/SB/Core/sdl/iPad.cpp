@@ -5,6 +5,7 @@
 #include "xTRC.h"
 #include "zGlobals.h"
 
+#include <imgui.h>
 #include <immintrin.h>
 #include <SDL3/SDL_gamepad.h>
 #include <SDL3/SDL_log.h>
@@ -91,6 +92,10 @@ S32 iPadUpdate(_tagxPad* pad, U32* on)
     {
         return 1;
     }
+    if (ImGui::GetIO().WantCaptureKeyboard)
+    {
+        return 1;
+    }
 
     *on |= SDL_GetGamepadButton(sActivePad, SDL_GAMEPAD_BUTTON_START) ? XPAD_BUTTON_START : 0;
     *on |= SDL_GetGamepadButton(sActivePad, SDL_GAMEPAD_BUTTON_BACK) ? XPAD_BUTTON_SELECT : 0;
@@ -117,6 +122,8 @@ S32 iPadUpdate(_tagxPad* pad, U32* on)
     *on |= SDL_GetGamepadButton(sActivePad, SDL_GAMEPAD_BUTTON_EAST) ? XPAD_BUTTON_EAST : 0;
     *on |= SDL_GetGamepadButton(sActivePad, SDL_GAMEPAD_BUTTON_WEST) ? XPAD_BUTTON_WEST : 0;
     *on |= SDL_GetGamepadButton(sActivePad, SDL_GAMEPAD_BUTTON_NORTH) ? XPAD_BUTTON_NORTH : 0;
+
+    *on |= SDL_GetGamepadButton(sActivePad, SDL_GAMEPAD_BUTTON_GUIDE) ? XPAD_BUTTON_GUIDE : 0;
 
     pad->analog1.x = SDL_GetGamepadAxis(sActivePad, SDL_GAMEPAD_AXIS_LEFTX) / 256;
     pad->analog1.y = SDL_GetGamepadAxis(sActivePad, SDL_GAMEPAD_AXIS_LEFTY) / 256;

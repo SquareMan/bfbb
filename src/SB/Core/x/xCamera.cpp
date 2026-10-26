@@ -10,6 +10,7 @@
 #include "zGrid.h"
 
 #include "iMath.h"
+#include "iSystem.h"
 
 #include <cmath>
 #include <cstring>
@@ -24,8 +25,7 @@
 #define CAMERAFX_TYPE_SHAKE 2
 
 // SLOP: put in header
-template <>
-inline F32 range_limit<F32>(F32 v, F32 minv, F32 maxv)
+template <> inline F32 range_limit<F32>(F32 v, F32 minv, F32 maxv)
 {
     if (v <= minv)
     {
@@ -39,7 +39,6 @@ inline F32 range_limit<F32>(F32 v, F32 minv, F32 maxv)
 
     return v;
 }
-
 
 void xCameraFXZoomUpdate(cameraFX* f, F32 dt, const xMat4x3*, xMat4x3* m);
 void xCameraFXShakeUpdate(cameraFX* f, F32 dt, const xMat4x3*, xMat4x3* m);
@@ -56,7 +55,6 @@ cameraFX sCameraFX[10];
 cameraFXTableEntry sCameraFXTable[3] = { { CAMERAFX_TYPE_NONE, NULL, NULL },
                                          { CAMERAFX_TYPE_ZOOM, xCameraFXZoomUpdate, NULL },
                                          { CAMERAFX_TYPE_SHAKE, xCameraFXShakeUpdate, NULL } };
-
 
 // These structs were used in deadstripped functions.
 // This function is here to force the symbols to be linked.
@@ -1181,6 +1179,11 @@ void xCameraEnd(xCamera* cam, F32 seconds, S32 update_scrn_fx)
 
 void xCameraShowRaster(xCamera* cam)
 {
+#ifdef PC_PORT
+    RwCameraBeginUpdate(cam->lo_cam);
+    imguiRender();
+    RwCameraEndUpdate(cam->lo_cam);
+#endif
     iCameraShowRaster(cam->lo_cam);
 }
 
