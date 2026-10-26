@@ -929,6 +929,39 @@ void xCameraUpdate(xCamera* cam, F32 dt)
 
 void xCameraBegin(xCamera* cam, S32 clear)
 {
+#ifdef PC_PORT
+    {
+        // NOTE: This isn't necessarily exactly what we want to do.
+        // Any cameras with raster sizes not intended to match the screen would be resized by this.
+        // Luckily it seems this path is never reached for those cases (shadow render code doesn't call this).
+
+        bool resized = false;
+        F32 screenWidth = iSystemScreenWidth();
+        F32 screenHeight = iSystemScreenHeight();
+        if (cam->lo_cam->frameBuffer && screenWidth != cam->lo_cam->frameBuffer->width ||
+            screenHeight != cam->lo_cam->frameBuffer->height)
+        {
+            cam->lo_cam->frameBuffer->width = screenWidth;
+            cam->lo_cam->frameBuffer->height = screenHeight;
+            resized = true;
+        }
+
+        if (cam->lo_cam->zBuffer && screenWidth != cam->lo_cam->zBuffer->width ||
+            screenHeight != cam->lo_cam->zBuffer->height)
+        {
+            cam->lo_cam->zBuffer->width = screenWidth;
+            cam->lo_cam->zBuffer->height = screenHeight;
+            resized = true;
+        }
+
+        if (resized)
+        {
+            // Set FOV again so that our view window is recalculated
+            xCameraSetFOV(cam, cam->fov);
+        }
+    }
+#endif
+
     iCameraBegin(cam->lo_cam, clear);
     iCameraFrustumPlanes(cam->lo_cam, cam->frustplane);
     iCameraUpdateFog(cam->lo_cam, 0);

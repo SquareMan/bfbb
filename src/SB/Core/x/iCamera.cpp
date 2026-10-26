@@ -97,26 +97,6 @@ void iCameraDestroy(RwCamera* camera)
 
 void iCameraBegin(RwCamera* cam, S32 clear)
 {
-#ifdef PC_PORT
-    // NOTE: This isn't necessarily exactly what we want to do.
-    // Any cameras with raster sizes not intended to match the screen would be resized by this.
-    // Luckily it seems this path is never reached for those cases (shadow render code doesn't call this).
-    F32 screenWidth = iSystemScreenWidth();
-    F32 screenHeight = iSystemScreenHeight();
-    if (cam->frameBuffer && screenWidth != cam->frameBuffer->width ||
-        screenHeight != cam->frameBuffer->height)
-    {
-        cam->frameBuffer->width = screenWidth;
-        cam->frameBuffer->height = screenHeight;
-    }
-
-    if (cam->zBuffer && screenWidth != cam->zBuffer->width || screenHeight != cam->zBuffer->height)
-    {
-        cam->zBuffer->width = screenWidth;
-        cam->zBuffer->height = screenHeight;
-    }
-#endif
-
     if (clear)
     {
         if (xglobals->fog.type != rwFOGTYPENAFOGTYPE)
