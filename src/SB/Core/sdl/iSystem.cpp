@@ -33,6 +33,8 @@
 #include <imgui_impl_sdl3.h>
 #include <imgui_impl_rw.h>
 
+#include <borealis/version.h>
+
 static SDL_Window* sWindow = NULL;
 
 static iTime sLastFrameStartTime = 0;
@@ -114,8 +116,9 @@ static void sdlInit()
     {
         windowFlags |= SDL_WINDOW_FULLSCREEN;
     }
-    sWindow = SDL_CreateWindow("Battle for Bikini Bottom", gBackendConfig.windowWidth,
-                               gBackendConfig.windowHeight, windowFlags);
+    sWindow =
+        SDL_CreateWindow("Battle for Bikini Bottom [" BOREALIS_APP_DESCRIBE "]",
+                         gBackendConfig.windowWidth, gBackendConfig.windowHeight, windowFlags);
     if (sWindow == NULL)
     {
         SDL_Log("Failed to create window: %s", SDL_GetError());

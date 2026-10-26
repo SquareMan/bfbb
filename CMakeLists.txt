@@ -1,5 +1,14 @@
 cmake_minimum_required(VERSION 3.23)
-project(bfbb-pc)
+
+include(cmake/DetectVersion.cmake)
+borealis_detect_version()
+configure_file(
+        ${CMAKE_CURRENT_SOURCE_DIR}/cmake/version.h.in
+        ${CMAKE_CURRENT_BINARY_DIR}/generated/borealis/version.h
+        @ONLY
+)
+
+project(bfbb-pc LANGUAGES C CXX VERSION ${BOREALIS_APP_VERSION})
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
@@ -104,6 +113,7 @@ target_compile_options(bfbb PRIVATE -Wno-deprecated-enum-enum-conversion)
 target_link_options(bfbb PRIVATE -Wl,/force:multiple)
 target_compile_definitions(bfbb PRIVATE _CRT_SECURE_NO_WARNINGS _CRT_NONSTDC_NO_WARNINGS)
 target_compile_definitions(bfbb PRIVATE PC_PORT WITH_LIBRW AVOID_UB)
+target_include_directories(bfbb PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/generated/)
 
 target_include_directories(bfbb SYSTEM PRIVATE
     include/
