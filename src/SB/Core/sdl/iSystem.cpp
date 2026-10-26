@@ -495,9 +495,6 @@ static void prelaunchLoop()
                     "Using resolutions other than 640x480 is currently experimental.");
                 ImGui::Separator();
 
-                windowSizeSelector();
-                shadowResSelector();
-
                 if (ImGui::Button("Toggle Fullscreen"))
                 {
                     gBackendConfig.fullscreen = !gBackendConfig.fullscreen;
@@ -505,6 +502,14 @@ static void prelaunchLoop()
                     backendConfigPersist();
                 }
                 ImGui::SetItemTooltip("Fullscreen always renders at screen resolution");
+
+                F32 spacing = ImGui::GetStyle().ItemInnerSpacing.x;
+                ImGui::PushItemWidth(ImGui::CalcItemWidth() - ImGui::GetItemRectSize().x - spacing);
+                ImGui::SameLine(0, spacing);
+                windowSizeSelector();
+                ImGui::PopItemWidth();
+
+                shadowResSelector();
             }
 
             {
