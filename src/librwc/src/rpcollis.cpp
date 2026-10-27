@@ -15,7 +15,7 @@ RpAtomic* RpAtomicForAllIntersections(RpAtomic* atomic, RpIntersection* intersec
     RpMorphTarget* morph = atomic->geometry->morphTarget;
 
     RwMatrix worldToFrame;
-    RwMatrixInvert(&worldToFrame, &atomic->getFrame()->modelling);
+    RwMatrixInvert(&worldToFrame, atomic->getFrame()->getLTM());
 
     switch (intersection->type)
     {
