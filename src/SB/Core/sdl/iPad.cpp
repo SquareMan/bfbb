@@ -160,7 +160,6 @@ void iPadRumbleFx(_tagxPad* p, _tagxRumble* r, F32 time_passed)
     {
         sCurrentRumble.low -= sCurrentRumble.low / r->seconds * time_passed;
         sCurrentRumble.high -= sCurrentRumble.high / r->seconds * time_passed;
-        SDL_Log("Rumble FX: %d, %d", sCurrentRumble.low, sCurrentRumble.high);
         SDL_RumbleGamepad(sActivePad, sCurrentRumble.low, sCurrentRumble.high,
                           r->seconds * 1000.0f);
     }
